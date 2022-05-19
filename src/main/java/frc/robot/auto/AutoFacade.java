@@ -59,53 +59,6 @@ public class AutoFacade {
     Logger.info("Auto : Drive Off : Stopped = " + stopped);
   }
 
-  public void shooterRun() {
-    Logger.info("Auto : Shooter Run");
-    scheduler.schedule(true, commands.shooterRun);
-  }
-
-  public void shooterStop() {
-    Logger.info("Auto : Shooter Stop");
-    if (commands.shooterRun.isScheduled()) {
-      commands.shooterRun.end(true);
-    }
-  }
-
-  public void storageRun() {
-    Logger.info("Auto : Storage Run");
-    storageStop();
-    scheduler.schedule(true, commands.storageRun);
-  }
-
-  public void storageReverse() {
-    Logger.info("Auto : Storage Reverse");
-    storageStop();
-    scheduler.schedule(true, commands.storageReverse);
-  }
-
-  public void storageStop() {
-    String stopped = "None";
-    if (commands.storageRun.isScheduled()) {
-      commands.storageRun.end(true);
-      stopped = "Forward";
-    } else if (commands.storageReverse.isScheduled()) {
-      commands.storageReverse.end(true);
-      stopped = "Reverse";
-    }
-    Logger.info("Auto : Storage Stop : Stopped = " + stopped);
-  }
-
-  public void intakeRun() {
-    Logger.info("Auto : Intake Run");
-    scheduler.schedule(true, commands.intakeRun);
-  }
-
-  public void intakeStop() {
-    Logger.info("Auto : Intake Stop");
-    if (commands.intakeRun.isScheduled())
-      commands.intakeRun.end(true);
-  }
-
   public boolean waitFor(AutoLine currentCommand) {
     if (waitTimer == null) {
       int duration = currentCommand.getInt(0);

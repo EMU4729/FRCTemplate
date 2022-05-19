@@ -15,9 +15,9 @@ import frc.robot.auto.AutoFiles;
 public class Auto extends CommandBase {
   private final AutoFacade autoFacade = new AutoFacade();
 
-  private ArrayList<AutoLine> commands = new ArrayList<>();
-  private Iterator<AutoLine> commandIterator;
-  private AutoLine currentCommand;
+  private ArrayList<AutoLine> lines = new ArrayList<>();
+  private Iterator<AutoLine> lineIterator;
+  private AutoLine currentLine;
   private boolean isFinished = false;
 
   public Auto() {
@@ -25,38 +25,38 @@ public class Auto extends CommandBase {
 
   @Override
   public void initialize() {
-    commands = AutoFiles.updateAndGetAuto();
-    commandIterator = commands.iterator();
-    currentCommand = commandIterator.next();
+    lines = AutoFiles.updateAndGetAuto();
+    lineIterator = lines.iterator();
+    currentLine = lineIterator.next();
     Logger.info("Auto code read : Backup");
   }
 
   public void nextCommand() {
-    if (!commandIterator.hasNext()) {
+    if (!lineIterator.hasNext()) {
       isFinished = true;
       return;
     }
-    currentCommand = commandIterator.next();
+    currentLine = lineIterator.next();
   }
 
   @Override
   public void execute() {
-    if (currentCommand == null) {
+    if (currentLine == null) {
       isFinished = true;
       Logger.error("Auto : Command equal to Null");
       return;
     }
-    switch (currentCommand.name) {
+    switch (currentLine.name) {
       case "driveTank":
-        autoFacade.driveTank(currentCommand);
+        autoFacade.driveTank(currentLine);
         nextCommand();
         break;
       case "driveArcade": // drive robot arcade
-        autoFacade.driveArcade(currentCommand);
+        autoFacade.driveArcade(currentLine);
         nextCommand();
         break;
       case "driveStraight":
-        autoFacade.driveStraight(currentCommand);
+        autoFacade.driveStraight(currentLine);
         nextCommand();
         break;
       case "driveOff": // stop robot
@@ -64,41 +64,13 @@ public class Auto extends CommandBase {
         Logger.info("Auto : Drive Stop");
         nextCommand();
         break;
-      case "shooterRun": // run shooter
-        autoFacade.shooterRun();
-        nextCommand();
-        break;
-      case "shooterStop":
-        autoFacade.shooterStop();
-        nextCommand();
-        break;
-      case "storageRun": // run storage
-        autoFacade.storageRun();
-        nextCommand();
-        break;
-      case "storageReverse": // run storage in reverse
-        autoFacade.storageReverse();
-        nextCommand();
-        break;
-      case "storageStop": // stop storage
-        autoFacade.storageStop();
-        nextCommand();
-        break;
-      case "intakeRun": // run intake
-        autoFacade.intakeRun();
-        nextCommand();
-        break;
-      case "intakeStop": // stop intake
-        autoFacade.intakeStop();
-        nextCommand();
-        break;
       case "wait": // wait for time
-        if (autoFacade.waitFor(currentCommand)) {
+        if (autoFacade.waitFor(currentLine)) {
           nextCommand();
         }
         break;
       default:
-        Logger.warn("Auto : Invalid command name " + currentCommand.name);
+        Logger.warn("Auto : Invalid command name " + currentLine.name);
         nextCommand();
         break;
     }
@@ -112,8 +84,6 @@ public class Auto extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     Logger.info("Auto code : End");
-    autoFacade.storageStop();
-    autoFacade.intakeStop();
     autoFacade.driveOff();
   }
 }

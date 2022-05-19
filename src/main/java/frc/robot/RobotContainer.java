@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.Auto;
-import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.Teleop;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -22,7 +22,7 @@ import frc.robot.commands.TeleopDrive;
 public class RobotContainer {
   private final Commands commands = Commands.getInstance();
   private final Auto autoCommand = new Auto();
-  private final TeleopDrive teleopCommand = new TeleopDrive();
+  private final Teleop teleopCommand = new Teleop();
   private final OI oi = OI.getInstance();
 
   /**
@@ -42,26 +42,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Run Intake
-    oi.lb.whenHeld(commands.intakeRun);
-
-    // Shoot Storage
-    oi.rb.whenHeld(commands.shooterRun);
-
-    // Run Storage
-    oi.x.whenHeld(commands.storageRun);
-
-    // Reverse Storage
-    oi.b.whenHeld(commands.storageReverse);
-
     // Invert Drive
     oi.start.whenPressed(commands.driveInvert);
 
-    // Climber Up/Down
-    oi.dPadUp.whenHeld(commands.climberUp);
-    oi.dPadDown.whenHeld(commands.climberDown);
-
-    // Drive bindings handled in driveCommand
+    // Drive bindings handled in teleop command
   }
 
   /**

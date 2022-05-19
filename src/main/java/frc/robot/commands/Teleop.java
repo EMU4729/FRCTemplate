@@ -10,7 +10,7 @@ import frc.robot.Variables;
 /**
  * The Teleop Command.
  */
-public class TeleopDrive extends CommandBase {
+public class Teleop extends CommandBase {
   private final Variables variables = Variables.getInstance();
   private final Subsystems subsystems = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
@@ -18,7 +18,7 @@ public class TeleopDrive extends CommandBase {
 
   private double speedMultiplier;
 
-  public TeleopDrive() {
+  public Teleop() {
     addRequirements(subsystems.drive);
   }
 
