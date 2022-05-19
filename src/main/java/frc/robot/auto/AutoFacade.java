@@ -1,6 +1,5 @@
 package frc.robot.auto;
 
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Commands;
 import frc.robot.Subsystems;
 import frc.robot.utils.logger.Logger;
@@ -9,7 +8,6 @@ import frc.robot.utils.AsyncTimer;
 public class AutoFacade {
   private final Subsystems subsystems = Subsystems.getInstance();
   private final Commands commands = Commands.getInstance();
-  private final CommandScheduler scheduler = CommandScheduler.getInstance();
 
   private AsyncTimer waitTimer;
 
@@ -19,29 +17,21 @@ public class AutoFacade {
   public void driveTank(AutoLine currentCommand) {
     double leftSpeed = currentCommand.getDouble(0);
     double rightSpeed = currentCommand.getDouble(0);
-    commands.autoDriveTank.leftSpeed = leftSpeed;
-    commands.autoDriveTank.rightSpeed = rightSpeed;
     Logger.info("Auto : DriveTank : Left Speed=" + leftSpeed + ", Right Speed=" + rightSpeed);
-    scheduler.schedule(true, commands.autoDriveTank);
+    commands.autoDriveTank.run(leftSpeed, rightSpeed);
   }
 
   public void driveArcade(AutoLine currentCommand) {
     double speed = currentCommand.getDouble(0);
     double steering = currentCommand.getDouble(1);
-    commands.autoDriveArcade.speed = speed;
-    commands.autoDriveArcade.steering = steering;
     Logger.info("Auto : DriveArcade : Speed=" + speed + ", steer=" + steering);
-
-    // If needed, make auto speed multiplier also affects steering
-    scheduler.schedule(true, commands.autoDriveArcade);
+    commands.autoDriveArcade.run(speed, steering);
   }
 
   public void driveStraight(AutoLine currentCommand) {
     double speed = currentCommand.getDouble(0);
     Logger.info("Auto : Drive Straight : Speed = " + speed);
-    commands.autoDriveStraight.speed = speed;
-    commands.autoDriveArcade.steering = subsystems.navigation.getAngle();
-    scheduler.schedule(true, commands.autoDriveStraight);
+    commands.autoDriveStraight.run(speed, subsystems.navigation.getAngle());
   }
 
   public void driveOff() {

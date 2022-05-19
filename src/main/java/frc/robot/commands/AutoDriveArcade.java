@@ -11,11 +11,17 @@ import frc.robot.Subsystems;
 public class AutoDriveArcade extends CommandBase {
   private final Subsystems subsystems = Subsystems.getInstance();
 
-  public double speed;
-  public double steering;
+  private double speed;
+  private double steering;
 
   public AutoDriveArcade() {
     addRequirements(subsystems.drive);
+  }
+
+  public void run(double speed, double steering) {
+    this.speed = speed;
+    this.steering = steering;
+    this.schedule(true);
   }
 
   @Override

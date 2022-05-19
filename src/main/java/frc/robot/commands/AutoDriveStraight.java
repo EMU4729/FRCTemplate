@@ -11,11 +11,17 @@ import frc.robot.Subsystems;
 public class AutoDriveStraight extends CommandBase {
   private final Subsystems subsystems = Subsystems.getInstance();
 
-  public double targetAngle;
-  public double speed;
+  private double targetAngle;
+  private double speed;
 
   public AutoDriveStraight() {
     addRequirements(subsystems.drive, subsystems.navigation);
+  }
+
+  public void run(double targetAngle, double speed) {
+    this.targetAngle = targetAngle;
+    this.speed = speed;
+    this.schedule(true);
   }
 
   @Override

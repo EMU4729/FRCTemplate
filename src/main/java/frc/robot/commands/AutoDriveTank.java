@@ -11,17 +11,22 @@ import frc.robot.Subsystems;
 public class AutoDriveTank extends CommandBase {
   private final Subsystems subsystems = Subsystems.getInstance();
 
-  public double leftSpeed;
-  public double rightSpeed;
+  private double leftSpeed;
+  private double rightSpeed;
 
   public AutoDriveTank() {
     addRequirements(subsystems.drive);
   }
 
+  public void run(double leftSpeed, double rightSpeed) {
+    this.leftSpeed = leftSpeed;
+    this.rightSpeed = rightSpeed;
+    this.schedule(true);
+  }
+
   @Override
   public void initialize() {
     subsystems.drive.tank(leftSpeed, rightSpeed);
-
   }
 
   @Override
