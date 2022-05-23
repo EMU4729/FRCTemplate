@@ -47,6 +47,33 @@ public class NavigationSub extends SubsystemBase {
     return imu.getAngle();
   }
 
+  /**
+   * Gets the rate from the left drive encoder.
+   * 
+   * @return The rate of the left drive encoder.
+   */
+  public double getLeftEncoderRate() {
+    return leftEncoder.getRate();
+  }
+
+  /**
+   * Gets the rate of the right drive encoder.
+   * 
+   * @return The rate of the right drive encoder.
+   */
+  public double getRightEncoderRate() {
+    return rightEncoder.getRate();
+  }
+
+  /**
+   * Gets the average rate of the drive encoders.
+   * 
+   * @return The average rate of the drive encoders.
+   */
+  public double getAverageEncoderRate() {
+    return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
+  }
+
   public double proportionalStraightAdjustment(double target) {
     double current = getAngle();
     return current * constants.AUTO_STRAIGHT_KP;

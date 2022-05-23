@@ -14,10 +14,6 @@ public class OI {
   private static Optional<OI> instance = Optional.empty();
   private final Constants constants = Constants.getInstance();
 
-  private OI() {
-    System.out.println("Oi init");
-  }
-
   public static OI getInstance() {
     if (!instance.isPresent()) {
       instance = Optional.of(new OI());

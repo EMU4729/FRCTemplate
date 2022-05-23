@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.Subsystems;
 
 /**
@@ -9,18 +11,23 @@ import frc.robot.Subsystems;
  * Only to be used in autonomous.
  */
 public class AutoDriveStraight extends CommandBase {
+  private final Constants constants = Constants.getInstance();
   private final Subsystems subsystems = Subsystems.getInstance();
 
-  private double targetAngle;
   private double speed;
+  private PIDController pid;
 
   public AutoDriveStraight() {
     addRequirements(subsystems.drive, subsystems.navigation);
   }
 
   public void run(double targetAngle, double speed) {
-    this.targetAngle = targetAngle;
     this.speed = speed;
+    pid = new PIDController(
+        constants.AUTO_STRAIGHT_KP,
+        constants.AUTO_STRAIGHT_KI,
+        constants.AUTO_STRAIGHT_KD);
+    pid.setSetpoint(targetAngle);
     this.schedule(true);
   }
 
@@ -30,8 +37,8 @@ public class AutoDriveStraight extends CommandBase {
 
   @Override
   public void execute() {
-    subsystems.drive.arcade(
-        speed, subsystems.navigation.proportionalStraightAdjustment(targetAngle));
+    double steering = pid.calculate(subsystems.navigation.getAngle());
+    subsystems.drive.arcade(speed, steering);
   }
 
   @Override

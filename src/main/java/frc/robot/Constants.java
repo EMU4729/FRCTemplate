@@ -45,8 +45,23 @@ public final class Constants {
   /** Port Number for right drive encoder B channel */
   public final int DRIVE_ENCODER_PORT_RB = 69420; // UNUSED
 
-  /** Proportional constant for driving straight durin auto */
+  // Auto Straight PID Constants
+  /** Proportional constant for driving straight during auto */
   public double AUTO_STRAIGHT_KP = 0.234; // UPDATE
+  /** Integral constant for driving straight during auto */
+  public double AUTO_STRAIGHT_KI = 0.234; // UPDATE
+  /** Derivative constant for driving straight during auto */
+  public double AUTO_STRAIGHT_KD = 0.234; // UPDATE
+
+  // Teleop Throttle PID Constants
+  /** Proportional constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KP = 0.234; // UPDATE
+  /** Integral constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KI = 0.234; // UPDATE
+  /** Derivative constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KD = 0.234; // UPDATE
+  /** Encoder max rate for PID loop */
+  public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
 
   // Controller
   /** Port Number for xbox controller input device */

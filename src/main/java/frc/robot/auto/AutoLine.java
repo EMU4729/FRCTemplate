@@ -2,7 +2,6 @@ package frc.robot.auto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import frc.robot.utils.logger.Logger;
 
