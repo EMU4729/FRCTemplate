@@ -33,13 +33,11 @@ public class DriveSub extends SubsystemBase {
    * @param rightSpeed The right speed.
    */
   public void tank(double leftSpeed, double rightSpeed) {
-    int direction = vars.invertDriveDirection ? 1 : -1;
-
     leftSpeed = Clamper.absUnit(leftSpeed);
     rightSpeed = Clamper.absUnit(rightSpeed);
 
-    leftMaster.set(leftSpeed * direction);
-    rightMaster.set(rightSpeed * direction);
+    leftMaster.set(leftSpeed);
+    rightMaster.set(rightSpeed);
   }
 
   /**

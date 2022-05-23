@@ -36,12 +36,14 @@ public class TeleopDrive extends CommandBase {
 
     double throttle = Math.pow(oi.controller.getLeftY(), variables.inputCurveExponent);
     double steering = oi.controller.getRightX();
+    double speedMultiplier = variables.teleopSpeedMultiplier;
+    int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
 
     pid.setSetpoint(constants.DRIVE_ENCODER_MAX_RATE * throttle);
-    double speed = pid.calculate(subsystems.navigation.getAverageEncoderRate());
+    double speed = pid.calculate(subsystems.navigation.getAverageEncoderRate()) * speedMultiplier * reversalMultiplier;
 
     // If needed, make the teleop speed multiplier affect steering, too
-    subsystems.drive.arcade(speed * variables.teleopSpeedMultiplier, steering);
+    subsystems.drive.arcade(speed, steering);
   }
 
   @Override
