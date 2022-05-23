@@ -29,21 +29,21 @@ public final class Constants {
 
   // Drive Ports
   /** Port Number for left master drive */
-  public final int DRIVE_MOTOR_PORT_LM = 4;
+  public final int DRIVE_MOTOR_PORT_LM = 4; // WORKING
   /** Port Number for right master drive */
-  public final int DRIVE_MOTOR_PORT_RM = 1;
+  public final int DRIVE_MOTOR_PORT_RM = 1; // WORKING
   /** Port Number for left slave drive */
-  public final int DRIVE_MOTOR_PORT_LS = 5;
+  public final int DRIVE_MOTOR_PORT_LS = 5; // WORKING
   /** Port Number for right slave drive */
-  public final int DRIVE_MOTOR_PORT_RS = 2;
+  public final int DRIVE_MOTOR_PORT_RS = 2; // WORKING
   /** Port Number for left drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_LA = 69420; // UNUSED
+  public final int DRIVE_ENCODER_PORT_LA = 69420; // UPDATE
   /** Port Number for left drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_LB = 69420; // UNUSED
+  public final int DRIVE_ENCODER_PORT_LB = 69420; // UPDATE
   /** Port Number for right drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_RA = 69420; // UNUSED
+  public final int DRIVE_ENCODER_PORT_RA = 69420; // UPDATE
   /** Port Number for right drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_RB = 69420; // UNUSED
+  public final int DRIVE_ENCODER_PORT_RB = 69420; // UPDATE
 
   // Auto Straight PID Constants
   /** Proportional constant for driving straight during auto */
