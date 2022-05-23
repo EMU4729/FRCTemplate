@@ -74,11 +74,6 @@ public class NavigationSub extends SubsystemBase {
     return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
   }
 
-  public double proportionalStraightAdjustment(double target) {
-    double current = getAngle();
-    return current * constants.AUTO_STRAIGHT_KP;
-  }
-
   /**
    * Gets the odometry of the robot
    * 
