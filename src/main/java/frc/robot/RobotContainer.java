@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.Auto;
 import frc.robot.commands.TeleopDrive;
 
@@ -21,6 +22,7 @@ import frc.robot.commands.TeleopDrive;
  */
 public class RobotContainer {
   private final Commands commands = Commands.getInstance();
+  private final Variables variables = Variables.getInstance();
   private final Auto autoCommand = new Auto();
   private final TeleopDrive teleopCommand = new TeleopDrive();
   private final OI oi = OI.getInstance();
@@ -43,7 +45,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Invert Drive
-    oi.start.whenPressed(commands.driveInvert);
+    oi.start.whenPressed(
+        new InstantCommand(() -> variables.invertDriveDirection = !variables.invertDriveDirection));
 
     // Drive bindings handled in teleop command
   }
