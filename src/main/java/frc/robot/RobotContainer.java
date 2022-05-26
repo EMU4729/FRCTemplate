@@ -21,7 +21,6 @@ import frc.robot.commands.TeleopDrive;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Commands commands = Commands.getInstance();
   private final Variables variables = Variables.getInstance();
   private final Auto autoCommand = new Auto();
   private final TeleopDrive teleopCommand = new TeleopDrive();
