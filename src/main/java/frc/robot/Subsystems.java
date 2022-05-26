@@ -12,7 +12,6 @@ public class Subsystems {
   private static Optional<Subsystems> instance = Optional.empty();
 
   private Subsystems() {
-    System.out.println("subsystes init");
   }
 
   public static Subsystems getInstance() {
