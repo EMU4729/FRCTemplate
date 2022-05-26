@@ -5,7 +5,6 @@ import java.util.Optional;
 import frc.robot.commands.AutoDriveArcade;
 import frc.robot.commands.AutoDriveStraight;
 import frc.robot.commands.AutoDriveTank;
-import frc.robot.commands.DriveInvert;
 
 /**
  * Commands - Use this class to initialize and access commands globally.
@@ -27,5 +26,4 @@ public class Commands {
   public final AutoDriveStraight autoDriveStraight = new AutoDriveStraight();
   public final AutoDriveArcade autoDriveArcade = new AutoDriveArcade();
   public final AutoDriveTank autoDriveTank = new AutoDriveTank();
-  public final DriveInvert driveInvert = new DriveInvert();
 }
