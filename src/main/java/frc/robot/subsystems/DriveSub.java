@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.Clamper;
@@ -11,17 +14,18 @@ import frc.robot.utils.Clamper;
  */
 public class DriveSub extends SubsystemBase {
   private final Constants constants = Constants.getInstance();
+
   private final WPI_TalonSRX leftMaster = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LM);
   private final WPI_TalonSRX leftSlave = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LS);
+  private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftMaster, leftSlave);
+
   private final WPI_TalonSRX rightMaster = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_RM);
   private final WPI_TalonSRX rightSlave = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_RS);
+  private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightMaster, rightSlave);
+
+  private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
 
   public DriveSub() {
-    leftSlave.follow(leftMaster);
-    rightSlave.follow(rightMaster);
-
-    // change this if needed
-    // leftSlave.setInverted(true);
   }
 
   /**
@@ -33,9 +37,7 @@ public class DriveSub extends SubsystemBase {
   public void tank(double leftSpeed, double rightSpeed) {
     leftSpeed = Clamper.absUnit(leftSpeed);
     rightSpeed = Clamper.absUnit(rightSpeed);
-
-    leftMaster.set(leftSpeed);
-    rightMaster.set(rightSpeed);
+    drive.tankDrive(leftSpeed, rightSpeed);
   }
 
   /**
@@ -45,9 +47,9 @@ public class DriveSub extends SubsystemBase {
    * @param steering The steering
    */
   public void arcade(double speed, double steering) {
-    double leftSpeed = steering + speed;
-    double rightSpeed = steering - speed;
-    tank(leftSpeed, rightSpeed);
+    speed = Clamper.absUnit(speed);
+    steering = Clamper.absUnit(steering);
+    drive.arcadeDrive(speed, steering);
   }
 
   /**
@@ -56,5 +58,4 @@ public class DriveSub extends SubsystemBase {
   public void off() {
     tank(0, 0);
   }
-
 }
