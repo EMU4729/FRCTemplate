@@ -62,16 +62,20 @@ public class RobotContainer {
     // Motor Run
     oi.dPadUp.whenHeld(new StartEndCommand(
         () -> subsystems.motor.setMotorOneSpeed(variables.motorOneSpeed),
-        () -> subsystems.motor.setMotorOneSpeed(0), subsystems.motor));
+        () -> subsystems.motor.setMotorOneSpeed(0),
+        subsystems.motor));
     oi.dPadDown.whenHeld(new StartEndCommand(
         () -> subsystems.motor.setMotorOneSpeed(-variables.motorOneSpeed),
-        () -> subsystems.motor.setMotorOneSpeed(0), subsystems.motor));
+        () -> subsystems.motor.setMotorOneSpeed(0),
+        subsystems.motor));
     oi.y.whenHeld(new StartEndCommand(
         () -> subsystems.motor.setMotorTwoSpeed(variables.motorTwoSpeed),
-        () -> subsystems.motor.setMotorTwoSpeed(0), subsystems.motor));
+        () -> subsystems.motor.setMotorTwoSpeed(0),
+        subsystems.motor));
     oi.a.whenHeld(new StartEndCommand(
         () -> subsystems.motor.setMotorTwoSpeed(-variables.motorTwoSpeed),
-        () -> subsystems.motor.setMotorTwoSpeed(0), subsystems.motor));
+        () -> subsystems.motor.setMotorTwoSpeed(0),
+        subsystems.motor));
 
     // Drive bindings handled in teleop command
   }

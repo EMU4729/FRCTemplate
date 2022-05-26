@@ -21,7 +21,7 @@ public class DriveSub extends SubsystemBase {
     rightSlave.follow(rightMaster);
 
     // change this if needed
-    leftMaster.setInverted(true);
+    // leftSlave.setInverted(true);
   }
 
   /**

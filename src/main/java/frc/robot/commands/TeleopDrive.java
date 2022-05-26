@@ -12,12 +12,11 @@ import frc.robot.Variables;
  */
 public class TeleopDrive extends CommandBase {
   private final Variables variables = Variables.getInstance();
-  private final Constants constants = Constants.getInstance();
   private final Subsystems subsystems = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
 
   public TeleopDrive() {
-    addRequirements(subsystems.drive, subsystems.motor);
+    addRequirements(subsystems.drive);
   }
 
   @Override
