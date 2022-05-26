@@ -36,32 +36,14 @@ public final class Constants {
   public final int DRIVE_MOTOR_PORT_LS = 5; // WORKING
   /** Port Number for right slave drive */
   public final int DRIVE_MOTOR_PORT_RS = 2; // WORKING
-  /** Port Number for left drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_LA = 69420; // UPDATE
-  /** Port Number for left drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_LB = 69420; // UPDATE
-  /** Port Number for right drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_RA = 69420; // UPDATE
-  /** Port Number for right drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_RB = 69420; // UPDATE
 
-  // Auto Straight PID Constants
-  /** Proportional constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KP = 0.234; // UPDATE
-  /** Integral constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KI = 0.234; // UPDATE
-  /** Derivative constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KD = 0.234; // UPDATE
-
-  // Teleop Throttle PID Constants
-  /** Proportional constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KP = 0.234; // UPDATE
-  /** Integral constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KI = 0.234; // UPDATE
-  /** Derivative constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KD = 0.234; // UPDATE
-  /** Encoder max rate for PID loop */
-  public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
+  // Motor Ports
+  /** Port number for motor one */
+  public final int MOTOR_ONE_PORT = 6; // UNTESTED
+  /** Port number for motor two */
+  public final int MOTOR_TWO_PORT = 7; // UNTESTED
+  /** Motor speed adjustment */
+  public final double MOTOR_SPEED_ADJUSTMENT = 0.05;
 
   // Controller
   /** Port Number for xbox controller input device */

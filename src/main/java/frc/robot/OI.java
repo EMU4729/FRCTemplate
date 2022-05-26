@@ -28,8 +28,12 @@ public class OI {
       Button.kStart.value);
   public final JoystickButton rb = new JoystickButton(controller,
       Button.kRightBumper.value);
+  public final JoystickButton a = new JoystickButton(controller, Button.kA.value);
   public final JoystickButton b = new JoystickButton(controller, Button.kB.value);
   public final JoystickButton x = new JoystickButton(controller, Button.kX.value);
+  public final JoystickButton y = new JoystickButton(controller, Button.kY.value);
   public final POVButton dPadUp = new POVButton(controller, 0);
+  public final POVButton dPadRight = new POVButton(controller, 90);
   public final POVButton dPadDown = new POVButton(controller, 180);
+  public final POVButton dPadLeft = new POVButton(controller, 270);
 }

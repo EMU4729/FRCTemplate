@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.Auto;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.utils.Clamper;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -20,8 +22,10 @@ import frc.robot.commands.TeleopDrive;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private final Variables variables = Variables.getInstance();
+  private final Constants constants = Constants.getInstance();
   private final Commands commands = Commands.getInstance();
-  private final Auto autoCommand = new Auto();
+  private final Subsystems subsystems = Subsystems.getInstance();
   private final TeleopDrive teleopCommand = new TeleopDrive();
   private final OI oi = OI.getInstance();
 
@@ -45,6 +49,30 @@ public class RobotContainer {
     // Invert Drive
     oi.start.whenPressed(commands.driveInvert);
 
+    // Motor Speed Adjustment
+    oi.dPadRight.whenPressed(new InstantCommand(
+        () -> variables.motorOneSpeed = Clamper.unit(variables.motorOneSpeed + constants.MOTOR_SPEED_ADJUSTMENT)));
+    oi.dPadLeft.whenPressed(new InstantCommand(
+        () -> variables.motorOneSpeed = Clamper.unit(variables.motorOneSpeed - constants.MOTOR_SPEED_ADJUSTMENT)));
+    oi.b.whenPressed(new InstantCommand(
+        () -> variables.motorTwoSpeed = Clamper.unit(variables.motorTwoSpeed + constants.MOTOR_SPEED_ADJUSTMENT)));
+    oi.x.whenPressed(new InstantCommand(
+        () -> variables.motorTwoSpeed = Clamper.unit(variables.motorTwoSpeed - constants.MOTOR_SPEED_ADJUSTMENT)));
+
+    // Motor Run
+    oi.dPadUp.whenHeld(new StartEndCommand(
+        () -> subsystems.motor.setMotorOneSpeed(variables.motorOneSpeed),
+        () -> subsystems.motor.setMotorOneSpeed(0), subsystems.motor));
+    oi.dPadDown.whenHeld(new StartEndCommand(
+        () -> subsystems.motor.setMotorOneSpeed(-variables.motorOneSpeed),
+        () -> subsystems.motor.setMotorOneSpeed(0), subsystems.motor));
+    oi.y.whenHeld(new StartEndCommand(
+        () -> subsystems.motor.setMotorTwoSpeed(variables.motorTwoSpeed),
+        () -> subsystems.motor.setMotorTwoSpeed(0), subsystems.motor));
+    oi.a.whenHeld(new StartEndCommand(
+        () -> subsystems.motor.setMotorTwoSpeed(-variables.motorTwoSpeed),
+        () -> subsystems.motor.setMotorTwoSpeed(0), subsystems.motor));
+
     // Drive bindings handled in teleop command
   }
 
@@ -63,6 +91,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoCommand;
+    return null;
   }
 }

@@ -25,14 +25,17 @@ public final class Variables {
 
   /** Bool to invert robot steering direction */
   public boolean invertSteering = false;
-  /** Bool to invert robot drive direction flipping the apparent front of the robot */
+  /**
+   * Bool to invert robot drive direction flipping the apparent front of the robot
+   */
   public boolean invertDriveDirection = false;
 
   /** Multiplier for robot max speed in teleop */
   public double teleopSpeedMultiplier = 1;
-  /** Multiplier for robot max speed in auto */
-  public double autoSpeedMultiplier = 1;
 
   /** Drive Input Curve Exponent */
   public double inputCurveExponent = 3;
+
+  public double motorOneSpeed = 0;
+  public double motorTwoSpeed = 0;
 }

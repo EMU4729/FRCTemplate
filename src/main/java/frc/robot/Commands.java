@@ -2,9 +2,6 @@ package frc.robot;
 
 import java.util.Optional;
 
-import frc.robot.commands.AutoDriveArcade;
-import frc.robot.commands.AutoDriveStraight;
-import frc.robot.commands.AutoDriveTank;
 import frc.robot.commands.DriveInvert;
 
 /**
@@ -24,8 +21,5 @@ public class Commands {
     return instance.get();
   }
 
-  public final AutoDriveStraight autoDriveStraight = new AutoDriveStraight();
-  public final AutoDriveArcade autoDriveArcade = new AutoDriveArcade();
-  public final AutoDriveTank autoDriveTank = new AutoDriveTank();
   public final DriveInvert driveInvert = new DriveInvert();
 }
