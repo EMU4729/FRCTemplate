@@ -66,6 +66,8 @@ public final class Constants {
   // Controller
   /** Port Number for xbox controller input device */
   public final int DEVICE_PORT_XBOX_CONTROLLER = 0; // WORKING
+  /** Threshold for triggering the controller right and left triggers */
+  public final double CONTROLLER_TRIGGER_THRESHOLD = 0.5;
 
   // File Paths
   /** file path header for files on usb storage */
