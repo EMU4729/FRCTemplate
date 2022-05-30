@@ -40,6 +40,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    // Initialize teleop chooser
     teleopChooser.setDefaultOption("PID Teleop", pidTeleopCommand);
     teleopChooser.addOption("Normal Teleop", teleopDrive);
     SmartDashboard.putData(teleopChooser);
