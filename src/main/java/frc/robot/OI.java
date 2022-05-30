@@ -34,9 +34,9 @@ public class OI {
   public final JoystickButton rb = new JoystickButton(controller,
       Button.kRightBumper.value);
 
-  public final AxisButton rt = new AxisButton(controller, Axis.kRightTrigger.value,
+  public final AxisButton rtButton = new AxisButton(controller, Axis.kRightTrigger.value,
       constants.CONTROLLER_TRIGGER_THRESHOLD);
-  public final AxisButton lt = new AxisButton(controller, Axis.kLeftTrigger.value,
+  public final AxisButton ltButton = new AxisButton(controller, Axis.kLeftTrigger.value,
       constants.CONTROLLER_TRIGGER_THRESHOLD);
 
   public final JoystickButton lsButton = new JoystickButton(controller, Button.kLeftStick.value);
