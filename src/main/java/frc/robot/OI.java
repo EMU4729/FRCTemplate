@@ -47,8 +47,12 @@ public class OI {
   public final JoystickButton x = new JoystickButton(controller, Button.kX.value);
   public final JoystickButton y = new JoystickButton(controller, Button.kY.value);
 
-  public final POVButton dPadUp = new POVButton(controller, 0);
-  public final POVButton dPadRight = new POVButton(controller, 90);
-  public final POVButton dPadDown = new POVButton(controller, 180);
-  public final POVButton dPadLeft = new POVButton(controller, 270);
+  public final POVButton dPadN = new POVButton(controller, 0);
+  public final POVButton dPadNE = new POVButton(controller, 45);
+  public final POVButton dPadE = new POVButton(controller, 90);
+  public final POVButton dPadSE = new POVButton(controller, 135);
+  public final POVButton dPadS = new POVButton(controller, 180);
+  public final POVButton dPadSW = new POVButton(controller, 225);
+  public final POVButton dPadW = new POVButton(controller, 270);
+  public final POVButton dPadNW = new POVButton(controller, 315);
 }
