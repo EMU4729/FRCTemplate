@@ -26,6 +26,10 @@ public class NavigationSub extends SubsystemBase {
   public NavigationSub() {
     // Remove if needed
     rightEncoder.setReverseDirection(true);
+
+    addChild("Left Drive Encoder", leftEncoder);
+    addChild("Right Drive Encoder", rightEncoder);
+    addChild("IMU", imu);
   }
 
   @Override
@@ -33,10 +37,6 @@ public class NavigationSub extends SubsystemBase {
     odometry.update(
         Rotation2d.fromDegrees(getAngle()),
         leftEncoder.getDistance(), rightEncoder.getDistance());
-
-    SmartDashboard.putNumber("Left Encoder Rate", getLeftEncoderRate());
-    SmartDashboard.putNumber("Right Encoder Rate", getRightEncoderRate());
-    SmartDashboard.putNumber("Robot Yaw Angle", getAngle());
   }
 
   /**

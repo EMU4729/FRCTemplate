@@ -26,6 +26,7 @@ public class DriveSub extends SubsystemBase {
   private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
 
   public DriveSub() {
+    addChild("Differential Drive", drive);
   }
 
   /**
@@ -56,6 +57,6 @@ public class DriveSub extends SubsystemBase {
    * Stop all motors.
    */
   public void off() {
-    tank(0, 0);
+    drive.stopMotor();
   }
 }
