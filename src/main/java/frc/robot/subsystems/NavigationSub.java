@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -22,11 +23,20 @@ public class NavigationSub extends SubsystemBase {
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(getAngle()));
 
+  public NavigationSub() {
+    // Remove if needed
+    rightEncoder.setReverseDirection(true);
+  }
+
   @Override
   public void periodic() {
     odometry.update(
         Rotation2d.fromDegrees(getAngle()),
         leftEncoder.getDistance(), rightEncoder.getDistance());
+
+    SmartDashboard.putNumber("Left Encoder Rate", getLeftEncoderRate());
+    SmartDashboard.putNumber("Right Encoder Rate", getRightEncoderRate());
+    SmartDashboard.putNumber("Robot Yaw Angle", getAngle());
   }
 
   /**

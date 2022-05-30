@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.Auto;
-import frc.robot.commands.TeleopDrive;
+import frc.robot.commands.PIDTeleopDrive;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -23,7 +23,7 @@ import frc.robot.commands.TeleopDrive;
 public class RobotContainer {
   private final Variables variables = Variables.getInstance();
   private final Auto autoCommand = new Auto();
-  private final TeleopDrive teleopCommand = new TeleopDrive();
+  private final PIDTeleopDrive teleopCommand = new PIDTeleopDrive();
   private final OI oi = OI.getInstance();
 
   /**

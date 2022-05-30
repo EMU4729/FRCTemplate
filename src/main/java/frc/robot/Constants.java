@@ -37,29 +37,29 @@ public final class Constants {
   /** Port Number for right slave drive */
   public final int DRIVE_MOTOR_PORT_RS = 2; // WORKING
   /** Port Number for left drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_LA = 69420; // UPDATE
+  public final int DRIVE_ENCODER_PORT_LA = 0; // UPDATE
   /** Port Number for left drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_LB = 69420; // UPDATE
+  public final int DRIVE_ENCODER_PORT_LB = 1; // UPDATE
   /** Port Number for right drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_RA = 69420; // UPDATE
+  public final int DRIVE_ENCODER_PORT_RA = 2; // UPDATE
   /** Port Number for right drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_RB = 69420; // UPDATE
+  public final int DRIVE_ENCODER_PORT_RB = 3; // UPDATE
 
   // Auto Straight PID Constants
   /** Proportional constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KP = 0.234; // UPDATE
+  public double AUTO_STRAIGHT_KP = 0.2; // UPDATE
   /** Integral constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KI = 0.234; // UPDATE
+  public double AUTO_STRAIGHT_KI = 0.8; // UPDATE
   /** Derivative constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KD = 0.234; // UPDATE
+  public double AUTO_STRAIGHT_KD = 0.0; // UPDATE
 
   // Teleop Throttle PID Constants
   /** Proportional constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KP = 0.234; // UPDATE
+  public double TELEOP_THROTTLE_KP = 0.2; // UPDATE
   /** Integral constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KI = 0.234; // UPDATE
+  public double TELEOP_THROTTLE_KI = 0.8; // UPDATE
   /** Derivative constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KD = 0.234; // UPDATE
+  public double TELEOP_THROTTLE_KD = 0.0; // UPDATE
   /** Encoder max rate for PID loop */
   public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
 
