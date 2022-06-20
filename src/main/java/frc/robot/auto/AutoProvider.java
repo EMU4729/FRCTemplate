@@ -28,7 +28,7 @@ public class AutoProvider {
     return instance.get();
   }
 
-  public static Command getAuto() {
-    return getInstance().chooser.getSelected();
+  public Command getAuto() {
+    return chooser.getSelected();
   }
 }

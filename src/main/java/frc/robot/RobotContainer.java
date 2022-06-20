@@ -23,6 +23,8 @@ import frc.robot.teleop.TeleopProvider;
  */
 public class RobotContainer {
   private final Variables variables = Variables.getInstance();
+  private final AutoProvider autoProvider = AutoProvider.getInstance();
+  private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
   private final OI oi = OI.getInstance();
 
   /**
@@ -55,7 +57,7 @@ public class RobotContainer {
    * @return the command to run in teleop
    */
   public Command getTeleopCommand() {
-    return TeleopProvider.getTeleop();
+    return teleopProvider.getTeleop();
   }
 
   /**
@@ -64,6 +66,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return AutoProvider.getAuto();
+    return autoProvider.getAuto();
   }
 }

@@ -30,7 +30,7 @@ public class TeleopProvider {
     return instance.get();
   }
 
-  public static Command getTeleop() {
-    return getInstance().chooser.getSelected();
+  public Command getTeleop() {
+    return chooser.getSelected();
   }
 }
