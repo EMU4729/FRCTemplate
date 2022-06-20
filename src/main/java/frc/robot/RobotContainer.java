@@ -6,13 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.Auto;
-import frc.robot.commands.PIDTeleopDrive;
-import frc.robot.commands.TeleopDrive;
+
+import frc.robot.auto.AutoProvider;
+import frc.robot.teleop.TeleopProvider;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -27,23 +25,12 @@ public class RobotContainer {
   private final Variables variables = Variables.getInstance();
   private final OI oi = OI.getInstance();
 
-  private final Command autoCommand = new Auto();
-
-  private final Command pidTeleopCommand = new PIDTeleopDrive();
-  private final Command teleopDrive = new TeleopDrive();
-  private final SendableChooser<Command> teleopChooser = new SendableChooser<>();
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
-    // Initialize teleop chooser
-    teleopChooser.setDefaultOption("PID Teleop", pidTeleopCommand);
-    teleopChooser.addOption("Normal Teleop", teleopDrive);
-    SmartDashboard.putData(teleopChooser);
   }
 
   /**
@@ -68,7 +55,7 @@ public class RobotContainer {
    * @return the command to run in teleop
    */
   public Command getTeleopCommand() {
-    return teleopChooser.getSelected();
+    return TeleopProvider.getTeleop();
   }
 
   /**
@@ -77,6 +64,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoCommand;
+    return AutoProvider.getAuto();
   }
 }
