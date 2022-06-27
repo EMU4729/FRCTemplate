@@ -3,7 +3,6 @@ package frc.robot;
 import java.util.Optional;
 
 import frc.robot.subsystems.DriveSub;
-import frc.robot.subsystems.NavigationSub;
 
 /**
  * Subsystems - Use this class to initialize and access all subsystems globally.
@@ -22,5 +21,4 @@ public class Subsystems {
   }
 
   public final DriveSub drive = new DriveSub();
-  public final NavigationSub navigation = new NavigationSub();
 }

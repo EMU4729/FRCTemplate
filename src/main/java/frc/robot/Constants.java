@@ -7,6 +7,12 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+
 /**
  * Constants - use this class to store any port ids, file paths, or basically
  * anything that will not change.
@@ -44,6 +50,28 @@ public final class Constants {
   public final int DRIVE_ENCODER_PORT_RA = 2; // UPDATE
   /** Port Number for right drive encoder B channel */
   public final int DRIVE_ENCODER_PORT_RB = 3; // UPDATE
+
+  // Drive Simulation Constants
+  public final double DRIVESIM_TRACK_WIDTH_METERS = 0.69;
+  public final DifferentialDriveKinematics DRIVESIM_KINEMATICS = new DifferentialDriveKinematics(
+      DRIVESIM_TRACK_WIDTH_METERS);
+  public final double DRIVESIM_WHEEL_DIAMETER_METERS = 0.15;
+
+  public final double DRIVESIM_VOLTS = 0.22;
+  public final double DRIVESIM_V_VOLT_SECONDS_PER_METER = 1.98;
+  public final double DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_METER = 0.2;
+
+  public final double DRIVESIM_V_VOLT_SECONDS_PER_RADIAN = 1.5;
+  public final double DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3;
+
+  public final LinearSystem<N2, N2, N2> DRIVESIM_DRIVETRAIN_PLANT = LinearSystemId.identifyDrivetrainSystem(
+      DRIVESIM_V_VOLT_SECONDS_PER_METER,
+      DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_METER,
+      DRIVESIM_V_VOLT_SECONDS_PER_RADIAN,
+      DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_RADIAN);
+
+  public final DCMotor DRIVESIM_GEARBOX = DCMotor.getCIM(2);
+  public final double DRIVESIM_GEARING = 8;
 
   // Auto Straight PID Constants
   /** Proportional constant for driving straight during auto */

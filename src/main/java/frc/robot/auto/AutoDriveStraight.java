@@ -18,7 +18,7 @@ public class AutoDriveStraight extends CommandBase {
   private PIDController pid;
 
   public AutoDriveStraight() {
-    addRequirements(subsystems.drive, subsystems.navigation);
+    addRequirements(subsystems.drive);
   }
 
   public void run(double targetAngle, double speed) {
@@ -37,7 +37,7 @@ public class AutoDriveStraight extends CommandBase {
 
   @Override
   public void execute() {
-    double steering = pid.calculate(subsystems.navigation.getAngle());
+    double steering = pid.calculate(subsystems.drive.getHeading());
     subsystems.drive.arcade(speed, steering);
   }
 

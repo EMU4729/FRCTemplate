@@ -21,7 +21,7 @@ public class PIDTeleopDrive extends CommandBase {
   private final OI oi = OI.getInstance();
 
   public PIDTeleopDrive() {
-    addRequirements(subsystems.drive, subsystems.navigation);
+    addRequirements(subsystems.drive);
   }
 
   @Override
@@ -42,7 +42,7 @@ public class PIDTeleopDrive extends CommandBase {
     int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
 
     pid.setSetpoint(constants.DRIVE_ENCODER_MAX_RATE * throttle);
-    double speed = pid.calculate(subsystems.navigation.getAverageEncoderRate()) *
+    double speed = pid.calculate(subsystems.drive.getAverageEncoderRate()) *
         speedMultiplier * reversalMultiplier;
 
     // If needed, make the teleop speed multiplier affect steering, too
