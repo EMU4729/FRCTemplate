@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
+import frc.robot.utils.logger.Logger;
 
 /**
  * The Teleop Command.
@@ -33,6 +34,8 @@ public class TeleopDrive extends CommandBase {
     int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
 
     double speed = throttle * speedMultiplier * reversalMultiplier;
+
+    subsystems.drive.getDist();
 
     // If needed, make the teleop speed multiplier affect steering, too
     subsystems.drive.arcade(speed, steering);

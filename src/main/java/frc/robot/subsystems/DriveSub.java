@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.Clamper;
+import frc.robot.utils.logger.Logger;
 
 /**
  * Drive Subsystem.
@@ -31,13 +32,13 @@ public class DriveSub extends SubsystemBase {
   private final WPI_TalonSRX leftMaster = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LM);
   private final WPI_TalonSRX leftSlave = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LS);
   private final Encoder leftEncoder = new Encoder(
-      constants.DRIVE_ENCODER_PORT_LA, constants.DRIVE_ENCODER_PORT_LB);
+      constants.DRIVE_ENCODER_PORT_LA, constants.DRIVE_ENCODER_PORT_LB,false,Encoder.EncodingType.k2X);
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftMaster, leftSlave);
 
   private final WPI_TalonSRX rightMaster = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_RM);
   private final WPI_TalonSRX rightSlave = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_RS);
   private final Encoder rightEncoder = new Encoder(
-      constants.DRIVE_ENCODER_PORT_RA, constants.DRIVE_ENCODER_PORT_RB);
+      constants.DRIVE_ENCODER_PORT_RA, constants.DRIVE_ENCODER_PORT_RB,true,Encoder.EncodingType.k2X);
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightMaster, rightSlave);
 
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
@@ -73,6 +74,16 @@ public class DriveSub extends SubsystemBase {
       imuSim = null;
       fieldSim = null;
     }
+    leftEncoder.setDistancePerPulse(60.078/256.);
+    leftEncoder.setMaxPeriod(0.1);
+    leftEncoder.setMinRate(10);
+    leftEncoder.setSamplesToAverage(5);
+    rightEncoder.setDistancePerPulse(59.883/256.);
+    rightEncoder.setMaxPeriod(0.1);
+    rightEncoder.setMinRate(10);
+    rightEncoder.setSamplesToAverage(5);
+    rightMaster.setInverted(true);
+    rightSlave.setInverted(true);
     addChild("Differential Drive", drive);
   }
 
@@ -143,6 +154,25 @@ public class DriveSub extends SubsystemBase {
     return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
   }
 
+  public double getDist(){
+    double l = leftEncoder.getDistance();
+    double r = rightEncoder.getDistance();
+    double t = (l+r)/2;
+    Logger.info("totalDist : L - "+l+", R - "+r+" T - "+t);
+    return t;
+  }
+  public void driveDist(int dist, double speed){
+    while(getDist() < dist){
+      System.out.println("drv dist : "+ getDist());
+      arcade(speed,0);
+      try{
+      Thread.sleep(100);
+      } catch(Exception e){}
+    }
+    off();
+    return;
+  }
+
   /**
    * Resets the encoders.
    */
@@ -189,6 +219,7 @@ public class DriveSub extends SubsystemBase {
     speed = Clamper.absUnit(speed);
     steering = Clamper.absUnit(steering);
     drive.arcadeDrive(speed, steering);
+    
   }
 
   /**
