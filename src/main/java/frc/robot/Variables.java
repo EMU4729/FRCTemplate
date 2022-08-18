@@ -35,4 +35,13 @@ public final class Variables {
 
   /** Drive Input Curve Exponent */
   public double inputCurveExponent = 3;
+
+
+  /** max speed the robot can do in a straight line m/s*/
+  public double robotMaxSpeed = 1;
+  /** min throttle for robot to move 0->1 */
+  public double robotMinThrottle = 0.2;
+  /** should max speed be updated if the robot exedes it */
+  public boolean autoUpdateMaxSpeed = true;
+
 }

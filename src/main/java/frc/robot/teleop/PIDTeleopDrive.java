@@ -1,6 +1,7 @@
 package frc.robot.teleop;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OI;
@@ -42,12 +43,12 @@ public class PIDTeleopDrive extends CommandBase {
     double speedMultiplier = variables.teleopSpeedMultiplier;
     int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
     
-    pid.setSetpoint(constants.DRIVE_ENCODER_MAX_RATE * throttle);
-    double speed = pid.calculate(subsystems.drive.getAverageEncoderRate()) *
+    pid.setSetpoint(throttle);
+    double speed = pid.calculate(-subsystems.drive.distToTrottle()) *
         speedMultiplier * reversalMultiplier;
 
     // If needed, make the teleop speed multiplier affect steering, too
-    //debug(speed, steering);
+    debug(speed, steering, throttle);
     subsystems.drive.arcade(speed, steering);
   }
 
@@ -56,11 +57,15 @@ public class PIDTeleopDrive extends CommandBase {
     return false;
   }
 
-  private void debug(double speed, double steering){
-    Logger.info("PID Teleop : avg speed : "+subsystems.drive.getAverageEncoderRate());
+  private void debug(double speed, double steering, double throttle){
+    SmartDashboard.putNumber("speed", speed);
+
+
+    Logger.info("PID Teleop : avg speed : "+subsystems.drive.distToTrottle());
     Logger.info("PID Teleop : left speed : "+subsystems.drive.getLeftEncoderRate());
     Logger.info("PID Teleop : right speed : "+subsystems.drive.getRightEncoderRate());
-    Logger.info("PID Teleop : desired speed : "+ speed);
+    Logger.info("PID Teleop : desired speed : "+ throttle);
+    Logger.info("PID Teleop : Setpoint : + " + speed);
     Logger.info("PID Teleop : desired steering : "+ steering);
     Logger.info("PID Teleop : current pos error : "+ pid.getPositionError());
     Logger.info("PID Teleop : current vel error : "+ pid.getVelocityError());

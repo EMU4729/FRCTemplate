@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import frc.robot.utils.motorInfo.MotorInfo;
+import frc.robot.utils.motorInfo.ActuControlTypes;
+
 import java.util.Map;
 import java.util.Optional;
 
@@ -33,23 +36,15 @@ public final class Constants {
   // Envars
   public final Map<String, String> env = System.getenv();
 
-  // Drive Ports
-  /** Port Number for left master drive */
-  public final int DRIVE_MOTOR_PORT_LM = 4; // WORKING
-  /** Port Number for right master drive */
-  public final int DRIVE_MOTOR_PORT_RM = 1; // WORKING
-  /** Port Number for left slave drive */
-  public final int DRIVE_MOTOR_PORT_LS = 5; // WORKING
-  /** Port Number for right slave drive */
-  public final int DRIVE_MOTOR_PORT_RS = 2; // WORKING
-  /** Port Number for left drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_LA = 0; // UPDATE
-  /** Port Number for left drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_LB = 1; // UPDATE
-  /** Port Number for right drive encoder A channel */
-  public final int DRIVE_ENCODER_PORT_RA = 2; // UPDATE
-  /** Port Number for right drive encoder B channel */
-  public final int DRIVE_ENCODER_PORT_RB = 3; // UPDATE
+  // Motor info
+  /** Port Number for left master drive [Port,controller type, invert, Encoder]*/
+  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(4,ActuControlTypes.TalonSRX, new int[]{0,1});
+  /** Port Number for right master drive [Port,controller type, invert, Encoder]*/
+  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(1, ActuControlTypes.TalonSRX, true, new int[]{2,3});
+  /** Port Number for left slave drive [Port,controller type, invert, Encoder]*/
+  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(5,ActuControlTypes.TalonSRX, new int[]{0,1});
+  /** Port Number for right slave drive [Port,controller type, invert, Encoder]*/
+  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, ActuControlTypes.TalonSRX, true, new int[]{2,3});
 
   // Drive Simulation Constants
   public final double DRIVESIM_TRACK_WIDTH_METERS = 0.69;
@@ -112,4 +107,9 @@ public final class Constants {
   public final int REPEAT_LIMIT_AUTO_READ = 10;
   /** save attempts per second for the logger */
   public int LOGGER_SAVE_RATE = 10;
+
+  // Robot features
+  /** distance between wheel center side to side (m)*/
+  public final double robotWheelWidth = 0.870;
+
 }

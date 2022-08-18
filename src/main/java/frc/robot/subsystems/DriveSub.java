@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.utils.Clamper;
 import frc.robot.utils.logger.Logger;
+import frc.robot.Variables;
 
 /**
  * Drive Subsystem.
@@ -28,6 +29,7 @@ import frc.robot.utils.logger.Logger;
  */
 public class DriveSub extends SubsystemBase {
   private final Constants constants = Constants.getInstance();
+  private final Variables vars = Variables.getInstance();
 
   private final WPI_TalonSRX leftMaster = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LM);
   private final WPI_TalonSRX leftSlave = new WPI_TalonSRX(constants.DRIVE_MOTOR_PORT_LS);
@@ -151,7 +153,20 @@ public class DriveSub extends SubsystemBase {
    * @return The distance.
    */
   public double getAverageEncoderRate() {
+    Logger.info("Speed : L - "+getLeftEncoderRate()+", R - "+getRightEncoderRate()+" T - "+(getLeftEncoderRate() + getRightEncoderRate()) / 2);
     return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
+  }
+
+  public double distToTrottle(){
+    double curSpeed = getAverageEncoderRate();
+    double throttle = curSpeed/vars.robotMaxSpeed;
+    if(throttle > 1.0 && vars.autoUpdate){
+      Logger.info("Max Speed Updated");
+      vars.robotMaxSpeed = curSpeed;
+      throttle = Math.abs(distToTrottle());
+    }
+    Logger.info("Throttle " + throttle);
+    return throttle;
   }
 
   public double getDist(){
@@ -159,6 +174,8 @@ public class DriveSub extends SubsystemBase {
     double r = rightEncoder.getDistance();
     double t = (l+r)/2;
     Logger.info("totalDist : L - "+l+", R - "+r+" T - "+t);
+    getAverageEncoderRate();
+    distToTrottle();
     return t;
   }
   public void driveDist(int dist, double speed){
