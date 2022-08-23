@@ -12,7 +12,7 @@ public class Auto extends SequentialCommandGroup {
     addCommands(
         // Drive forward
 
-        new InstantCommand(() -> subsystems.drive.driveDist(1000, 0.4), subsystems.drive),//() -> subsystems.drive.arcade(0.1, 0), subsystems.drive),
+        //new InstantCommand(() -> subsystems.drive.driveDist(1000, 0.4), subsystems.drive),//() -> subsystems.drive.arcade(0.1, 0), subsystems.drive),
         // Wait 2s
         new WaitCommand(2)
         // Drive backwards

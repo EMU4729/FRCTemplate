@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Subsystems;
 import frc.robot.utils.logger.Logger;
 
 public class Navigation extends SubsystemBase{
@@ -16,7 +15,6 @@ public class Navigation extends SubsystemBase{
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(imu.getAngle()));
-  private final Subsystems subsystems = Subsystems.getInstance();
 
   public final Encoder drvLeftEncoder = constants.DRIVE_MOTOR_ID_LM.createEncoder();
   public final Encoder drvRightEncoder = constants.DRIVE_MOTOR_ID_RM.createEncoder();
@@ -29,14 +27,14 @@ public class Navigation extends SubsystemBase{
   /**  m/s of speed */
   public double speed = 0;
   /** deg/s of rotation (CW = pos)*/
-  public double rotation = 0;
+  public double turn = 0;
 
 
   @Override
   public void periodic() {
     odometry.update(Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
     speed = getCOMSpeed();
-    rotation = getTurnRate();
+    turn = getTurnRate();
   }
    /**
    * Returns the currently-estimated pose of the robot.
@@ -69,6 +67,11 @@ public class Navigation extends SubsystemBase{
     }
     return 0;
   }
+
+  public void resetEncoders(){
+    drvLeftEncoder.reset();
+    drvRightEncoder.reset();
+  }
   
 
 
@@ -79,7 +82,7 @@ public class Navigation extends SubsystemBase{
    * @param pose The pose.
    */
   public void resetOdometry(Pose2d pose) {
-    subsystems.drive2.resetEncoders();
+    //subsystems.drive2.resetEncoders();
     odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
   }
 	private double getHeading() {

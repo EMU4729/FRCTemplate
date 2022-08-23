@@ -16,10 +16,6 @@ public class PIDTeleopDrive extends CommandBase {
   private final Variables variables = Variables.getInstance();
   private final Constants constants = Constants.getInstance();
   private final Subsystems subsystems = Subsystems.getInstance();
-  private final PIDController pid = new PIDController(
-      constants.TELEOP_THROTTLE_KP,
-      constants.TELEOP_THROTTLE_KI,
-      constants.TELEOP_THROTTLE_KD);
   private final OI oi = OI.getInstance();
 
   public PIDTeleopDrive() {
@@ -36,20 +32,16 @@ public class PIDTeleopDrive extends CommandBase {
     // Where s is output speed, c is joystick value and x is a input curve
     // exponent
     // constant.
-
-    double throttle = Math.pow(oi.controller.getLeftY(),
-        variables.inputCurveExponent);
-    double steering = oi.controller.getRightX();
-    double speedMultiplier = variables.teleopSpeedMultiplier;
-    int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
     
-    pid.setSetpoint(throttle);
-    double speed = pid.calculate(-subsystems.drive.distToTrottle()) *
-        speedMultiplier * reversalMultiplier;
+    double throttle = getThrottle();
+    double speed = variables.robotMaxSpeed*throttle;
+    double steering = getSteering();
 
-    // If needed, make the teleop speed multiplier affect steering, too
-    debug(speed, steering, throttle);
-    subsystems.drive.arcade(speed, steering);
+    speed = throttle;
+
+    int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
+
+    subsystems.drive.arcade(speed*reversalMultiplier, steering);
   }
 
   @Override
@@ -57,17 +49,23 @@ public class PIDTeleopDrive extends CommandBase {
     return false;
   }
 
-  private void debug(double speed, double steering, double throttle){
-    SmartDashboard.putNumber("speed", speed);
+  private double getThrottle(){
+    double throttle = oi.controller.getLeftY();
+    if(Math.abs(throttle) < constants.CONTROLLER_AXIS_DEADZONE){return 0;}
+    throttle = Math.pow(throttle, variables.speedCurveExponent);
+    throttle = Math.copySign(
+        Math.abs(throttle)*(1.0-variables.robotMinThrottle) + variables.robotMinThrottle,
+        throttle);
+    return throttle;
+  }
 
-
-    Logger.info("PID Teleop : avg speed : "+subsystems.drive.distToTrottle());
-    Logger.info("PID Teleop : left speed : "+subsystems.drive.getLeftEncoderRate());
-    Logger.info("PID Teleop : right speed : "+subsystems.drive.getRightEncoderRate());
-    Logger.info("PID Teleop : desired speed : "+ throttle);
-    Logger.info("PID Teleop : Setpoint : + " + speed);
-    Logger.info("PID Teleop : desired steering : "+ steering);
-    Logger.info("PID Teleop : current pos error : "+ pid.getPositionError());
-    Logger.info("PID Teleop : current vel error : "+ pid.getVelocityError());
+  private double getSteering(){
+    double steering = oi.controller.getRightX();
+    if(Math.abs(steering) < constants.CONTROLLER_AXIS_DEADZONE){return 0;}
+    steering = Math.pow(steering, variables.turnCurveExponent);
+    steering = Math.copySign(
+        Math.abs(steering)*(1.0-variables.robotMinThrottle) + variables.robotMinThrottle,
+        steering);
+    return steering;
   }
 }

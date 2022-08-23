@@ -55,4 +55,5 @@ public class OI {
   public final POVButton dPadSW = new POVButton(controller, 225);
   public final POVButton dPadW = new POVButton(controller, 270);
   public final POVButton dPadNW = new POVButton(controller, 315);
+
 }

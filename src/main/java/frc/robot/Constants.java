@@ -38,13 +38,13 @@ public final class Constants {
 
   // Motor info
   /** Port Number for left master drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(4,ActuControlTypes.TalonSRX, new int[]{0,1});
+  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(4,ActuControlTypes.TalonSRX, new int[]{0,1}, 60.078/256./1000);
   /** Port Number for right master drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(1, ActuControlTypes.TalonSRX, true, new int[]{2,3});
+  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(1, ActuControlTypes.TalonSRX, true, new int[]{2,3}, 59.883/256./1000);
   /** Port Number for left slave drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(5,ActuControlTypes.TalonSRX, new int[]{0,1});
+  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(5,ActuControlTypes.TalonSRX);
   /** Port Number for right slave drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, ActuControlTypes.TalonSRX, true, new int[]{2,3});
+  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, ActuControlTypes.TalonSRX, true);
 
   // Drive Simulation Constants
   public final double DRIVESIM_TRACK_WIDTH_METERS = 0.69;
@@ -68,29 +68,13 @@ public final class Constants {
   public final DCMotor DRIVESIM_GEARBOX = DCMotor.getCIM(2);
   public final double DRIVESIM_GEARING = 8;
 
-  // Auto Straight PID Constants
-  /** Proportional constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KP = 0.2; // UPDATE
-  /** Integral constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KI = 0.8; // UPDATE
-  /** Derivative constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KD = 0.0; // UPDATE
-
-  // Teleop Throttle PID Constants
-  /** Proportional constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KP = 0.2; // UPDATE
-  /** Integral constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KI = 0.8; // UPDATE
-  /** Derivative constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KD = 0.0; // UPDATE
-  /** Encoder max rate for PID loop */
-  public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
-
   // Controller
   /** Port Number for xbox controller input device */
   public final int DEVICE_PORT_XBOX_CONTROLLER = 0; // WORKING
   /** Threshold for triggering the controller right and left triggers */
   public final double CONTROLLER_TRIGGER_THRESHOLD = 0.5;
+  /** deadband for controller axies either side of 0 */
+  public final double CONTROLLER_AXIS_DEADZONE = 0.1;
 
   // File Paths
   /** file path header for files on usb storage */
