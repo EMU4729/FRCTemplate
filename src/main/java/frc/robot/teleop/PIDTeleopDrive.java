@@ -27,12 +27,7 @@ public class PIDTeleopDrive extends CommandBase {
   }
 
   @Override
-  public void execute() {
-    // Speed Input Curve: s = c^x
-    // Where s is output speed, c is joystick value and x is a input curve
-    // exponent
-    // constant.
-    
+  public void execute() {    
     double throttle = getThrottle();
     double speed = variables.robotMaxSpeed*throttle;
     double steering = getSteering();

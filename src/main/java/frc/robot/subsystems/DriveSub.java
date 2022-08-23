@@ -37,6 +37,8 @@ public class DriveSub extends SubsystemBase {
   private final PIDController PIDsteer = new PIDController(0,0,0);
 
   public DriveSub() {
+    PIDthrot.setPID(vars.TELEOP_THROTTLE_KP, vars.TELEOP_THROTTLE_KI, vars.TELEOP_THROTTLE_KD);
+    PIDsteer.setPID(vars.TELEOP_STEERING_KP, vars.TELEOP_STEERING_KI, vars.TELEOP_STEERING_KD);
     addChild("Differential Drive", drive);
   }
 
@@ -60,13 +62,10 @@ public class DriveSub extends SubsystemBase {
    * @param turnRate  rate to turn at deg/s
    */
   public void pidArcade(double speed, double turnRate){
-    PIDthrot.setPID(vars.TELEOP_THROTTLE_KP, vars.TELEOP_THROTTLE_KI, vars.TELEOP_THROTTLE_KD);
-    PIDsteer.setPID(vars.TELEOP_STEERING_KP, vars.TELEOP_STEERING_KI, vars.TELEOP_STEERING_KD);
     
     double throttle = PIDthrot.calculate(subs.nav.speed,speed);
 
-    System.out.println("PID Throttle : " + throttle);
-    //arcade(throttle, turnRate);
+    //arcade(throttle, steering);
   }
 
   /**
