@@ -21,30 +21,38 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
  * anything that will not change.
  */
 public final class Constants {
-  private static Optional<Constants> instance = Optional.empty();
+  private static Optional<Constants> inst = Optional.empty();
 
   private Constants() {
   }
 
   public static Constants getInstance() {
-    if (!instance.isPresent()) {
-      instance = Optional.of(new Constants());
+    if (!inst.isPresent()) {
+      inst = Optional.of(new Constants());
     }
-    return instance.get();
+    return inst.get();
   }
 
   // Envars
   public final Map<String, String> env = System.getenv();
 
-  // Motor info
-  /** Port Number for left master drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(4,ActuControlTypes.TalonSRX, new int[]{0,1}, 60.078/256./1000);
-  /** Port Number for right master drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(1, ActuControlTypes.TalonSRX, true, new int[]{2,3}, 59.883/256./1000);
-  /** Port Number for left slave drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(5,ActuControlTypes.TalonSRX);
-  /** Port Number for right slave drive [Port,controller type, invert, Encoder]*/
-  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, ActuControlTypes.TalonSRX, true);
+  // Drive
+  /** Information for left master drive [Port,controller type, {invert,brake,connectionSaftey}]*/
+  public final MotorInfo DRIVE_MOTOR_ID_LM = 
+      new MotorInfo(4,ActuControlTypes.TalonSRX)
+      .initSaftey().encoder(new int[]{0,1}, 60.078/256./1000);
+  /** Information for right master drive [Port,controller type, {invert,brake,connectionSaftey}]*/
+  public final MotorInfo DRIVE_MOTOR_ID_RM = 
+      new MotorInfo(1, ActuControlTypes.TalonSRX)
+      .initInvert().initSaftey().encoder(new int[]{2,3}, 59.883/256./1000);
+  /** Information for left slave drive [Port,controller type, {invert,brake,connectionSaftey}]*/
+  public final MotorInfo DRIVE_MOTOR_ID_LS = 
+      new MotorInfo(5,ActuControlTypes.TalonSRX)
+      .initSaftey();
+  /** Information for right slave drive [Port,controller type, {invert,brake,connectionSaftey}]*/
+  public final MotorInfo DRIVE_MOTOR_ID_RS = 
+      new MotorInfo(2, ActuControlTypes.TalonSRX)
+      .initInvert().initSaftey();
 
   // Drive Simulation Constants
   public final double DRIVESIM_TRACK_WIDTH_METERS = 0.69;
@@ -68,6 +76,26 @@ public final class Constants {
   public final DCMotor DRIVESIM_GEARBOX = DCMotor.getCIM(2);
   public final double DRIVESIM_GEARING = 8;
 
+  // Turret
+  /** Limit switch for turret slew angle */
+  public final int TURRET_SLEW_LIMIT = -1;
+  /** Limit switch for turret slew angle */
+  public final int TURRET_HOOD_LIMIT = -1;
+  /** Information for turret slew motor [Port,controller type, {invert,brake,connectionSaftey}, Encoder]*/
+  public final MotorInfo TURRET_SLEW_MOTOR_ID = 
+      new MotorInfo(-1, ActuControlTypes.Default).initBrake().encoder(new int[]{-1,-1}, -1);
+  /** Information for turret slew motor [Port,controller type, {invert,brake,connectionSaftey}, Encoder]*/
+  public final MotorInfo TURRET_HOOD_MOTOR_ID = 
+      new MotorInfo(-1, ActuControlTypes.Default).initBrake().encoder(new int[]{-1,-1}, -1);
+  /** min max degree range for turret slew */
+  public final double[] TURRET_SLEW_RANGE = {0,270};
+  /** min max degree range for turret hood */
+  public final double[] TURRET_HOOD_RANGE = {0,0};
+  /** throttle limits for turret slew {>30,>10,<10}*/
+  public final double[] TURRET_SLEW_THROT_LIMS = {0.5,0.2,0.05};
+  /** throttle limits for turret hood */
+  public final double[] TURRET_HOOD_THROT_LIMS = {0.5,0.2,0.05};
+
   // Controller
   /** Port Number for xbox controller input device */
   public final int DEVICE_PORT_XBOX_CONTROLLER = 0; // WORKING
@@ -81,7 +109,7 @@ public final class Constants {
   public final String[] PATH_USB = { "u//", "v//" };
   /** file path header for files on internal storage */
   public final String PATH_INTERNAL = env.get("HOME");
-  /** file name for default auto */
+  /** file name for default auto @deprecated*/
   public final String PATH_AUTO_FILE_NAME = "autoCommands.txt";
 
   // Error Retry Limit
@@ -96,4 +124,31 @@ public final class Constants {
   /** distance between wheel center side to side (m)*/
   public final double robotWheelWidth = 0.870;
 
+  // Control
+  /** contoller deadband width from 0 */
+  public double DRIVE_DEADBAND = 0.1;
+
+  // Auto Straight PID Constants
+  /** Proportional constant for driving straight during auto */
+  public double AUTO_STRAIGHT_KP = 0.2; // UPDATE
+  /** Integral constant for driving straight during auto */
+  public double AUTO_STRAIGHT_KI = 0.8; // UPDATE
+  /** Derivative constant for driving straight during auto */
+  public double AUTO_STRAIGHT_KD = 0.0; // UPDATE
+
+  // Teleop Throttle PID Constants
+  /** Proportional constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KP = 0.2; // UPDATE
+  /** Integral constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KI = 0.0; // UPDATE
+  /** Derivative constant for throttle during teleop */
+  public double TELEOP_THROTTLE_KD = 0.8; // UPDATE
+  /** Proportional constant for steering during teleop */
+  public double TELEOP_STEERING_KP = 0.2; // UPDATE
+  /** Integral constant for steering during teleop */
+  public double TELEOP_STEERING_KI = 0.0; // UPDATE
+  /** Derivative constant for steering during teleop */
+  public double TELEOP_STEERING_KD = 0.8; // UPDATE
+  /** Encoder max rate for PID loop */
+  public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
 }

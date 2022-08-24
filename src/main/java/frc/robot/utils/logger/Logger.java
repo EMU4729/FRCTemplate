@@ -14,20 +14,21 @@ import java.text.SimpleDateFormat;
 import frc.robot.Constants;
 
 public class Logger {
-  private static Optional<Logger> instance = Optional.empty();
-  private ArrayList<LogLine> logCache = new ArrayList<LogLine>();
-  private final Constants constants = Constants.getInstance();
+  private static  Optional<Logger>    inst      = Optional.empty();
+  private final   Constants           cnst      = Constants.getInstance();
 
-  private final ReentrantLock cacheLock = new ReentrantLock();
+  private         ArrayList<LogLine>  logCache  = new ArrayList<LogLine>();
 
-  private Thread LogThread;
+  private final   ReentrantLock       cacheLock = new ReentrantLock();
 
-  private boolean logPause = false;
-  private boolean logStop = false;
+  private         Thread              LogThread;
 
-  private File logFile;
-  private String filePath;
-  private boolean FileCreationFailed = false;
+  private         boolean             logPause  = false;
+  private         boolean             logStop   = false;
+
+  private         File                logFile;
+  private         String              filePath;
+  private         boolean             FilCrtFld = false;
 
   private Logger() {
     findFilePath();
@@ -35,10 +36,10 @@ public class Logger {
     runLoggerThread();
   }
   public static Logger getInstance() {
-    if (!instance.isPresent()) {
-      instance = Optional.of(new Logger());
+    if (!inst.isPresent()) {
+      inst = Optional.of(new Logger());
     }
-    return instance.get();
+    return inst.get();
   }
 
   public static void header(String content) {
@@ -68,22 +69,22 @@ public class Logger {
   private void findFilePath(){
     if(logPause){ return; }
     try {
-      for(String tmpPath : constants.PATH_USB){
+      for(String tmpPath : cnst.PATH_USB){
         if(new File(tmpPath).exists()){
           filePath = tmpPath;
           System.out.println("Logger : File Path Found : "+filePath);
           return;
         }
       }
-      FileCreationFailed = true;
+      FilCrtFld = true;
       System.out.println("Logger : File Path Not Found : Logger printing to consol");
     } catch(SecurityException e) {
-      FileCreationFailed = true;
+      FilCrtFld = true;
       System.out.println("Logger : File Path Security Exception : Logger printing to consol");
     }
   }
   private void makeFile(){
-    if(FileCreationFailed || logPause){return;}
+    if(FilCrtFld || logPause){return;}
 
     Date date = Calendar.getInstance().getTime();
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_hh-mm");
@@ -91,25 +92,25 @@ public class Logger {
     
     try { 
       for(int i = 0; !logFile.createNewFile(); i++){
-        if(i > constants.REPEAT_LIMIT_LOGGER_CREATION){
-          FileCreationFailed = true;
+        if(i > cnst.REPEAT_LIMIT_LOGGER_CREATION){
+          FilCrtFld = true;
           System.out.println("Logger : File Creation Failed : Timed Out : Logger printing to consol");
           return;
         }
         logFile = new File(filePath+dateFormat.format(date)+"_("+i+").txt");
       }
     } catch(IOException e){
-      FileCreationFailed = true;
+      FilCrtFld = true;
       System.out.println("Logger : File Creation Failed : IOException : "+e+" : Logger printing to consol");
     } catch(SecurityException e){
-      FileCreationFailed = true;
+      FilCrtFld = true;
       System.out.println("Logger : File Creation Failed : Security Exception : "+e+" : Logger printing to consol");
     }
   }
   public void save() {
     if(logCache.isEmpty() || logPause){ return; }
     cacheLock.lock();
-    if(FileCreationFailed){
+    if(FilCrtFld){
       while(!logCache.isEmpty()){
         System.out.println(logCache.remove(0).toString());
       }
@@ -162,7 +163,7 @@ public class Logger {
       try {
         while(!logStop){
           save();
-          Thread.sleep(1000 / constants.LOGGER_SAVE_RATE);
+          Thread.sleep(1000 / cnst.LOGGER_SAVE_RATE);
         }
       } catch (InterruptedException e){
         System.out.println("Logger : Save Thread Interupted : "+e);

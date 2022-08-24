@@ -22,10 +22,10 @@ import frc.robot.teleop.TeleopProvider;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Variables variables = Variables.getInstance();
-  private final AutoProvider autoProvider = AutoProvider.getInstance();
-  private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
-  private final OI oi = OI.getInstance();
+  private final Variables       vars            = Variables.getInstance();
+  private final AutoProvider    autoProvider    = AutoProvider.getInstance();
+  private final TeleopProvider  teleopProvider  = TeleopProvider.getInstance();
+  private final OI              oi              = OI.getInstance();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -46,7 +46,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Invert Drive
     oi.start.whenPressed(
-        new InstantCommand(() -> variables.invertDriveDirection = !variables.invertDriveDirection));
+        new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
     // Drive bindings handled in teleop command
   }

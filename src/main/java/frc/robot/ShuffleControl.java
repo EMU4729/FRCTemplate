@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 
 public class ShuffleControl {
-  private static Optional<ShuffleControl> instance = Optional.empty();
+  private static  Optional<ShuffleControl>  inst  = Optional.empty();
 
-  private ShuffleboardTab drive = Shuffleboard.getTab("Drive");
+  private         ShuffleboardTab           drive = Shuffleboard.getTab("Drive");
 
   private ShuffleboardLayout inOut = drive
       .getLayout("Input Output", BuiltInLayouts.kList)
@@ -72,10 +72,10 @@ public class ShuffleControl {
   
 
   public static ShuffleControl getInstance() {
-    if (instance.isEmpty()) {
-      instance = Optional.of(new ShuffleControl());
+    if (inst.isEmpty()) {
+      inst = Optional.of(new ShuffleControl());
     }
-    return instance.get();
+    return inst.get();
   }
 
 }

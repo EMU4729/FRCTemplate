@@ -3,12 +3,12 @@ package frc.robot.utils.logger;
 import edu.wpi.first.wpilibj.RobotController;
 
 public class LogLine {
-  private final LogLevel level;
-  private final String content;
+  private final LogLevel  level;
+  private final String    content;
 
   public LogLine(String content, LogLevel level) {
-    this.level = level;
-    this.content = content;
+    this.level    = level;
+    this.content  = content;
   }
 
   public String toString() {

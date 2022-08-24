@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Subsystems;
 
 public class Auto extends SequentialCommandGroup {
-  private final Subsystems subsystems = Subsystems.getInstance();
+  private final Subsystems subs = Subsystems.getInstance();
 
   public Auto() {
     addCommands(

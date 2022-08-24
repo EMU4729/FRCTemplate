@@ -5,19 +5,31 @@ import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.Constants;
+import frc.robot.utils.CrvFt;
 import frc.robot.utils.logger.Logger;
 
 /**
  * The Teleop Command.
  */
 public class TeleopDrive extends CommandBase {
-  private final Variables variables = Variables.getInstance();
-  private final Constants constants = Constants.getInstance();
-  private final Subsystems subsystems = Subsystems.getInstance();
-  private final OI oi = OI.getInstance();
+  private final Variables   vars      = Variables.getInstance();
+  private final Constants   cnst      = Constants.getInstance();
+  private final Subsystems  subs      = Subsystems.getInstance();
+  private final OI          oi        = OI.getInstance();
+  private       boolean     accel     = true;
 
-  public TeleopDrive() {
-    addRequirements(subsystems.drive);
+  private       double      lastThrot = 0;
+
+  private final CrvFt       throtFit;
+  private final CrvFt       steerFit;
+
+  public TeleopDrive(){
+    this(Variables.getInstance().DriveSettingsTELEOP);
+  }
+  public TeleopDrive(double[][] settings) {
+    throtFit = new CrvFt(settings[1][1],settings[1][2],settings[1][3]);
+    steerFit = new CrvFt(settings[2][1],settings[2][2],settings[2][3]);
+    addRequirements(subs.drive);
   }
 
   @Override
@@ -26,43 +38,19 @@ public class TeleopDrive extends CommandBase {
 
   @Override
   public void execute() {
-    // Speed Input Curve: s = c^x
-    // Where s is output speed, c is joystick value and x is a input curve exponent
-    // constant.
+    double throttle = throtFit.fit(oi.controller.getLeftY());
+    double steering = steerFit.fit(oi.controller.getRightX(),0.5+0.5*Math.abs(throttle));//limiting max steering based on throttle
 
-    double throttle = getThrottle();
-    double steering = getSteering();
-    double speedMultiplier = variables.teleopSpeedMultiplier;
-    int reversalMultiplier = variables.invertDriveDirection ? 1 : -1;
+    throttle = throttle * (vars.invertDriveDirection ? 1 : -1); //flips the direction of forward based on controller button
 
-    double speed = throttle * speedMultiplier * reversalMultiplier;
-
+    lastThrot += Math.copySign(vars.accelInterval, (throttle - lastThrot));
+    if(accel){throttle = lastThrot;}
     // If needed, make the teleop speed multiplier affect steering, too
-    subsystems.drive.arcade(speed, steering);
+    subs.drive.arcade(throttle, steering);
   }
 
   @Override
   public boolean isFinished() {
     return false;
-  }
-
-  private double getThrottle(){
-    double throttle = oi.controller.getLeftY();
-    if(Math.abs(throttle) < constants.CONTROLLER_AXIS_DEADZONE){return 0;}
-    throttle = Math.pow(throttle, variables.speedCurveExponent);
-    throttle = Math.copySign(
-        Math.abs(throttle)*(1.0-variables.robotMinThrottle) + variables.robotMinThrottle,
-        throttle);
-    return throttle;
-  }
-
-  private double getSteering(){
-    double steering = oi.controller.getRightX();
-    if(Math.abs(steering) < constants.CONTROLLER_AXIS_DEADZONE){return 0;}
-    steering = Math.pow(steering, variables.turnCurveExponent);
-    steering = Math.copySign(
-        Math.abs(steering)*(1.0-variables.robotMinThrottle) + variables.robotMinThrottle,
-        steering);
-    return steering;
   }
 }

@@ -13,17 +13,17 @@ import frc.robot.utils.AxisButton;
  * OI - Use this class to access and initialize all controller-related stuff.
  */
 public class OI {
-  private static Optional<OI> instance = Optional.empty();
-  private final Constants constants = Constants.getInstance();
+  private static  Optional<OI>  inst = Optional.empty();
+  private final   Constants     cnst = Constants.getInstance();
 
   public static OI getInstance() {
-    if (!instance.isPresent()) {
-      instance = Optional.of(new OI());
+    if (!inst.isPresent()) {
+      inst = Optional.of(new OI());
     }
-    return instance.get();
+    return inst.get();
   }
 
-  public final XboxController controller = new XboxController(constants.DEVICE_PORT_XBOX_CONTROLLER);
+  public final XboxController controller = new XboxController(cnst.DEVICE_PORT_XBOX_CONTROLLER);
 
   public final JoystickButton start = new JoystickButton(controller,
       Button.kStart.value);
@@ -35,9 +35,9 @@ public class OI {
       Button.kRightBumper.value);
 
   public final AxisButton rtButton = new AxisButton(controller, Axis.kRightTrigger.value,
-      constants.CONTROLLER_TRIGGER_THRESHOLD);
+      cnst.CONTROLLER_TRIGGER_THRESHOLD);
   public final AxisButton ltButton = new AxisButton(controller, Axis.kLeftTrigger.value,
-      constants.CONTROLLER_TRIGGER_THRESHOLD);
+      cnst.CONTROLLER_TRIGGER_THRESHOLD);
 
   public final JoystickButton lsButton = new JoystickButton(controller, Button.kLeftStick.value);
   public final JoystickButton rsButton = new JoystickButton(controller, Button.kRightStick.value);

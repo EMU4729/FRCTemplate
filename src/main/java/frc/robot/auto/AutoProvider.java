@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Command for Autonomous.
  */
 public class AutoProvider {
-  private static Optional<AutoProvider> instance = Optional.empty();
+  private static Optional<AutoProvider>   inst    = Optional.empty();
 
-  private final Command auto = new Auto();
-  private final SendableChooser<Command> chooser = new SendableChooser<>();
+  private final  Command                  auto    = new Auto();
+  private final  SendableChooser<Command> chooser = new SendableChooser<>();
 
   private AutoProvider() {
     chooser.setDefaultOption("Default Auto", auto);
@@ -22,10 +22,10 @@ public class AutoProvider {
   }
 
   public static AutoProvider getInstance() {
-    if (!instance.isPresent()) {
-      instance = Optional.of(new AutoProvider());
+    if (!inst.isPresent()) {
+      inst = Optional.of(new AutoProvider());
     }
-    return instance.get();
+    return inst.get();
   }
 
   public Command getAuto() {

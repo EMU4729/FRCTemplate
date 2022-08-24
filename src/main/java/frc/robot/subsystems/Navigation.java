@@ -10,14 +10,14 @@ import frc.robot.Constants;
 import frc.robot.utils.logger.Logger;
 
 public class Navigation extends SubsystemBase{
-  private final Constants constants = Constants.getInstance();
+  private final Constants                 cnst = Constants.getInstance();
 
-  private final ADIS16470_IMU imu = new ADIS16470_IMU();
-  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
+  private final ADIS16470_IMU             imu       = new ADIS16470_IMU();
+  private final DifferentialDriveOdometry odometry  = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(imu.getAngle()));
 
-  public final Encoder drvLeftEncoder = constants.DRIVE_MOTOR_ID_LM.createEncoder();
-  public final Encoder drvRightEncoder = constants.DRIVE_MOTOR_ID_RM.createEncoder();
+  public final Encoder                    drvLeftEncoder = cnst.DRIVE_MOTOR_ID_LM.createEncoder();
+  public final Encoder                    drvRightEncoder = cnst.DRIVE_MOTOR_ID_RM.createEncoder();
   
   
   /** m from start pos in x rel to start angle @WIP not implimented */
@@ -62,7 +62,7 @@ public class Navigation extends SubsystemBase{
     double vR = getRightEncoderRate();
       
     if(vL == vR){
-      double centRad = (vL*constants.robotWheelWidth)/(vR - vL) + 0.5*constants.robotWheelWidth;
+      double centRad = (vL*cnst.robotWheelWidth)/(vR - vL) + 0.5*cnst.robotWheelWidth;
       return Math.toDegrees(getCOMSpeed()/centRad);
     }
     return 0;

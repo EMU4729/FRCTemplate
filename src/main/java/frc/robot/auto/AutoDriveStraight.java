@@ -11,14 +11,14 @@ import frc.robot.Subsystems;
  * Only to be used in autonomous.
  */
 public class AutoDriveStraight extends CommandBase {
-  private final Constants constants = Constants.getInstance();
-  private final Subsystems subsystems = Subsystems.getInstance();
+  private final Constants     cnst = Constants.getInstance();
+  private final Subsystems    subs = Subsystems.getInstance();
 
-  private double speed;
-  private PIDController pid;
+  private       double        speed;
+  private       PIDController pid;
 
   public AutoDriveStraight() {
-    addRequirements(subsystems.drive);
+    addRequirements(subs.drive);
   }
 
   public void run(double targetAngle, double speed) {
@@ -43,7 +43,7 @@ public class AutoDriveStraight extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    subsystems.drive.off();
+    subs.drive.off();
   }
 
 }

@@ -11,41 +11,17 @@ import java.util.Optional;
  * settings/options/variables.
  */
 public final class Variables {
-  private static Optional<Variables> instance = Optional.empty();
+  private static Optional<Variables> inst = Optional.empty();
 
   private Variables() {
   }
 
   public static Variables getInstance() {
-    if (!instance.isPresent()) {
-      instance = Optional.of(new Variables());
+    if (!inst.isPresent()) {
+      inst = Optional.of(new Variables());
     }
-    return instance.get();
+    return inst.get();
   }
-
-  // Auto Straight PID Constants
-  /** Proportional constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KP = 0.2; // UPDATE
-  /** Integral constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KI = 0.8; // UPDATE
-  /** Derivative constant for driving straight during auto */
-  public double AUTO_STRAIGHT_KD = 0.0; // UPDATE
-
-  // Teleop Throttle PID Constants
-  /** Proportional constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KP = 0.2; // UPDATE
-  /** Integral constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KI = 0.0; // UPDATE
-  /** Derivative constant for throttle during teleop */
-  public double TELEOP_THROTTLE_KD = 0.8; // UPDATE
-  /** Proportional constant for steering during teleop */
-  public double TELEOP_STEERING_KP = 0.2; // UPDATE
-  /** Integral constant for steering during teleop */
-  public double TELEOP_STEERING_KI = 0.0; // UPDATE
-  /** Derivative constant for steering during teleop */
-  public double TELEOP_STEERING_KD = 0.8; // UPDATE
-  /** Encoder max rate for PID loop */
-  public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
 
   /** Bool to invert robot steering direction */
   public boolean invertSteering = false;
@@ -62,13 +38,28 @@ public final class Variables {
   /** Drive Turning Curve Exponent */
   public double turnCurveExponent = 3;
 
-
-  /** max speed the robot can do in a straight line m/s*/
+  /** max speed of robot m/s*/
   public double robotMaxSpeed = 3.850;
-  /** min throttle for robot to move 0->1 */
-  public double robotMinThrottle = 0.3;
-  /** min steering for robot to turn% 0->1 */
-  public double robotMinTurn = 0.3;
+  /** seconds 0 -> max */
+  public int accelTime = 5;
+  private double accelSteps = accelTime/0.02;
+  public double accelInterval = 1/accelSteps;
+  /** min throttle for movement */
+  public double robotminThrot = 0.3;
+  /** min throttle for turning */
+  public double robotminTurn = 0.3;
+  /** settings for robot drive in default teleop  
+   * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve power}*/
+  public double[][] DriveSettingsTELEOP = {{robotminThrot,1,3},{robotminTurn,0.8,3}};
+  /** settings for robot drive in demo mode  
+   * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve power}*/
+  public double[][] DriveSettingsDEMO = {{robotminThrot,0.6,3},{robotminTurn,0.6,3}};
+  /** settings for robot drive in PID drive  
+   * {min speed,max speed,curve power}, {min turn rate , max turn rate,curve power}*/
+  public double[][] DriveSettingsPID1 = {{0,robotMaxSpeed,3},{0,1,3}};
+  /** settings for robot drive in PID drive  
+  * {min speed,max speed,curve power}, {min turn rate , max turn rate,curve power}*/
+ public double[][] DriveSettingsPID2 = {{robotminThrot,1,1},{robotminTurn,1,1}};
 
   /** should max speed be updated if the robot exedes it */
   public boolean autoUpdateMaxSpeed = false;
