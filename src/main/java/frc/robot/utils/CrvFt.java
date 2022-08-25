@@ -6,6 +6,7 @@ public class CrvFt {
   private double inMin;     private double inMax;
   public double outAbsMin; public double outAbsMax;
   public double pow;
+  public double throtEffect = 1;
 
   /** fits curve and adjusts range of input */
   public CrvFt(double outMin,double outMax,double pow){
@@ -20,6 +21,10 @@ public class CrvFt {
     this.outAbsMin = outAbsMin;
     this.outAbsMax = outAbsMax;
     this.pow = pow;
+  }
+  public CrvFt initThrotEffect(double throtEffect){
+    this.throtEffect = throtEffect;
+    return this;
   }
     
   /** <pre> 
@@ -46,6 +51,9 @@ public class CrvFt {
    * <pre>
    */
   public double fit(double input, double maxOutAdjust){
+    if(input == 0){return 0;}
+    maxOutAdjust = (1-throtEffect)+throtEffect*Math.abs(maxOutAdjust);
+
     input = MathUtil.clamp(input, inMin, inMax);                                          //clamp input within the input min max
     input = ((input-inMin)/(inMax-inMin)-0.5)*2;                                          //reset range to -1 to 1
     input = Math.copySign(Math.pow(Math.abs(input), pow),input);                          //fit power of curve to the input

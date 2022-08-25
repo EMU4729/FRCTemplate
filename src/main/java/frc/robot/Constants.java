@@ -124,9 +124,6 @@ public final class Constants {
   /** distance between wheel center side to side (m)*/
   public final double robotWheelWidth = 0.870;
 
-  // Control
-  /** contoller deadband width from 0 */
-  public double DRIVE_DEADBAND = 0.1;
 
   // Auto Straight PID Constants
   /** Proportional constant for driving straight during auto */

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OI;
+import frc.robot.ShuffleControl;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.utils.CrvFt;
@@ -24,11 +25,12 @@ public class PIDTeleopDrive extends CommandBase {
   private final CrvFt       steerFit;
 
   public PIDTeleopDrive(){
-    this(Variables.getInstance().DriveSettingsPID1);
+    this(Variables.getInstance().DriveSettingsPID1,Variables.getInstance().DriveSettingsPID2);
   }
-  public PIDTeleopDrive(double[][] settings) {
-    throtFit = new CrvFt(settings[1][1],settings[1][2],settings[1][3]);
-    steerFit = new CrvFt(settings[2][1],settings[2][2],settings[2][3]);
+  public PIDTeleopDrive(double[][] settings1,double[][] settings2) {
+    throtFit = new CrvFt(settings1[0][0],settings1[0][1],settings1[0][2]);
+    steerFit = new CrvFt(settings1[1][0],settings1[1][1],settings1[1][2]).initThrotEffect(settings1[1][3]);
+    subs.drive.pidArcadeSetup(settings2);
     addRequirements(subs.drive);
   }
 
@@ -38,10 +40,11 @@ public class PIDTeleopDrive extends CommandBase {
 
   @Override
   public void execute() {    
-    double speed = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(),cnst.DRIVE_DEADBAND));
-    double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(),cnst.DRIVE_DEADBAND),0.5+0.5*Math.abs(speed/throtFit.outAbsMax));
+    double speed = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(),cnst.CONTROLLER_AXIS_DEADZONE));
+    double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(),cnst.CONTROLLER_AXIS_DEADZONE),speed/throtFit.outAbsMax);
     int reversalMultiplier = vars.invertDriveDirection ? 1 : -1;
 
+    ShuffleControl.getInstance().setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
     subs.drive.pidArcade(speed*reversalMultiplier, steering);
   }
 

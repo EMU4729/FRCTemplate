@@ -12,16 +12,22 @@ import frc.robot.subsystems.Turret;
 public class Subsystems {
   private static Optional<Subsystems> inst = Optional.empty();
 
-  public static final Navigation nav = new Navigation(); //leave it static (crash)
-  public final DriveSub drive = new DriveSub();
-  //public final Turret turret = new Turret();
+  public Navigation nav;
+  public DriveSub drive;
+  //public final Turret turret;
 
   private Subsystems() {
+  }
+  private void init(){
+    nav = new Navigation();
+    drive = new DriveSub();
+    //turret = new Turret();
   }
 
   public static Subsystems getInstance() {
     if (inst.isEmpty()) {
       inst = Optional.of(new Subsystems());
+      inst.get().init();
     }
     return inst.get();
   }

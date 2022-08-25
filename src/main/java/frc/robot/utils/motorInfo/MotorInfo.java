@@ -72,7 +72,7 @@ public class MotorInfo {
       if(EncoderPort.get()[0] < 0){throw new IllegalStateException("MotorInfo : encoder port 1 < 0, check port is setup");}
       if(EncoderPort.get()[1] < 0){throw new IllegalStateException("MotorInfo : encoder port 2 < 0, check port is setup");}
     } else {throw new IllegalStateException("MotorInfo : EncoderPort not found, check EncoderPort is defined");}
-    if(EncoderSteps.isEmpty()){
+    if(EncoderSteps.isPresent()){
       if(EncoderSteps.get() < 0){throw new IllegalArgumentException("MotorInfo : EncoderSteps < 0, check EncoderSteps is setup");}
     } else {throw new IllegalStateException("MotorInfo : EncoderSteps not found, check EncoderSteps is defined");}
     

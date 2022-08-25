@@ -49,17 +49,17 @@ public final class Variables {
   /** min throttle for turning */
   public double robotminTurn = 0.3;
   /** settings for robot drive in default teleop  
-   * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve power}*/
-  public double[][] DriveSettingsTELEOP = {{robotminThrot,1,3},{robotminTurn,0.8,3}};
+   * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve power,throttle effect}*/
+  public double[][] DriveSettingsTELEOP = {{robotminThrot,1,3},{robotminTurn,1,3,0.3}};
   /** settings for robot drive in demo mode  
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve power}*/
-  public double[][] DriveSettingsDEMO = {{robotminThrot,0.6,3},{robotminTurn,0.6,3}};
+  public double[][] DriveSettingsDEMO = {{robotminThrot,0.5,3},{robotminTurn,0.6,3,0.1}};
   /** settings for robot drive in PID drive  
    * {min speed,max speed,curve power}, {min turn rate , max turn rate,curve power}*/
-  public double[][] DriveSettingsPID1 = {{0,robotMaxSpeed,3},{0,1,3}};
+  public double[][] DriveSettingsPID1 = {{0,robotMaxSpeed,3},{0,1,3,0.3}};
   /** settings for robot drive in PID drive  
   * {min speed,max speed,curve power}, {min turn rate , max turn rate,curve power}*/
- public double[][] DriveSettingsPID2 = {{robotminThrot,1,1},{robotminTurn,1,1}};
+ public double[][] DriveSettingsPID2 = {{robotminThrot,1,1},{robotminTurn,1,1,0.3}};
 
   /** should max speed be updated if the robot exedes it */
   public boolean autoUpdateMaxSpeed = false;

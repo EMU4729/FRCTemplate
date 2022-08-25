@@ -32,10 +32,10 @@ public class DriveSub extends SubsystemBase {
   private final MotorController       rightSlave  = cnst.DRIVE_MOTOR_ID_RS.createMotorController();
   private final MotorControllerGroup  rightMotors = new MotorControllerGroup(rightMaster, rightSlave);
 
-  private final DifferentialDrive     drive       = new DifferentialDrive(leftMotors, rightMotors);
+  public  final DifferentialDrive     drive       = new DifferentialDrive(leftMotors, rightMotors); //pub for shuffleboard
 
-  private final PIDController         PIDthrot    = new PIDController(0,0,0);
-  private final PIDController         PIDsteer    = new PIDController(0,0,0);
+  public  final PIDController         PIDthrot    = new PIDController(0,0,0);                       //pub for shuffleboard
+  public  final PIDController         PIDsteer    = new PIDController(0,0,0);                       //pub for shuffleboard
 
   private       CrvFt                 PIDThrotCurve;
   private       CrvFt                 PIDTurnCurve;
@@ -60,8 +60,8 @@ public class DriveSub extends SubsystemBase {
   }
 
   public void pidArcadeSetup(double[][] settings){
-    PIDThrotCurve = new CrvFt(settings[1][1], settings[1][2], settings[1][3]);
-    PIDTurnCurve = new CrvFt(settings[2][1], settings[2][2], settings[2][3]);
+    PIDThrotCurve = new CrvFt(settings[0][0], settings[0][1], settings[0][2]);
+    PIDTurnCurve = new CrvFt(settings[1][0], settings[1][1], settings[1][2]);
   }
   /**
    * runs a pid loop to drive at set speed and turn rate

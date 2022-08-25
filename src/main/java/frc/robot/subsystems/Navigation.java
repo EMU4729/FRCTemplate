@@ -12,7 +12,7 @@ import frc.robot.utils.logger.Logger;
 public class Navigation extends SubsystemBase{
   private final Constants                 cnst = Constants.getInstance();
 
-  private final ADIS16470_IMU             imu       = new ADIS16470_IMU();
+  public final ADIS16470_IMU             imu       = new ADIS16470_IMU();
   private final DifferentialDriveOdometry odometry  = new DifferentialDriveOdometry(
       Rotation2d.fromDegrees(imu.getAngle()));
 
@@ -52,7 +52,6 @@ public class Navigation extends SubsystemBase{
   
   /** Gets the average encoder rate. @return speed of COM. m/s*/
   private double getCOMSpeed() {
-    Logger.info("Speed : L - "+getLeftEncoderRate()+", R - "+getRightEncoderRate()+" T - "+(getLeftEncoderRate() + getRightEncoderRate()) / 2);
     return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
   }
   
