@@ -25,6 +25,7 @@ public class RobotContainer {
   private final Variables       vars            = Variables.getInstance();
   private final AutoProvider    autoProvider    = AutoProvider.getInstance();
   private final TeleopProvider  teleopProvider  = TeleopProvider.getInstance();
+  private final Commands        coms            = Commands.getInstance(); 
   private final OI              oi              = OI.getInstance();
 
   /**
@@ -48,7 +49,26 @@ public class RobotContainer {
     oi.start.whenPressed(
         new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
+    oi.b.whenPressed(
+        new InstantCommand(() -> vars.test1Speed += 0.1));
+
+    oi.x.whenPressed(
+        new InstantCommand(() -> vars.test1Speed -= 0.1));
+
+    oi.y.whenHeld(coms.test1Forward);
+
+    oi.a.whenHeld(coms.test1Backward);
     // Drive bindings handled in teleop command
+
+    oi.dPadN.whenPressed(
+        new InstantCommand(() -> vars.test2Speed += 0.1));
+
+    oi.dPadS.whenPressed(
+        new InstantCommand(() -> vars.test2Speed -= 0.1));
+
+    oi.dPadE.whenHeld(coms.test2Forward);
+
+    oi.dPadW.whenHeld(coms.test2Backward);
   }
 
   /**

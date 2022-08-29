@@ -96,6 +96,14 @@ public final class Constants {
   /** throttle limits for turret hood */
   public final double[] TURRET_HOOD_THROT_LIMS = {0.5,0.2,0.05};
 
+  //Test
+  /** Information for turret test motor [Port,controller type, {invert,brake,connectionSaftey}, Encoder]*/
+  public final MotorInfo TEST_1_MOTOR_ID =
+      new MotorInfo(6, ActuControlTypes.VictorSPX).initBrake();
+  /** Information for turret test motor [Port,controller type, {invert,brake,connectionSaftey}, Encoder]*/
+  public final MotorInfo TEST_2_MOTOR_ID =
+      new MotorInfo(7, ActuControlTypes.VictorSPX).initBrake();
+
   // Controller
   /** Port Number for xbox controller input device */
   public final int DEVICE_PORT_XBOX_CONTROLLER = 0; // WORKING
