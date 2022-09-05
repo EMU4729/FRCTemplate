@@ -4,16 +4,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
 
-public class Test2Backward extends CommandBase{
+public class Test2Backward extends CommandBase {
     private final Subsystems subs = Subsystems.getInstance();
     private final Variables vars = Variables.getInstance();
 
-    public Test2Backward(){
+    public Test2Backward() {
         addRequirements(subs.test1);
     }
 
     @Override
-    public void initialize(){
+    public void initialize() {
         subs.test2.setSpeed(-vars.test2Speed);
     }
 

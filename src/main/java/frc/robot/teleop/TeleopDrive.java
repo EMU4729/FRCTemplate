@@ -3,40 +3,40 @@ package frc.robot.teleop;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.OI;
 import frc.robot.ShuffleControl;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.Constants;
-import frc.robot.utils.CrvFt;
+import frc.robot.utils.CurveFit;
 import frc.robot.utils.logger.Logger;
 
 /**
  * The Teleop Command.
  */
 public class TeleopDrive extends CommandBase {
-  private final Variables       vars      = Variables.getInstance();
-  private final Constants       cnst      = Constants.getInstance();
-  private final Subsystems      subs      = Subsystems.getInstance();
-  private final OI              oi        = OI.getInstance();
-  private       Optional<ShuffleControl> shuffle = Optional.empty();
-  private       boolean     accel     = false;
+  private final Variables vars = Variables.getInstance();
+  private final Constants cnst = Constants.getInstance();
+  private final Subsystems subs = Subsystems.getInstance();
+  private final OI oi = OI.getInstance();
+  private Optional<ShuffleControl> shuffle = Optional.empty();
+  private boolean accel = false;
 
-  private       double      lastThrot = 0;
+  private double lastThrot = 0;
 
   int i = 0;
 
-  private final CrvFt       throtFit;
-  private final CrvFt       steerFit;
+  private final CurveFit throtFit;
+  private final CurveFit steerFit;
 
-  public TeleopDrive(){
+  public TeleopDrive() {
     this(Variables.getInstance().DriveSettingsTELEOP);
   }
+
   public TeleopDrive(double[][] settings) {
-    throtFit = new CrvFt(settings[0][0],settings[0][1],settings[0][2]);
-    steerFit = new CrvFt(settings[1][0],settings[1][1],settings[1][2]).initThrotEffect(settings[1][3]);
+    throtFit = new CurveFit(settings[0][0], settings[0][1], settings[0][2]);
+    steerFit = new CurveFit(settings[1][0], settings[1][1], settings[1][2]).setThrotEffect(settings[1][3]);
     addRequirements(subs.drive);
   }
 
@@ -47,17 +47,28 @@ public class TeleopDrive extends CommandBase {
   @Override
   public void execute() {
 
-    double throttle = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(),cnst.CONTROLLER_AXIS_DEADZONE));
-    double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(),cnst.CONTROLLER_AXIS_DEADZONE)
-        ,throttle);//limiting max steering based on throttle
-    if(i%100==0){i=0;Logger.info("throt stick : "+oi.controller.getLeftY()+" throt : "+throttle+" steer stick : "+oi.controller.getRightX()+"steer : "+steering);}else{i++;}
+    double throttle = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(), cnst.CONTROLLER_AXIS_DEADZONE));
+    double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(), cnst.CONTROLLER_AXIS_DEADZONE),
+        throttle);// limiting max steering based on throttle
+    if (i % 100 == 0) {
+      i = 0;
+      Logger.info("throt stick : " + oi.controller.getLeftY() + " throt : " + throttle + " steer stick : "
+          + oi.controller.getRightX() + "steer : " + steering);
+    } else {
+      i++;
+    }
 
-    throttle = throttle * (vars.invertDriveDirection ? 1 : -1); //flips the direction of forward based on controller button
+    throttle = throttle * (vars.invertDriveDirection ? 1 : -1); // flips the direction of forward based on controller
+                                                                // button
 
     lastThrot += Math.copySign(vars.accelInterval, (throttle - lastThrot));
-    if(accel){throttle = lastThrot;}
+    if (accel) {
+      throttle = lastThrot;
+    }
     // If needed, make the teleop speed multiplier affect steering, too
-    if(shuffle.isEmpty()){shuffle = Optional.of(ShuffleControl.getInstance());}
+    if (shuffle.isEmpty()) {
+      shuffle = Optional.of(ShuffleControl.getInstance());
+    }
     shuffle.get().setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
     shuffle.get().setThrotGraph(-oi.controller.getLeftY(), throttle);
     shuffle.get().setSteerGraph(oi.controller.getRightX(), steering);

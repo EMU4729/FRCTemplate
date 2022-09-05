@@ -19,11 +19,11 @@ import frc.robot.utils.logger.Logger;
  * project.
  */
 public class Robot extends TimedRobot {
-  private Command         autoCommand;
-  private Command         teleopCommmand;
-  private RobotContainer  robotContainer;
+  private Command autoCommand;
+  private Command teleopCommmand;
+  private RobotContainer robotContainer;
 
-  private final Logger    logger          = Logger.getInstance();
+  private final Logger logger = Logger.getInstance();
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
-    ShuffleControl.getInstance(); //init ShuffleBoard
+    ShuffleControl.getInstance(); // init ShuffleBoard
   }
 
   /**

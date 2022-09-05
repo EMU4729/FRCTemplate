@@ -13,10 +13,10 @@ import frc.robot.Variables;
 public class TeleopProvider {
   private static Optional<TeleopProvider> inst = Optional.empty();
 
-  private final Command                   teleop    = new TeleopDrive();
-  private final Command                   demo      = new TeleopDrive(Variables.getInstance().DriveSettingsDEMO);
-  private final Command                   pidTeleop = new PIDTeleopDrive();
-  public  final SendableChooser<Command>  chooser   = new SendableChooser<>(); // pub for shuffle board
+  private final Command teleop = new TeleopDrive();
+  private final Command demo = new TeleopDrive(Variables.getInstance().DriveSettingsDEMO);
+  private final Command pidTeleop = new PIDTeleopDrive();
+  public final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
 
   private TeleopProvider() {
     chooser.setDefaultOption("Default Teleop", teleop);

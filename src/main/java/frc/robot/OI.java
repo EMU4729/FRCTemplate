@@ -13,8 +13,8 @@ import frc.robot.utils.AxisButton;
  * OI - Use this class to access and initialize all controller-related stuff.
  */
 public class OI {
-  private static  Optional<OI>  inst = Optional.empty();
-  private final   Constants     cnst = Constants.getInstance();
+  private static Optional<OI> inst = Optional.empty();
+  private final Constants cnst = Constants.getInstance();
 
   public static OI getInstance() {
     if (!inst.isPresent()) {
