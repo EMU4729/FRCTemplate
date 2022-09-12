@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Variables;
+// import frc.robot.Variables;
 
 public class TurretSub extends SubsystemBase {
   private final Constants cnst = Constants.getInstance();
-  private final Variables vars = Variables.getInstance();
+  // private final Variables vars = Variables.getInstance();
 
   private final MotorController slew = cnst.TURRET_SLEW_MOTOR_ID.createMotorController();
   private final Encoder slewEncoder = cnst.TURRET_SLEW_MOTOR_ID.createEncoder();

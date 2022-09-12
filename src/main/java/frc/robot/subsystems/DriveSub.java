@@ -2,18 +2,14 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Subsystems;
 import frc.robot.utils.CurveFit;
-import frc.robot.utils.logger.Logger;
-import frc.robot.Variables;
-import frc.robot.teleop.PIDTeleopDrive;
+// import frc.robot.Variables;
 
 /**
  * Drive Subsystem.
@@ -22,7 +18,7 @@ import frc.robot.teleop.PIDTeleopDrive;
 public class DriveSub extends SubsystemBase {
   private final Constants cnst = Constants.getInstance();
   private final Subsystems subs = Subsystems.getInstance();
-  private final Variables vars = Variables.getInstance();
+  // private final Variables vars = Variables.getInstance();
 
   private final MotorController leftMaster = cnst.DRIVE_MOTOR_ID_LM.createMotorController();
   private final MotorController leftSlave = cnst.DRIVE_MOTOR_ID_LS.createMotorController();

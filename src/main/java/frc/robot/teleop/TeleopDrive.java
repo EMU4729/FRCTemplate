@@ -20,15 +20,14 @@ public class TeleopDrive extends CommandBase {
   private final Constants cnst = Constants.getInstance();
   private final Subsystems subs = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
-  private Optional<ShuffleControl> shuffle = Optional.empty();
-  private boolean accel = false;
-
-  private double lastThrot = 0;
-
-  int i = 0;
 
   private final CurveFit throtFit;
   private final CurveFit steerFit;
+
+  private Optional<ShuffleControl> shuffle = Optional.empty();
+  private boolean accel = false;
+  private double lastThrot = 0;
+  int i = 0;
 
   public TeleopDrive() {
     this(Variables.getInstance().DriveSettingsTELEOP);
@@ -46,10 +45,10 @@ public class TeleopDrive extends CommandBase {
 
   @Override
   public void execute() {
-
     double throttle = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(), cnst.CONTROLLER_AXIS_DEADZONE));
     double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(), cnst.CONTROLLER_AXIS_DEADZONE),
         throttle);// limiting max steering based on throttle
+
     if (i % 100 == 0) {
       i = 0;
       Logger.info("throt stick : " + oi.controller.getLeftY() + " throt : " + throttle + " steer stick : "
@@ -65,13 +64,15 @@ public class TeleopDrive extends CommandBase {
     if (accel) {
       throttle = lastThrot;
     }
-    // If needed, make the teleop speed multiplier affect steering, too
+
+    // Update ShuffleBoard
     if (shuffle.isEmpty()) {
       shuffle = Optional.of(ShuffleControl.getInstance());
     }
     shuffle.get().setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
     shuffle.get().setThrotGraph(-oi.controller.getLeftY(), throttle);
     shuffle.get().setSteerGraph(oi.controller.getRightX(), steering);
+
     subs.drive.arcade(throttle, steering);
   }
 
