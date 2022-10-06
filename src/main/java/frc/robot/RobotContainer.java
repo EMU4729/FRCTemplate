@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.auto.AutoProvider;
 import frc.robot.teleop.TeleopProvider;
 
@@ -26,6 +26,7 @@ public class RobotContainer {
   private final AutoProvider autoProvider = AutoProvider.getInstance();
   private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
   private final Commands coms = Commands.getInstance();
+  private final Subsystems subs = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
 
   /**
@@ -49,6 +50,13 @@ public class RobotContainer {
     oi.start.whenPressed(
         new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
+    // Init Turret Slew
+    oi.a.whenPressed(new InstantCommand(() -> subs.turret.initSlew(), subs.turret));
+
+    // Turret Slew Control
+    oi.dPadW
+        .whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(-0.1), () -> subs.turret.setSpeed(0), subs.turret));
+    oi.dPadE.whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(0.1), () -> subs.turret.setSpeed(0), subs.turret));
     // Drive bindings handled in teleop command
   }
 

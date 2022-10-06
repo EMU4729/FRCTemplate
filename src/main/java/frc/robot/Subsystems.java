@@ -5,6 +5,7 @@ import java.util.Optional;
 import frc.robot.subsystems.DriveSub;
 import frc.robot.subsystems.NavigationSub;
 // import frc.robot.subsystems.TurretSub;
+import frc.robot.subsystems.TurretSub;
 
 /**
  * Subsystems - Use this class to initialize and access all subsystems globally.
@@ -15,7 +16,7 @@ public class Subsystems {
 
   public NavigationSub nav;
   public DriveSub drive;
-  // public final Turret turret;
+  public TurretSub turret;
 
   public static Subsystems getInstance() {
     if (inst.isEmpty()) {
@@ -31,7 +32,7 @@ public class Subsystems {
   private void init() {
     nav = new NavigationSub();
     drive = new DriveSub();
-    // turret = new Turret();
+    turret = new TurretSub();
   }
 
 }

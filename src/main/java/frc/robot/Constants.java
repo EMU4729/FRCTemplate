@@ -57,15 +57,15 @@ public final class Constants {
 
         // Turret
         /** Limit switch for turret slew angle */
-        public final int TURRET_SLEW_LIMIT = -1;
+        public final int TURRET_SLEW_LIMIT = 4;
         /** Limit switch for turret slew angle */
         public final int TURRET_HOOD_LIMIT = -1;
         /**
          * Information for turret slew motor [Port,controller type,
          * {invert,brake,connectionSaftey}, Encoder]
          */
-        public final MotorInfo TURRET_SLEW_MOTOR_ID = new MotorInfo(-1, MotorInfo.Type.Never).withBrake()
-                        .encoder(new int[] { -1, -1 }, -1);
+        public final MotorInfo TURRET_SLEW_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake()
+                        .encoder(new int[] { 0, 1 }, 1);
         /**
          * Information for turret slew motor [Port,controller type,
          * {invert,brake,connectionSaftey}, Encoder]

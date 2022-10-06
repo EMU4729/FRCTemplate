@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -8,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 // import frc.robot.Variables;
+import frc.robot.utils.logger.Logger;
 
 public class TurretSub extends SubsystemBase {
   private final Constants cnst = Constants.getInstance();
@@ -19,6 +21,11 @@ public class TurretSub extends SubsystemBase {
   private final Encoder hoodEncoder = cnst.TURRET_HOOD_MOTOR_ID.createEncoder();
   private final DigitalInput slewLimit = new DigitalInput(cnst.TURRET_SLEW_LIMIT);
   private final DigitalInput hoodLimit = new DigitalInput(cnst.TURRET_HOOD_LIMIT);
+
+  @Override
+  public void periodic() {
+    Logger.info("Turret : Slew Encoder : " + slewEncoder.getDistance());
+  }
 
   public void initSlew() {
     new ScheduleCommand(new InstantCommand(() -> slew.set(0.05)))
@@ -36,6 +43,11 @@ public class TurretSub extends SubsystemBase {
           hood.stopMotor();
           hoodEncoder.reset();
         });
+  }
+
+  public void setSpeed(double speed) {
+    speed = MathUtil.clamp(speed, -1, 1);
+    slew.set(speed);
   }
 
   /** example and test @WIP */
