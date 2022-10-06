@@ -7,11 +7,6 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import frc.robot.utils.MotorInfo;
 
 /**
@@ -32,7 +27,7 @@ public final class Constants {
         }
 
         // Envars
-        public final Map<String, String> env = System.getenv();
+        public final Map<String, String> ENV = System.getenv();
 
         // Drive
         /**
@@ -59,28 +54,6 @@ public final class Constants {
          */
         public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, MotorInfo.Type.TalonSRX)
                         .withInvert().withSafety();
-
-        // Drive Simulation Constants
-        public final double DRIVESIM_TRACK_WIDTH_METERS = 0.69;
-        public final DifferentialDriveKinematics DRIVESIM_KINEMATICS = new DifferentialDriveKinematics(
-                        DRIVESIM_TRACK_WIDTH_METERS);
-        public final double DRIVESIM_WHEEL_DIAMETER_METERS = 0.15;
-
-        public final double DRIVESIM_VOLTS = 0.22;
-        public final double DRIVESIM_V_VOLT_SECONDS_PER_METER = 1.98;
-        public final double DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_METER = 0.2;
-
-        public final double DRIVESIM_V_VOLT_SECONDS_PER_RADIAN = 1.5;
-        public final double DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3;
-
-        public final LinearSystem<N2, N2, N2> DRIVESIM_DRIVETRAIN_PLANT = LinearSystemId.identifyDrivetrainSystem(
-                        DRIVESIM_V_VOLT_SECONDS_PER_METER,
-                        DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_METER,
-                        DRIVESIM_V_VOLT_SECONDS_PER_RADIAN,
-                        DRIVESIM_A_VOLT_SECONDS_SQUARED_PER_RADIAN);
-
-        public final DCMotor DRIVESIM_GEARBOX = DCMotor.getCIM(2);
-        public final double DRIVESIM_GEARING = 8;
 
         // Turret
         /** Limit switch for turret slew angle */
@@ -132,7 +105,7 @@ public final class Constants {
         /** file path header for files on usb storage */
         public final String[] PATH_USB = { "u//", "v//" };
         /** file path header for files on internal storage */
-        public final String PATH_INTERNAL = env.get("HOME");
+        public final String PATH_INTERNAL = ENV.get("HOME");
         /** file name for default auto @deprecated */
         public final String PATH_AUTO_FILE_NAME = "autoCommands.txt";
 
@@ -146,7 +119,7 @@ public final class Constants {
 
         // Robot features
         /** distance between wheel center side to side (m) */
-        public final double robotWheelWidth = 0.870;
+        public final double ROBOT_WHEEL_WIDTH = 0.870;
 
         // Auto Straight PID Constants
         /** Proportional constant for driving straight during auto */

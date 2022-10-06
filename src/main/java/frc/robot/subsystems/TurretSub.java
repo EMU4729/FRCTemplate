@@ -20,7 +20,7 @@ public class TurretSub extends SubsystemBase {
   private final DigitalInput slewLimit = new DigitalInput(cnst.TURRET_SLEW_LIMIT);
   private final DigitalInput hoodLimit = new DigitalInput(cnst.TURRET_HOOD_LIMIT);
 
-  public void initHood() {
+  public void initSlew() {
     new ScheduleCommand(new InstantCommand(() -> slew.set(0.05)))
         .until(() -> slewLimit.get())
         .andThen(() -> {
@@ -29,7 +29,7 @@ public class TurretSub extends SubsystemBase {
         });
   }
 
-  public void initSlew() {
+  public void initHood() {
     new ScheduleCommand(new InstantCommand(() -> hood.set(0.05)))
         .until(() -> hoodLimit.get())
         .andThen(() -> {
@@ -44,11 +44,11 @@ public class TurretSub extends SubsystemBase {
     if (Math.abs(dif) < 2) {
       slew.stopMotor();
     } else if (Math.abs(dif) < 10) {
-      slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[3], dif));
-    } else if (Math.abs(dif) < 30) {
       slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[2], dif));
-    } else if (Math.abs(dif) >= 30) {
+    } else if (Math.abs(dif) < 30) {
       slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[1], dif));
+    } else if (Math.abs(dif) >= 30) {
+      slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[0], dif));
     }
   }
 }

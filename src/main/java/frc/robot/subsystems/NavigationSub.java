@@ -66,7 +66,7 @@ public class NavigationSub extends SubsystemBase {
     double vR = getRightEncoderRate();
 
     if (vL == vR) {
-      double centRad = (vL * cnst.robotWheelWidth) / (vR - vL) + 0.5 * cnst.robotWheelWidth;
+      double centRad = (vL * cnst.ROBOT_WHEEL_WIDTH) / (vR - vL) + 0.5 * cnst.ROBOT_WHEEL_WIDTH;
       return Math.toDegrees(getCOMSpeed() / centRad);
     }
     return 0;
