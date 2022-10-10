@@ -6,8 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 // import frc.robot.Variables;
@@ -33,19 +32,19 @@ public class TurretSub extends SubsystemBase {
   private int printCount = 0;
   private double angle = 0;
   private boolean initialized = false;
-  public final Command initSlewCommand = new ScheduleCommand(new RunCommand(() -> {
+
+  public final Command initSlewCommand = new FunctionalCommand(() -> {
+    Logger.info("Turret : Slew Initialization Started");
     setSpeed(-0.15);
-  }, this))
-      .until(() -> {
-        Logger.info("Turret : Init Slew Command Running");
-        return !slewLimit.get();
-      })
-      .andThen(() -> {
-        slew.stopMotor();
-        slewEncoder.reset(); // TODO: Figure out why this isn't working
-        initialized = true;
-        Logger.info("Turret : Init Slew Command Finished");
-      });
+  }, () -> {
+  }, interrupted -> {
+    slew.stopMotor();
+    slewEncoder.reset(); // TODO: Figure out why this isn't working
+    initialized = true;
+    Logger.info("Turret : Slew Initialization Finished");
+  }, () -> {
+    return !slewLimit.get();
+  }, this);
 
   @Override
   public void periodic() {
@@ -65,40 +64,26 @@ public class TurretSub extends SubsystemBase {
     // setSpeed(slewController.calculate(slewEncoder.getDistance()));
   }
 
-  // public void initHood() {
-  // new ScheduleCommand(new InstantCommand(() -> hood.set(0.05)))
-  // .until(() -> hoodLimit.get())
-  // .andThen(() -> {
-  // hood.stopMotor();
-  // hoodEncoder.reset();
-  // });
-  // }
-
+  /**
+   * Sets the target angle for the turret slew.
+   * 
+   * @param angle The desired angle from 0 to 300 (degrees).
+   */
   public void setAngle(double angle) {
     if (!initialized) {
-      Logger.error("Turret : TurretSub.setAngle() called before initialization");
+      Logger.error("Turret : TurretSub#setAngle() called before initialization");
       return;
     }
     this.angle = MathUtil.clamp(angle, cnst.TURRET_HOOD_RANGE[0], cnst.TURRET_HOOD_RANGE[1]);
   }
 
+  /**
+   * Sets the speed of the turret slew.
+   * 
+   * @param speed Speed, from -1 to 1
+   */
   public void setSpeed(double speed) {
     speed = MathUtil.clamp(speed, -1, 1);
     slew.set(speed);
   }
-
-  /** example and test @WIP */
-  // public void driveSlew(double angle) {
-  // double dif = angle - slewEncoder.getDistance();
-  // if (Math.abs(dif) < 2) {
-  // slew.stopMotor();
-  // } else if (Math.abs(dif) < 10) {
-  // slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[2], dif));
-  // } else if (Math.abs(dif) < 30) {
-  // slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[1], dif));
-  // } else if (Math.abs(dif) >= 30) {
-  // slew.set(Math.copySign(cnst.TURRET_SLEW_THROT_LIMS[0], dif));
-  // }
-  // }
-
 }
