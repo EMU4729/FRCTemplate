@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -33,18 +33,26 @@ public class TurretSub extends SubsystemBase {
   private int printCount = 0;
   private double angle = 0;
   private boolean initialized = false;
-  public final Command initSlewCommand = new ScheduleCommand(new InstantCommand(() -> setSpeed(-0.3), this))
-      .until(() -> slewLimit.get())
+  public final Command initSlewCommand = new ScheduleCommand(new RunCommand(() -> {
+    setSpeed(-0.15);
+  }, this))
+      .until(() -> {
+        Logger.info("Turret : Init Slew Command Running");
+        return !slewLimit.get();
+      })
       .andThen(() -> {
         slew.stopMotor();
-        slewEncoder.reset();
+        slewEncoder.reset(); // TODO: Figure out why this isn't working
         initialized = true;
+        Logger.info("Turret : Init Slew Command Finished");
       });
 
   @Override
   public void periodic() {
     if (printCount > 100) {
+      Logger.info("Turret : Limit Switch Triggered : " + slewLimit.get());
       Logger.info("Turret : Slew Encoder Distance : " + slewEncoder.getDistance());
+      Logger.info("Turret : Slew Encoder Stops : " + slewEncoder.get());
       printCount = 0;
     } else {
       printCount++;
