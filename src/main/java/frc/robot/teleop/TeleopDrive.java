@@ -10,7 +10,6 @@ import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.Constants;
 import frc.robot.utils.CurveFit;
-import frc.robot.utils.logger.Logger;
 
 /**
  * The Teleop Command.
@@ -51,8 +50,8 @@ public class TeleopDrive extends CommandBase {
 
     if (i % 100 == 0) {
       i = 0;
-      Logger.info("throt stick : " + oi.controller.getLeftY() + " throt : " + throttle + " steer stick : "
-          + oi.controller.getRightX() + "steer : " + steering);
+      // Logger.info("throt stick : " + oi.controller.getLeftY() + " throt : " + throttle + " steer stick : "
+          // + oi.controller.getRightX() + "steer : " + steering);
     } else {
       i++;
     }

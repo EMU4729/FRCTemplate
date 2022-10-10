@@ -65,7 +65,7 @@ public final class Constants {
          * {invert,brake,connectionSaftey}, Encoder]
          */
         public final MotorInfo TURRET_SLEW_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake()
-                        .encoder(new int[] { 0, 1 }, 1);
+                        .encoder(new int[] { 8, 9 }, 1);
         /**
          * Information for turret slew motor [Port,controller type,
          * {invert,brake,connectionSaftey}, Encoder]

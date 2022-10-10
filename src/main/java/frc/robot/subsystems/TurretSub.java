@@ -17,18 +17,24 @@ public class TurretSub extends SubsystemBase {
 
   private final MotorController slew = cnst.TURRET_SLEW_MOTOR_ID.createMotorController();
   private final Encoder slewEncoder = cnst.TURRET_SLEW_MOTOR_ID.createEncoder();
-  private final MotorController hood = cnst.TURRET_HOOD_MOTOR_ID.createMotorController();
-  private final Encoder hoodEncoder = cnst.TURRET_HOOD_MOTOR_ID.createEncoder();
+  // private final MotorController hood = cnst.TURRET_HOOD_MOTOR_ID.createMotorController();
+  // private final Encoder hoodEncoder = cnst.TURRET_HOOD_MOTOR_ID.createEncoder();
   private final DigitalInput slewLimit = new DigitalInput(cnst.TURRET_SLEW_LIMIT);
-  private final DigitalInput hoodLimit = new DigitalInput(cnst.TURRET_HOOD_LIMIT);
+  // private final DigitalInput hoodLimit = new DigitalInput(cnst.TURRET_HOOD_LIMIT);
+  private int printCounter = 0;
 
   @Override
   public void periodic() {
-    Logger.info("Turret : Slew Encoder : " + slewEncoder.getDistance());
+    if (printCounter > 200) {
+      printCounter = 0;
+      Logger.info("Turret : Slew Encoder : " + slewEncoder.getDistance());
+    } else {
+      printCounter++;
+    }
   }
 
   public void initSlew() {
-    new ScheduleCommand(new InstantCommand(() -> slew.set(0.05)))
+    new ScheduleCommand(new InstantCommand(() -> slew.set(-0.3)))
         .until(() -> slewLimit.get())
         .andThen(() -> {
           slew.stopMotor();
@@ -36,14 +42,14 @@ public class TurretSub extends SubsystemBase {
         });
   }
 
-  public void initHood() {
-    new ScheduleCommand(new InstantCommand(() -> hood.set(0.05)))
-        .until(() -> hoodLimit.get())
-        .andThen(() -> {
-          hood.stopMotor();
-          hoodEncoder.reset();
-        });
-  }
+  // public void initHood() {
+  //   new ScheduleCommand(new InstantCommand(() -> hood.set(0.05)))
+  //       .until(() -> hoodLimit.get())
+  //       .andThen(() -> {
+  //         hood.stopMotor();
+  //         hoodEncoder.reset();
+  //       });
+  // }
 
   public void setSpeed(double speed) {
     speed = MathUtil.clamp(speed, -1, 1);
