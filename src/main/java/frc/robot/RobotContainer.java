@@ -51,7 +51,7 @@ public class RobotContainer {
         new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
     // Init Turret Slew
-    oi.a.whenPressed(new InstantCommand(() -> subs.turret.initSlew(), subs.turret));
+    oi.a.whenPressed(subs.turret.initSlewCommand);
 
     // Turret Slew Control
     oi.dPadW

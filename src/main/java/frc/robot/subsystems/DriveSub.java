@@ -37,8 +37,10 @@ public class DriveSub extends SubsystemBase {
   private CurveFit pidTurnCurve;
 
   public DriveSub() {
-    pidThrot.setPID(cnst.TELEOP_THROTTLE_KP, cnst.TELEOP_THROTTLE_KI, cnst.TELEOP_THROTTLE_KD);
-    pidSteer.setPID(cnst.TELEOP_STEERING_KP, cnst.TELEOP_STEERING_KI, cnst.TELEOP_STEERING_KD);
+    pidThrot.setPID(cnst.TELEOP_THROTTLE_PID[0], cnst.TELEOP_THROTTLE_PID[1],
+        cnst.TELEOP_THROTTLE_PID[2]);
+    pidSteer.setPID(cnst.TELEOP_STEERING_PID[0], cnst.TELEOP_STEERING_PID[1],
+        cnst.TELEOP_STEERING_PID[2]);
     addChild("Differential Drive", drive);
   }
 

@@ -75,11 +75,9 @@ public final class Constants {
         /** min max degree range for turret slew */
         public final double[] TURRET_SLEW_RANGE = { 0, 270 };
         /** min max degree range for turret hood */
-        public final double[] TURRET_HOOD_RANGE = { 0, 0 };
-        /** throttle limits for turret slew {>30,>10,<10} */
-        public final double[] TURRET_SLEW_THROT_LIMS = { 0.5, 0.2, 0.05 };
-        /** throttle limits for turret hood */
-        public final double[] TURRET_HOOD_THROT_LIMS = { 0.5, 0.2, 0.05 };
+        public final double[] TURRET_HOOD_RANGE = { 0, 300 };
+        /** PID Constants for turret slew movement */
+        public final double[] TURRET_SLEW_PID = { 1, 1, 1 };
 
         // Test
         /**
@@ -121,27 +119,13 @@ public final class Constants {
         /** distance between wheel center side to side (m) */
         public final double ROBOT_WHEEL_WIDTH = 0.870;
 
-        // Auto Straight PID Constants
-        /** Proportional constant for driving straight during auto */
-        public double AUTO_STRAIGHT_KP = 0.2; // UPDATE
-        /** Integral constant for driving straight during auto */
-        public double AUTO_STRAIGHT_KI = 0.8; // UPDATE
-        /** Derivative constant for driving straight during auto */
-        public double AUTO_STRAIGHT_KD = 0.0; // UPDATE
+        /** Auto straight PID Constants */
+        public double[] AUTO_STRAIGHT_PID = { 0.2, 0.8, 0 }; // UPDATE
 
-        // Teleop Throttle PID Constants
-        /** Proportional constant for throttle during teleop */
-        public double TELEOP_THROTTLE_KP = 0.2; // UPDATE
-        /** Integral constant for throttle during teleop */
-        public double TELEOP_THROTTLE_KI = 0.0; // UPDATE
-        /** Derivative constant for throttle during teleop */
-        public double TELEOP_THROTTLE_KD = 0.8; // UPDATE
-        /** Proportional constant for steering during teleop */
-        public double TELEOP_STEERING_KP = 0.2; // UPDATE
-        /** Integral constant for steering during teleop */
-        public double TELEOP_STEERING_KI = 0.0; // UPDATE
-        /** Derivative constant for steering during teleop */
-        public double TELEOP_STEERING_KD = 0.8; // UPDATE
+        /** PID constants for throttle during teleop */
+        public double[] TELEOP_THROTTLE_PID = { 0.2, 0, 0.8 }; // UPDATE
+        /** PID constants for steering during teleop */
+        public double[] TELEOP_STEERING_PID = { 0.2, 0, 0.8 }; // UPDATE
         /** Encoder max rate for PID loop */
         public double DRIVE_ENCODER_MAX_RATE = 1; // UPDATE
 }
