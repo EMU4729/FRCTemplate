@@ -48,12 +48,18 @@ public class TurretSub extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putData(slewEncoder);
+
     angle = SmartDashboard.getNumber("Turret Angle", 0);
+    SmartDashboard.putNumber("Turret Angle", angle);
+    
     // Slew PID
     if (!initialized)
       return;
     slewController.setSetpoint(angle);
-    setSpeed(slewController.calculate(slewEncoder.getDistance()));
+    double output = slewController.calculate(slewEncoder.getDistance());
+    SmartDashboard.putNumber("Slew PID Output", output);
+    setSpeed(output);
   }
 
   /**

@@ -65,7 +65,7 @@ public final class Constants {
          * {invert,brake,connectionSaftey}, Encoder]
          */
         public final MotorInfo TURRET_SLEW_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake()
-                        .encoder(new int[] { 8, 9 }, 1);
+                        .encoder(new int[] { 8, 9 }, 3. / 4.);
         /**
          * Information for turret slew motor [Port,controller type,
          * {invert,brake,connectionSaftey}, Encoder]
@@ -77,7 +77,7 @@ public final class Constants {
         /** min max degree range for turret hood */
         public final double[] TURRET_HOOD_RANGE = { 0, 300 };
         /** PID Constants for turret slew movement */
-        public final double[] TURRET_SLEW_PID = { 1, 1, 1 };
+        public final double[] TURRET_SLEW_PID = { 0.01, 0.0015, 0 };
 
         // Test
         /**
