@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,7 +30,6 @@ public class TurretSub extends SubsystemBase {
   private final PIDController slewController = new PIDController(cnst.TURRET_SLEW_PID[0],
       cnst.TURRET_SLEW_PID[1], cnst.TURRET_SLEW_PID[2]);
 
-  private int printCount = 0;
   private double angle = 0;
   private boolean initialized = false;
 
@@ -39,7 +39,7 @@ public class TurretSub extends SubsystemBase {
   }, () -> {
   }, interrupted -> {
     slew.stopMotor();
-    slewEncoder.reset(); // TODO: Figure out why this isn't working
+    slewEncoder.reset();
     initialized = true;
     Logger.info("Turret : Slew Initialization Finished");
   }, () -> {
@@ -48,20 +48,12 @@ public class TurretSub extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (printCount > 100) {
-      Logger.info("Turret : Limit Switch Triggered : " + slewLimit.get());
-      Logger.info("Turret : Slew Encoder Distance : " + slewEncoder.getDistance());
-      Logger.info("Turret : Slew Encoder Stops : " + slewEncoder.get());
-      printCount = 0;
-    } else {
-      printCount++;
-    }
-
+    angle = SmartDashboard.getNumber("Turret Angle", 0);
     // Slew PID
-    // if (!initialized)
-    // return;
-    // slewController.setSetpoint(angle);
-    // setSpeed(slewController.calculate(slewEncoder.getDistance()));
+    if (!initialized)
+      return;
+    slewController.setSetpoint(angle);
+    setSpeed(slewController.calculate(slewEncoder.getDistance()));
   }
 
   /**
