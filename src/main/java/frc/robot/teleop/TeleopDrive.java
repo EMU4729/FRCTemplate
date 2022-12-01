@@ -5,9 +5,9 @@ import java.util.Optional;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.OI;
-import frc.robot.ShuffleControl;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
+import frc.robot.ShuffleControl.ShuffleControl;
 import frc.robot.Constants;
 import frc.robot.utils.CurveFit;
 
@@ -17,7 +17,6 @@ import frc.robot.utils.CurveFit;
 public class TeleopDrive extends CommandBase {
   private final Variables vars = Variables.getInstance();
   private final Constants cnst = Constants.getInstance();
-  private final Subsystems subs = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
 
   private final CurveFit throtFit;
@@ -35,7 +34,7 @@ public class TeleopDrive extends CommandBase {
   public TeleopDrive(double[][] settings) {
     throtFit = new CurveFit(settings[0][0], settings[0][1], settings[0][2]);
     steerFit = new CurveFit(settings[1][0], settings[1][1], settings[1][2]).setThrotEffect(settings[1][3]);
-    addRequirements(subs.drive);
+    addRequirements(Subsystems.drive);
   }
 
   @Override
@@ -64,15 +63,11 @@ public class TeleopDrive extends CommandBase {
       throttle = lastThrot;
     }
 
-    // Update ShuffleBoard
-    if (shuffle.isEmpty()) {
-      shuffle = Optional.of(ShuffleControl.getInstance());
-    }
-    shuffle.get().setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
-    shuffle.get().setThrotGraph(-oi.controller.getLeftY(), throttle);
-    shuffle.get().setSteerGraph(oi.controller.getRightX(), steering);
+    ShuffleControl.setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
+    ShuffleControl.setThrotGraph(-oi.controller.getLeftY(), throttle);
+    ShuffleControl.setSteerGraph(oi.controller.getRightX(), steering);
 
-    subs.drive.arcade(throttle, steering);
+    Subsystems.drive.arcade(throttle, steering);
   }
 
   @Override

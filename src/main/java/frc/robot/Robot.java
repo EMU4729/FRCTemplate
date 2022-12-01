@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.ShuffleControl.ShuffleControl;
 import frc.robot.utils.logger.Logger;
 
 /**
@@ -36,7 +37,7 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
-    ShuffleControl.getInstance(); // init ShuffleBoard
+    new ShuffleControl();
   }
 
   /**
@@ -66,7 +67,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     Logger.header("Disabled ----------------------------------------------------------------------------------------");
-    logger.pause();
   }
 
   @Override
@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    Subsystems.getInstance().nav.resetEncoders();
+    Subsystems.nav.resetEncoders();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

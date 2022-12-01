@@ -17,7 +17,6 @@ import frc.robot.utils.CurveFit;
  */
 public class DriveSub extends SubsystemBase {
   private final Constants cnst = Constants.getInstance();
-  private final Subsystems subs = Subsystems.getInstance();
   // private final Variables vars = Variables.getInstance();
 
   private final MotorController leftMaster = cnst.DRIVE_MOTOR_ID_LM.createMotorController();
@@ -69,7 +68,7 @@ public class DriveSub extends SubsystemBase {
    */
   public void pidArcade(double speed, double turnRate) {
 
-    double throttle = pidThrot.calculate(subs.nav.speed, speed);
+    double throttle = pidThrot.calculate(Subsystems.nav.speed, speed);
     throttle = pidThrotCurve.fit(throttle);
     double steering = 0;
     arcade(throttle, steering);

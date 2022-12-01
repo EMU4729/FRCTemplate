@@ -12,13 +12,12 @@ import frc.robot.Subsystems;
  */
 public class AutoDriveStraight extends CommandBase {
   private final Constants cnst = Constants.getInstance();
-  private final Subsystems subs = Subsystems.getInstance();
 
   private double speed;
   private PIDController pid;
 
   public AutoDriveStraight() {
-    addRequirements(subs.drive);
+    addRequirements(Subsystems.drive);
   }
 
   public void run(double targetAngle, double speed) {
@@ -32,8 +31,8 @@ public class AutoDriveStraight extends CommandBase {
 
   @Override
   public void execute() {
-    // double steering = pid.calculate(subsystems.drive.getHeading());
-    // subsystems.drive.arcade(speed, steering);
+    // double steering = pid.calculate(Subsystemsystems.drive.getHeading());
+    // Subsystemsystems.drive.arcade(speed, steering);
   }
 
   @Override
@@ -43,7 +42,7 @@ public class AutoDriveStraight extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    subs.drive.off();
+    Subsystems.drive.off();
   }
 
 }

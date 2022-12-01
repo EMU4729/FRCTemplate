@@ -19,18 +19,16 @@ import frc.robot.teleop.TeleopProvider;
  * the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of
  * the robot (including
- * subsystems, commands, and button mappings) should be declared here.
+ * Subsystemsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   private final Variables vars = Variables.getInstance();
   private final AutoProvider autoProvider = AutoProvider.getInstance();
   private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
-  private final Commands coms = Commands.getInstance();
-  private final Subsystems subs = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
 
   /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
+   * The container for the robot. Contains Subsystemsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
@@ -51,12 +49,12 @@ public class RobotContainer {
         new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
     // Init Turret Slew
-    oi.a.whenPressed(subs.turret.initSlewCommand);
+    oi.a.whenPressed(Subsystems.turret.initSlewCommand);
 
     // Turret Slew Control
     oi.dPadW
-        .whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(-0.3), () -> subs.turret.setSpeed(0), subs.turret));
-    oi.dPadE.whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(0.3), () -> subs.turret.setSpeed(0), subs.turret));
+        .whenHeld(new StartEndCommand(() -> Subsystems.turret.setSpeed(-0.3), () -> Subsystems.turret.setSpeed(0), Subsystems.turret));
+    oi.dPadE.whenHeld(new StartEndCommand(() -> Subsystems.turret.setSpeed(0.3), () -> Subsystems.turret.setSpeed(0), Subsystems.turret));
     // Drive bindings handled in teleop command
   }
 
