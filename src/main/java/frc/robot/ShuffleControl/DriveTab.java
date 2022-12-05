@@ -1,25 +1,14 @@
-package frc.robot;
+package frc.robot.ShuffleControl;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.Subsystems;
 import frc.robot.teleop.TeleopProvider;
-
-import java.util.Optional;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
-public class ShuffleControl {
-  private static Optional<ShuffleControl> inst = Optional.empty();
-  private Subsystems subs = Subsystems.getInstance();
-
-  public static ShuffleControl getInstance() {
-    if (inst.isEmpty()) {
-      inst = Optional.of(new ShuffleControl());
-    }
-    return inst.get();
-  }
-
+public class DriveTab {
   private ShuffleboardTab drive = Shuffleboard.getTab("Drive");
 
   private NetworkTableEntry controlX = drive
@@ -59,9 +48,9 @@ public class ShuffleControl {
     throtPIDGraphSense.setDoubleArray(new double[] { in, out });
   }
 
-  private ShuffleControl() {
+  protected DriveTab() {
     drive
-        .add("DriveOutput", subs.drive.drive)
+        .add("DriveOutput", Subsystems.drive.drive)
         .withSize(4, 2).withPosition(0, 0)
         .withWidget(BuiltInWidgets.kDifferentialDrive);
 
@@ -70,20 +59,13 @@ public class ShuffleControl {
         .withSize(2, 1).withPosition(2, 4)
         .withWidget(BuiltInWidgets.kComboBoxChooser);
 
-    /*
-     * drive
-     * .add("IMU",subs.nav.imu)
-     * .withSize(2, 1).withPosition(2, 5)
-     * .withWidget(BuiltInWidgets.k3AxisAccelerometer);
-     */
-
     drive
-        .add("Throttle PID", subs.drive.pidThrot)
+        .add("Throttle PID", Subsystems.drive.pidThrot)
         .withSize(1, 3).withPosition(4, 0)
         .withWidget(BuiltInWidgets.kPIDController);
 
     drive
-        .add("Steering PID", subs.drive.pidSteer)
+        .add("Steering PID", Subsystems.drive.pidSteer)
         .withSize(1, 3).withPosition(4, 3)
         .withWidget(BuiltInWidgets.kPIDController);
   }

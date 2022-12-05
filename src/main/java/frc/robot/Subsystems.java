@@ -11,28 +11,12 @@ import frc.robot.subsystems.TurretSub;
  * Subsystems - Use this class to initialize and access all subsystems globally.
  */
 public class Subsystems {
-  private static Optional<Subsystems> inst = Optional.empty();
   // private final Constants cnst = Constants.getInstance();
 
-  public NavigationSub nav;
-  public DriveSub drive;
-  public TurretSub turret;
+  public static NavigationSub nav = new NavigationSub();
+  public static DriveSub drive = new DriveSub();
+  public static TurretSub turret = new TurretSub();
 
-  public static Subsystems getInstance() {
-    if (inst.isEmpty()) {
-      inst = Optional.of(new Subsystems());
-      inst.get().init();
-    }
-    return inst.get();
-  }
-
-  private Subsystems() {
-  }
-
-  private void init() {
-    nav = new NavigationSub();
-    drive = new DriveSub();
-    turret = new TurretSub();
-  }
+  private Subsystems() {}
 
 }

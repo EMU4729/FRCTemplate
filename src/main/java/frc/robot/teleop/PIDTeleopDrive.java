@@ -4,9 +4,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OI;
-import frc.robot.ShuffleControl;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
+import frc.robot.ShuffleControl.ShuffleControl;
 import frc.robot.utils.CurveFit;
 
 /**
@@ -15,7 +15,6 @@ import frc.robot.utils.CurveFit;
 public class PIDTeleopDrive extends CommandBase {
   private final Variables vars = Variables.getInstance();
   private final Constants cnst = Constants.getInstance();
-  private final Subsystems subs = Subsystems.getInstance();
   private final OI oi = OI.getInstance();
 
   private final CurveFit throtFit;
@@ -28,8 +27,8 @@ public class PIDTeleopDrive extends CommandBase {
   public PIDTeleopDrive(double[][] settings1, double[][] settings2) {
     throtFit = new CurveFit(settings1[0][0], settings1[0][1], settings1[0][2]);
     steerFit = new CurveFit(settings1[1][0], settings1[1][1], settings1[1][2]).setThrotEffect(settings1[1][3]);
-    subs.drive.pidArcadeSetup(settings2);
-    addRequirements(subs.drive);
+    Subsystems.drive.pidArcadeSetup(settings2);
+    addRequirements(Subsystems.drive);
   }
 
   @Override
@@ -43,8 +42,8 @@ public class PIDTeleopDrive extends CommandBase {
         speed / throtFit.outAbsMax);
     int reversalMultiplier = vars.invertDriveDirection ? 1 : -1;
 
-    ShuffleControl.getInstance().setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
-    subs.drive.pidArcade(speed * reversalMultiplier, steering);
+    ShuffleControl.setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
+    Subsystems.drive.pidArcade(speed * reversalMultiplier, steering);
   }
 
   @Override
