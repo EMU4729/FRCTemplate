@@ -7,6 +7,8 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.MotorCommutation;
+
 import frc.robot.utils.MotorInfo;
 
 /**
@@ -90,6 +92,12 @@ public final class Constants {
          * {invert,brake,connectionSaftey}, Encoder]
          */
         public final MotorInfo TEST_2_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake();
+
+        // Intake Motors
+        // TODO: Update these dummy values
+        public final MotorInfo SHOOTER_MOTOR = new MotorInfo(69420, MotorInfo.Type.VictorSPX).withBrake();
+        public final MotorInfo INTAKE_MOTOR = new MotorInfo(69420, MotorInfo.Type.VictorSPX).withBrake();
+        public final MotorInfo CONVEYOR_MOTOR = new MotorInfo(69420, MotorInfo.Type.VictorSPX).withBrake();
 
         // Controller
         /** Port Number for xbox controller input device */

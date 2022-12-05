@@ -2,8 +2,11 @@ package frc.robot;
 
 import java.util.Optional;
 
+import frc.robot.subsystems.ConveyorSub;
 import frc.robot.subsystems.DriveSub;
+import frc.robot.subsystems.IntakeSub;
 import frc.robot.subsystems.NavigationSub;
+import frc.robot.subsystems.ShooterSub;
 // import frc.robot.subsystems.TurretSub;
 import frc.robot.subsystems.TurretSub;
 
@@ -17,6 +20,9 @@ public class Subsystems {
   public NavigationSub nav;
   public DriveSub drive;
   public TurretSub turret;
+  public IntakeSub intake;
+  public ConveyorSub conveyor;
+  public ShooterSub shooter;
 
   public static Subsystems getInstance() {
     if (inst.isEmpty()) {
@@ -33,6 +39,9 @@ public class Subsystems {
     nav = new NavigationSub();
     drive = new DriveSub();
     turret = new TurretSub();
+    intake = new IntakeSub();
+    conveyor = new ConveyorSub();
+    shooter = new ShooterSub();
   }
 
 }

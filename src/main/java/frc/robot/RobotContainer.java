@@ -57,6 +57,24 @@ public class RobotContainer {
     oi.dPadW
         .whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(-0.3), () -> subs.turret.setSpeed(0), subs.turret));
     oi.dPadE.whenHeld(new StartEndCommand(() -> subs.turret.setSpeed(0.3), () -> subs.turret.setSpeed(0), subs.turret));
+
+    // Intake + Conveyor Control
+    oi.y.whenHeld(new StartEndCommand(() -> {
+      subs.conveyor.setSpeed(0.5);
+      subs.intake.setSpeed(0.5);
+    }, () -> {
+      subs.conveyor.setSpeed(0);
+      subs.intake.setSpeed(0);
+    }, subs.intake, subs.conveyor));
+
+    // Shooter + Conveyor Control
+    oi.rtButton.whenHeld(new StartEndCommand(() -> {
+      subs.conveyor.setSpeed(0.5);
+      subs.shooter.setSpeed(0.5);
+    }, () -> {
+      subs.conveyor.setSpeed(0);
+      subs.intake.setSpeed(0);
+    }, subs.intake, subs.conveyor));
     // Drive bindings handled in teleop command
   }
 
