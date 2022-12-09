@@ -7,6 +7,7 @@ package frc.robot;
 import java.util.Map;
 import java.util.Optional;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.utils.MotorInfo;
 
 /**
@@ -69,12 +70,15 @@ public final class Constants {
   /**
    * Information for turret slew motor [Port,controller type,
    * {invert,brake,connectionSaftey}, Encoder]
+   * @wip
    */
   public final MotorInfo TURRET_HOOD_MOTOR_ID = new MotorInfo(-1, MotorInfo.Type.Never).withBrake()
       .encoder(new int[] { -1, -1 }, -1);
   /** min max degree range for turret slew */
   public final double[] TURRET_SLEW_RANGE = { 0, 270 };
-  /** min max degree range for turret hood */
+  /** min max degree range for turret hood 
+   * @wip
+   */
   public final double[] TURRET_HOOD_RANGE = { 0, 300 };
   /** PID Constants for turret slew movement */
   public final double[] TURRET_SLEW_PID = { 0.01, 0.0015, 0 };
@@ -118,6 +122,8 @@ public final class Constants {
   // Robot features
   /** distance between wheel center side to side (m) */
   public final double ROBOT_WHEEL_WIDTH = 0.870;
+  /** radius of the drive wheels (m) */
+  public final double ROBOT_WHEEL_RAD = Units.inchesToMeters(3);
 
   /** Auto straight PID Constants */
   public double[] AUTO_STRAIGHT_PID = { 0.2, 0.8, 0 }; // UPDATE

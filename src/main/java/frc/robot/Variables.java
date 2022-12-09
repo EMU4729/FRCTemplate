@@ -13,13 +13,10 @@ import java.util.Optional;
 public final class Variables {
   private static Optional<Variables> inst = Optional.empty();
 
-  private Variables() {
-  }
+  private Variables() {}
 
   public static Variables getInstance() {
-    if (!inst.isPresent()) {
-      inst = Optional.of(new Variables());
-    }
+    if (inst.isEmpty()) inst = Optional.of(new Variables());
     return inst.get();
   }
 

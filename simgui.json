@@ -1,14 +1,107 @@
 {
+  "HALProvider": {
+    "RoboRIO": {
+      "3.3V Rail": {
+        "open": true
+      },
+      "5V Rail": {
+        "open": true
+      },
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
+      },
+      "window": {
+        "visible": true
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/DriveSub": "Subsystem",
       "/LiveWindow/DriveSub/Differential Drive": "DifferentialDrive",
+      "/LiveWindow/NavigationSub": "Subsystem",
+      "/LiveWindow/TurretSub": "Subsystem",
+      "/LiveWindow/Ungrouped/DigitalInput[26]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[4]": "Digital Input",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/Victor SPX [7]": "Motor Controller",
+      "/Shuffleboard/Drive/DriveOutput": "DifferentialDrive",
+      "/Shuffleboard/Drive/Steering PID": "PIDController",
+      "/Shuffleboard/Drive/TeleopType": "String Chooser",
+      "/Shuffleboard/Drive/Throttle PID": "PIDController",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/SendableChooser[1]": "String Chooser"
+    },
+    "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/DriveSub/Differential Drive": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/NavigationSub": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/TurretSub": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/Ungrouped/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "Robot": {
+          "length": 0.7188000082969666,
+          "width": 0.7111999988555908
+        },
+        "height": 8.199999809265137,
+        "image": "C:\\Users\\Admin\\Desktop\\b3a034d4e2fc34561ab093adf367e137c1db8947_2_690x388.jpeg",
+        "width": 16.479999542236328,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/SendableChooser[0]": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/SendableChooser[1]": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Shuffleboard": {
+      "open": true
+    },
+    "SmartDashboard": {
+      "Field": {
+        "open": true
+      },
+      "SendableChooser[1]": {
+        "open": true
+      },
+      "open": true
     }
   }
 }

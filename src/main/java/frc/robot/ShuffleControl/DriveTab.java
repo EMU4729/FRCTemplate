@@ -1,4 +1,4 @@
-package frc.robot.ShuffleControl;
+package frc.robot.shufflecontrol;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Subsystems;

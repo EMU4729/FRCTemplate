@@ -1,4 +1,4 @@
-package frc.robot.ShuffleControl;
+package frc.robot.shufflecontrol;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -17,10 +17,9 @@ public class ShuffleControl {
 
   private static DriveTab driveTab = new DriveTab();
   private static NavTab navTab = new NavTab();
-  public static Field2d field = new Field2d();
 
   public ShuffleControl(){
-    SmartDashboard.putData("Field", field);
+    SmartDashboard.putData("Field", Subsystems.nav.field);
   }
 
   //drive tab

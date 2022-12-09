@@ -6,7 +6,7 @@ import frc.robot.Constants;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
-import frc.robot.ShuffleControl.ShuffleControl;
+import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.utils.CurveFit;
 
 /**
