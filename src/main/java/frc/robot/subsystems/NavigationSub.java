@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -10,19 +8,21 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.ShuffleControl.ShuffleControl;
+import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.utils.logger.Logger;
 
 public class NavigationSub extends SubsystemBase {
   private final Constants cnst = Constants.getInstance();
 
   public final ADIS16470_IMU imu = new ADIS16470_IMU();
-  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
-      Rotation2d.fromDegrees(imu.getAngle()));
-
+  
   public final Encoder drvLeftEncoder = cnst.DRIVE_MOTOR_ID_LM.createEncoder();
   public final Encoder drvRightEncoder = cnst.DRIVE_MOTOR_ID_RM.createEncoder();
 
+  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
+      Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
+
+  
   /** yaw offset at zeroing relitive to the field zero (deg) */
   private double yawOffset = 0;
 
@@ -44,6 +44,8 @@ public class NavigationSub extends SubsystemBase {
     odometry.update(Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(),
         drvRightEncoder.getDistance());
     ShuffleControl.field.setRobotPose(odometry.getPoseMeters());
+    ShuffleControl.navTab.setPitchAngle(getPitch());
+    ShuffleControl.navTab.setRollAngle(getRoll());
 
     
 
@@ -115,6 +117,19 @@ public class NavigationSub extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     imu.reset();
-    odometry.resetPosition(pose, getHeadingRot2d());
+    odometry.resetPosition(
+      Rotation2d.fromDegrees(imu.getAngle()),
+      0., 0., pose);
+  }
+
+  /** @return The roll angle of the robot */
+  public double getRoll() {
+    return imu.getXComplementaryAngle();
+
+  }
+
+  /** @return The pitch angle of the robot */
+  public double getPitch() {
+    return imu.getYComplementaryAngle();
   }
 }

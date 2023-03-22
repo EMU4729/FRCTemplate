@@ -58,7 +58,7 @@ public final class Variables {
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power,throttle effect}
    */
-  public double[][] DriveSettingsTELEOP = { { robotminThrot, 1, 3 }, { robotminTurn, 1, 3, 0.3 } };
+  public double[][] DriveSettingsTELEOP = { { robotminThrot, 1, 2 }, { robotminTurn, 1, 3, 0.3 } };
   /**
    * settings for robot drive in demo mode
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve

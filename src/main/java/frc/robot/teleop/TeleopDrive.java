@@ -1,13 +1,11 @@
 package frc.robot.teleop;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
-import frc.robot.ShuffleControl.ShuffleControl;
+import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.Constants;
 import frc.robot.utils.CurveFit;
 
@@ -22,10 +20,8 @@ public class TeleopDrive extends CommandBase {
   private final CurveFit throtFit;
   private final CurveFit steerFit;
 
-  private Optional<ShuffleControl> shuffle = Optional.empty();
   private boolean accel = false;
   private double lastThrot = 0;
-  int i = 0;
 
   public TeleopDrive() {
     this(Variables.getInstance().DriveSettingsTELEOP);
@@ -43,16 +39,13 @@ public class TeleopDrive extends CommandBase {
 
   @Override
   public void execute() {
-    double throttle = throtFit.fit(MathUtil.applyDeadband(oi.controller.getLeftY(), cnst.CONTROLLER_AXIS_DEADZONE));
-    double steering = steerFit.fit(MathUtil.applyDeadband(oi.controller.getRightX(), cnst.CONTROLLER_AXIS_DEADZONE),
+    double throttle = throtFit.fit(MathUtil.applyDeadband(oi.pilot.getLeftY(), cnst.CONTROLLER_AXIS_DEADZONE));
+    double steering = steerFit.fit(MathUtil.applyDeadband(oi.pilot.getRightX(), cnst.CONTROLLER_AXIS_DEADZONE),
         throttle);// limiting max steering based on throttle
 
-    if (i % 100 == 0) {
-      i = 0;
-      // Logger.info("throt stick : " + oi.controller.getLeftY() + " throt : " + throttle + " steer stick : "
-          // + oi.controller.getRightX() + "steer : " + steering);
-    } else {
-      i++;
+    // Invert steering when throttle >= 0 to mimic car controls
+    if (throttle > 0) {
+      steering *= -1;
     }
 
     throttle = throttle * (vars.invertDriveDirection ? 1 : -1); // flips the direction of forward based on controller
@@ -63,9 +56,9 @@ public class TeleopDrive extends CommandBase {
       throttle = lastThrot;
     }
 
-    ShuffleControl.setControlAxis(-oi.controller.getLeftY(), oi.controller.getRightX());
-    ShuffleControl.setThrotGraph(-oi.controller.getLeftY(), throttle);
-    ShuffleControl.setSteerGraph(oi.controller.getRightX(), steering);
+    ShuffleControl.driveTab.setControlAxis(-oi.pilot.getLeftY(), oi.pilot.getRightX());
+    ShuffleControl.driveTab.setThrotGraph(-oi.pilot.getLeftY(), throttle);
+    ShuffleControl.driveTab.setSteerGraph(oi.pilot.getRightX(), steering);
 
     Subsystems.drive.arcade(throttle, steering);
   }

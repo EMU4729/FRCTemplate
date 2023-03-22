@@ -1,28 +1,20 @@
-package frc.robot.ShuffleControl;
+package frc.robot.shufflecontrol;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import frc.robot.Subsystems;
 
 public class NavTab {
   private ShuffleboardTab nav = Shuffleboard.getTab("Nav");
 
-  private NetworkTableEntry gyroRot = nav
-      .add("GyroRotation", 0)
-      .withSize(3, 2).withPosition(0, 0)
-      .withWidget(BuiltInWidgets.kGraph)
-      .getEntry();
+  private GenericEntry pitchEntry = nav.add("Pitch Angle", 0).getEntry();
+  private GenericEntry rollEntry = nav.add("Roll Angle", 0).getEntry();
 
-  private NetworkTableEntry encoderRot = nav
-      .add("EncodeRotation", 0)
-      .withSize(3, 2).withPosition(3, 0)
-      .withWidget(BuiltInWidgets.kGraph)
-      .getEntry();
+  public void setPitchAngle(double pitch){
+    pitchEntry.setDouble(pitch);
+  }
 
-  public void setGyroAngle(double gyro, double encode){
-    gyroRot.setDouble(gyro);
-    encoderRot.setDouble(encode);
+  public void setRollAngle(double roll) {
+    rollEntry.setDouble(roll);
   }
 }

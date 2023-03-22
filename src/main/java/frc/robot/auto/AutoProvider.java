@@ -5,6 +5,7 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
  * Command for Autonomous.
@@ -12,12 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class AutoProvider {
   private static Optional<AutoProvider> inst = Optional.empty();
 
-  private final Command auto = new Auto();
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
   private AutoProvider() {
-    chooser.setDefaultOption("Default Auto", auto);
-
+    chooser.setDefaultOption("Disable Auto", new InstantCommand());
     SmartDashboard.putData(chooser);
   }
 
@@ -28,7 +27,7 @@ public class AutoProvider {
     return inst.get();
   }
 
-  public Command getAuto() {
+  public Command getMiddleAuto() {
     return chooser.getSelected();
   }
 }

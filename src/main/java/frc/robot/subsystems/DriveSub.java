@@ -52,7 +52,7 @@ public class DriveSub extends SubsystemBase {
   public void tank(double leftSpeed, double rightSpeed) {
     leftSpeed = MathUtil.clamp(leftSpeed, -1, 1);
     rightSpeed = MathUtil.clamp(rightSpeed, -1, 1);
-    drive.tankDrive(leftSpeed, rightSpeed);
+    drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
   public void pidArcadeSetup(double[][] settings) {
@@ -83,7 +83,7 @@ public class DriveSub extends SubsystemBase {
   public void arcade(double throttle, double steering) {
     throttle = MathUtil.clamp(throttle, -1, 1);
     steering = MathUtil.clamp(steering, -1, 1);
-    drive.arcadeDrive(throttle, steering);
+    drive.arcadeDrive(throttle, -steering);
 
   }
 

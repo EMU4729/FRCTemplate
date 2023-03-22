@@ -16,13 +16,11 @@ public class TeleopProvider {
 
   private final Command teleop = new TeleopDrive();
   private final Command demoTeleop = new TeleopDrive(Variables.getInstance().DriveSettingsDEMO);
-  private final Command pidTeleop = new PIDTeleopDrive();
   public final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
 
   private TeleopProvider() {
     chooser.setDefaultOption("Default Teleop", teleop);
     chooser.addOption("Demo Teleop", demoTeleop);
-    chooser.addOption("PID Teleop", pidTeleop);
     chooser.addOption("Disable Teleop", new InstantCommand(() -> {
     }));
 

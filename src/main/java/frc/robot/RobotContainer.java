@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.auto.AutoProvider;
 import frc.robot.teleop.TeleopProvider;
 
@@ -45,17 +44,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Invert Drive
-    oi.start.whenPressed(
+    oi.pilot.start().onTrue(
         new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
 
-    // Init Turret Slew
-    oi.a.whenPressed(Subsystems.turret.initSlewCommand);
-
-    // Turret Slew Control
-    oi.dPadW
-        .whenHeld(new StartEndCommand(() -> Subsystems.turret.setSpeed(-0.3), () -> Subsystems.turret.setSpeed(0), Subsystems.turret));
-    oi.dPadE.whenHeld(new StartEndCommand(() -> Subsystems.turret.setSpeed(0.3), () -> Subsystems.turret.setSpeed(0), Subsystems.turret));
-    // Drive bindings handled in teleop command
+    // Drive binddings handled in teleop command
   }
 
   /**
@@ -73,6 +65,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoProvider.getAuto();
+    return autoProvider.getMiddleAuto();
   }
 }

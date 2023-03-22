@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import frc.robot.utils.MotorInfo;
+import frc.robot.utils.PIDControllerConstants;
 
 /**
  * Constants - use this class to store any port ids, file paths, or basically
@@ -29,71 +30,39 @@ public final class Constants {
   // Envars
   public final Map<String, String> ENV = System.getenv();
 
+  // Temp place to keep migrated stuff
+  public final PIDControllerConstants BALANCE_CHARGE_PAD_PID = new PIDControllerConstants(0.02, 0.005, 0);
+  public final double BALANCE_CHARGE_PAD_DEADBAND = 5;
+
   // Drive
   /**
    * Information for left master drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(4, MotorInfo.Type.TalonSRX)
-      .withSafety().encoder(new int[] { 0, 1 }, 60.078 / 256. / 1000);
+  public final MotorInfo DRIVE_MOTOR_ID_LM = new MotorInfo(1, MotorInfo.Type.TalonSRX)
+      .withSafety().withBrake().encoder(new int[] { 4, 5 }, 60.078 / 256. / 1000);
   /**
    * Information for right master drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(1, MotorInfo.Type.TalonSRX)
-      .withInvert().withSafety().encoder(new int[] { 2, 3 }, 59.883 / 256. / 1000);
+  public final MotorInfo DRIVE_MOTOR_ID_RM = new MotorInfo(3, MotorInfo.Type.TalonSRX)
+      .withInvert().withBrake().withSafety().encoder(new int[] { 6, 7 }, 59.883 / 256. / 1000);
   /**
    * Information for left slave drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(5, MotorInfo.Type.TalonSRX)
-      .withSafety();
+  public final MotorInfo DRIVE_MOTOR_ID_LS = new MotorInfo(2, MotorInfo.Type.TalonSRX)
+      .withBrake().withSafety();
   /**
    * Information for right slave drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(2, MotorInfo.Type.TalonSRX)
-      .withInvert().withSafety();
-
-  // Turret
-  /** Limit switch for turret slew angle */
-  public final int TURRET_SLEW_LIMIT = 4;
-  /** Limit switch for turret slew angle */
-  public final int TURRET_HOOD_LIMIT = -1;
-  /**
-   * Information for turret slew motor [Port,controller type,
-   * {invert,brake,connectionSaftey}, Encoder]
-   */
-  public final MotorInfo TURRET_SLEW_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake()
-      .encoder(new int[] { 8, 9 }, 3. / 4.);
-  /**
-   * Information for turret slew motor [Port,controller type,
-   * {invert,brake,connectionSaftey}, Encoder]
-   */
-  public final MotorInfo TURRET_HOOD_MOTOR_ID = new MotorInfo(-1, MotorInfo.Type.Never).withBrake()
-      .encoder(new int[] { -1, -1 }, -1);
-  /** min max degree range for turret slew */
-  public final double[] TURRET_SLEW_RANGE = { 0, 270 };
-  /** min max degree range for turret hood */
-  public final double[] TURRET_HOOD_RANGE = { 0, 300 };
-  /** PID Constants for turret slew movement */
-  public final double[] TURRET_SLEW_PID = { 0.01, 0.0015, 0 };
-
-  // Test
-  /**
-   * Information for turret test motor [Port,controller type,
-   * {invert,brake,connectionSaftey}, Encoder]
-   */
-  public final MotorInfo TEST_1_MOTOR_ID = new MotorInfo(6, MotorInfo.Type.VictorSPX).withBrake();
-  /**
-   * Information for turret test motor [Port,controller type,
-   * {invert,brake,connectionSaftey}, Encoder]
-   */
-  public final MotorInfo TEST_2_MOTOR_ID = new MotorInfo(7, MotorInfo.Type.VictorSPX).withBrake();
+  public final MotorInfo DRIVE_MOTOR_ID_RS = new MotorInfo(4, MotorInfo.Type.TalonSRX)
+      .withInvert().withBrake().withSafety();
 
   // Controller
   /** Port Number for xbox controller input device */
-  public final int DEVICE_PORT_XBOX_CONTROLLER = 0; // WORKING
+  public final int PILOT_PORT_XBOX_CONTROLLER = 0; // WORKING
   /** Threshold for triggering the controller right and left triggers */
   public final double CONTROLLER_TRIGGER_THRESHOLD = 0.5;
   /** deadband for controller axies either side of 0 */
@@ -118,9 +87,6 @@ public final class Constants {
   // Robot features
   /** distance between wheel center side to side (m) */
   public final double ROBOT_WHEEL_WIDTH = 0.870;
-
-  /** Auto straight PID Constants */
-  public double[] AUTO_STRAIGHT_PID = { 0.2, 0.8, 0 }; // UPDATE
 
   /** PID constants for throttle during teleop */
   public double[] TELEOP_THROTTLE_PID = { 0.2, 0, 0.8 }; // UPDATE
