@@ -7,14 +7,23 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 public class NavTab {
   private ShuffleboardTab nav = Shuffleboard.getTab("Nav");
 
-  private GenericEntry pitchEntry = nav.add("Pitch Angle", 0).getEntry();
-  private GenericEntry rollEntry = nav.add("Roll Angle", 0).getEntry();
+  private GenericEntry yawEntry = nav.add("Heading Degrees", 0).getEntry();
+  private GenericEntry pitchEntry = nav.add("Pitch Degrees", 0).getEntry();
+  private GenericEntry rollEntry = nav.add("Roll Degrees", 0).getEntry();
+  private GenericEntry leftEncoderEntry = nav.add("Left Encoder Distance", 0).getEntry();
+  private GenericEntry rightEncoderEntry = nav.add("Right Encoder Distance", 0).getEntry();
 
-  public void setPitchAngle(double pitch){
-    pitchEntry.setDouble(pitch);
+  protected NavTab() {
   }
 
-  public void setRollAngle(double roll) {
+  public void setRotation(double yaw, double pitch, double roll) {
+    yawEntry.setDouble(yaw);
+    pitchEntry.setDouble(pitch);
     rollEntry.setDouble(roll);
+  }
+
+  public void setEncoderDistances(double left, double right) {
+    leftEncoderEntry.setDouble(left);
+    rightEncoderEntry.setDouble(right);
   }
 }

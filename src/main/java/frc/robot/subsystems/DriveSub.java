@@ -1,50 +1,50 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Subsystems;
-import frc.robot.utils.CurveFit;
-// import frc.robot.Variables;
+import frc.robot.constants.Constants;
 
 /**
  * Drive Subsystem.
  * Handles all drive functionality.
  */
 public class DriveSub extends SubsystemBase {
-  private final Constants cnst = Constants.getInstance();
-  // private final Variables vars = Variables.getInstance();
-
-  private final MotorController leftMaster = cnst.DRIVE_MOTOR_ID_LM.createMotorController();
-  private final MotorController leftSlave = cnst.DRIVE_MOTOR_ID_LS.createMotorController();
+  private final MotorController leftMaster = Constants.drive.MOTOR_ID_LM.build();
+  private final MotorController leftSlave = Constants.drive.MOTOR_ID_LS.build();
   private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftMaster, leftSlave);
 
-  private final MotorController rightMaster = cnst.DRIVE_MOTOR_ID_RM.createMotorController();
-  private final MotorController rightSlave = cnst.DRIVE_MOTOR_ID_RS.createMotorController();
+  private final MotorController rightMaster = Constants.drive.MOTOR_ID_RM.build();
+  private final MotorController rightSlave = Constants.drive.MOTOR_ID_RS.build();
   private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightMaster, rightSlave);
 
   public final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors); // pub for shuffleboard
 
-  public final PIDController pidThrot = new PIDController(0, 0, 0); // pub for shuffleboard
-  public final PIDController pidSteer = new PIDController(0, 0, 0); // pub for shuffleboard
-
-  private CurveFit pidThrotCurve;
-  private CurveFit pidTurnCurve;
+  // Simulation Variables
+  /** @wip add corrected values */
+  private final LinearSystem<N2, N2, N2> drivetrainSystem = LinearSystemId.identifyDrivetrainSystem(
+      Constants.sim.KV_LINEAR,
+      Constants.sim.KA_LINEAR,
+      Constants.sim.KV_ANGULAR,
+      Constants.sim.KA_ANGULAR);
+  public final DifferentialDrivetrainSim drivetrainSimulator = new DifferentialDrivetrainSim(
+      drivetrainSystem, DCMotor.getCIM(2), 10.71, Constants.features.ROBOT_WHEEL_WIDTH,
+      Constants.features.ROBOT_WHEEL_RAD, null);
 
   public DriveSub() {
-    pidThrot.setPID(cnst.TELEOP_THROTTLE_PID[0], cnst.TELEOP_THROTTLE_PID[1],
-        cnst.TELEOP_THROTTLE_PID[2]);
-    pidSteer.setPID(cnst.TELEOP_STEERING_PID[0], cnst.TELEOP_STEERING_PID[1],
-        cnst.TELEOP_STEERING_PID[2]);
     addChild("Differential Drive", drive);
   }
 
   /**
-   * Activates tank drive. Similar to MoveTank from ev3dev.
+   * Tank drive.
    * 
    * @param leftSpeed  The left speed.
    * @param rightSpeed The right speed.
@@ -55,40 +55,46 @@ public class DriveSub extends SubsystemBase {
     drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
-  public void pidArcadeSetup(double[][] settings) {
-    pidThrotCurve = new CurveFit(settings[0][0], settings[0][1], settings[0][2]);
-    pidTurnCurve = new CurveFit(settings[1][0], settings[1][1], settings[1][2]);
-  }
-
   /**
-   * runs a pid loop to drive at set speed and turn rate
+   * Tank drives the robot using the specified voltages.
+   * <strong>Highly unsafe.</strong> Values are uncapped, so use with caution.
    * 
-   * @param speed    speed to drive at m/s
-   * @param turnRate rate to turn at deg/s
+   * @param leftVoltage  The left output
+   * @param rightVoltage The right output
    */
-  public void pidArcade(double speed, double turnRate) {
-
-    double throttle = pidThrot.calculate(Subsystems.nav.speed, speed);
-    throttle = pidThrotCurve.fit(throttle);
-    double steering = 0;
-    arcade(throttle, steering);
+  public void tankVoltage(double leftVoltage, double rightVoltage) {
+    leftMotors.setVoltage(leftVoltage);
+    rightMotors.setVoltage(rightVoltage);
+    drive.feed();
   }
 
   /**
-   * Activates arcade drive. Similar to MoveSteering from ev3dev.
+   * Arcade drive.
    * 
    * @param throttle The speed
    * @param steering The steering
    */
   public void arcade(double throttle, double steering) {
     throttle = MathUtil.clamp(throttle, -1, 1);
-    steering = MathUtil.clamp(steering, -1, 1);
-    drive.arcadeDrive(throttle, -steering);
-
+    steering = -MathUtil.clamp(steering, -1, 1);
+    drive.arcadeDrive(throttle, -steering, true); // squared input fix later
   }
 
-  /** Stop all motors. */
+  /** Stops all motors. */
   public void off() {
-    drive.stopMotor();
+    tank(0, 0);
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // set sim motor volts to cur motor throt * bat volts
+
+    // the order is reversed because otherwise, simulation direction is the opposite of real life
+    // this is probably a result of a deeper issue with the code that i don't want to fix right now
+    drivetrainSimulator.setInputs(
+        rightMotors.get() * RobotController.getInputVoltage(),
+        leftMotors.get() * RobotController.getInputVoltage()
+    );
+    drivetrainSimulator.update(0.02);
   }
 }

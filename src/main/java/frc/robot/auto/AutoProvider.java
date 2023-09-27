@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /**
- * Command for Autonomous.
+ * Provides the default command for autonomous.
  */
 public class AutoProvider {
   private static Optional<AutoProvider> inst = Optional.empty();
@@ -16,8 +16,11 @@ public class AutoProvider {
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
   private AutoProvider() {
-    chooser.setDefaultOption("Disable Auto", new InstantCommand());
-    SmartDashboard.putData(chooser);
+    chooser.addOption("Simple Auto", new SimpleAuto());
+    chooser.addOption("PathWeaver Test", new PathWeaverCommand("paths/Sample.wpilib.json"));
+    chooser.addOption("Disable Auto", new InstantCommand());
+
+    SmartDashboard.putData("Auto Chooser", chooser);
   }
 
   public static AutoProvider getInstance() {
@@ -27,7 +30,7 @@ public class AutoProvider {
     return inst.get();
   }
 
-  public Command getMiddleAuto() {
+  public Command getSelected() {
     return chooser.getSelected();
   }
 }

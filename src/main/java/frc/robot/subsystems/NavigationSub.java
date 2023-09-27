@@ -1,112 +1,148 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Subsystems;
+import frc.robot.constants.Constants;
 import frc.robot.shufflecontrol.ShuffleControl;
-import frc.robot.utils.logger.Logger;
+import frc.robot.utils.PhotonBridge;
 
+/** Subsystem that handles all robot navigation */
 public class NavigationSub extends SubsystemBase {
-  private final Constants cnst = Constants.getInstance();
-
   public final ADIS16470_IMU imu = new ADIS16470_IMU();
-  
-  public final Encoder drvLeftEncoder = cnst.DRIVE_MOTOR_ID_LM.createEncoder();
-  public final Encoder drvRightEncoder = cnst.DRIVE_MOTOR_ID_RM.createEncoder();
 
-  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(
-      Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
+  private final Encoder drvLeftEncoder = Constants.drive.ENCODER_ID_L.build();
+  private final Encoder drvRightEncoder = Constants.drive.ENCODER_ID_R.build();
 
-  
-  /** yaw offset at zeroing relitive to the field zero (deg) */
-  private double yawOffset = 0;
+  private final Field2d field = new Field2d();
+  private final PhotonBridge photon = new PhotonBridge();
+  private final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
+      Constants.drive.KINEMATICS, getHeadingRot2d(), 0, 0, new Pose2d());
 
-  /** m from start pos in x rel to start angle @WIP not implimented */
-  public double xPos = 0;
-  /** m from start pos in y rel to start angle @WIP not implimented */
-  public double yPos = 0;
-  /** rotation rel to start in deg */
-  public double rot = 0;
-  /** m/s of speed */
-  public double speed = 0;
-  /** deg/s of rotation (CW = pos) */
-  public double turn = 0;
+  // Simulation Variables
+  private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
+  private final EncoderSim drvLeftEncoderSim = new EncoderSim(drvLeftEncoder);
+  private final EncoderSim drvRightEncoderSim = new EncoderSim(drvRightEncoder);
 
-  int n = 0;
+  public NavigationSub() {
+    SmartDashboard.putData("Field", field);
+  }
 
   @Override
   public void periodic() {
-    odometry.update(Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(),
-        drvRightEncoder.getDistance());
-    ShuffleControl.field.setRobotPose(odometry.getPoseMeters());
-    ShuffleControl.navTab.setPitchAngle(getPitch());
-    ShuffleControl.navTab.setRollAngle(getRoll());
+    updateOdometry();
+    updateShuffleboard();
+  }
 
-    
+  private void updateOdometry() {
+    poseEstimator.update(
+        Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
 
-    if(RobotController.getUserButton()){
-      Logger.info("Resetting Odometry (0,0,0)");
-      imu.calibrate();
-      resetOdometry(new Pose2d(0,0, new Rotation2d(0)));
+    Optional<EstimatedRobotPose> result = photon.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition());
+
+    if (result.isPresent()) {
+      EstimatedRobotPose camPose = result.get();
+      poseEstimator.addVisionMeasurement(
+          camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+      field.getObject("Cam Est Pos").setPose(camPose.estimatedPose.toPose2d());
+    } else {
+      // move it way off the screen to make it disappear
+      field.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
     }
+
+    field.getObject("Actual Pos").setPose(Subsystems.drive.drivetrainSimulator.getPose());
+    field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
 
-  /**
-   * Returns the currently-estimated pose of the robot.
-   * 
-   * @return The pose.
-   */
+  public void updateShuffleboard() {
+    ShuffleControl.navTab.setRotation(getHeadingDeg(), getPitch(), getRoll());
+    ShuffleControl.navTab.setEncoderDistances(
+        drvLeftEncoder.getDistance(),
+        drvRightEncoder.getDistance());
+  }
+
+  /** @return The currently-estimated pose of the robot. */
   public Pose2d getPose() {
-    return odometry.getPoseMeters();
+    // Not sure why, but poseEstimator is null for the first few seconds of runtime.
+    // Too bad!
+    if (poseEstimator == null)
+      return new Pose2d();
+
+    return poseEstimator.getEstimatedPosition();
   }
 
-  /**
-   * 
-   * @return direction in 
-   */
-  public double getHeadingDeg(){
-    return imu.getAngle() + yawOffset;
-  }
-  public Rotation2d getHeadingRot2d(){
-    return Rotation2d.fromDegrees(getHeadingDeg());
+  /** @return The wheel speeds of the robot */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(
+        getLeftEncoderRate(),
+        getRightEncoderRate());
   }
 
-  /** Gets the left encoder rate. @return The speed. m/s */
+  /** @return direction the robot is facing in degrees */
+  public double getHeadingDeg() {
+    return getHeadingRot2d().getDegrees();
+  }
+
+  /** @return direction the robot is facing as a Rotation2d */
+  public Rotation2d getHeadingRot2d() {
+    return getPose().getRotation();
+  }
+
+  /** @return The yaw angle of the robot in degrees */
+  public double getYaw() {
+    return imu.getAngle();
+  }
+
+  /** @return The roll angle of the robot in degrees */
+  public double getRoll() {
+    return imu.getXComplementaryAngle();
+  }
+
+  /** @return The pitch angle of the robot in degrees */
+  public double getPitch() {
+    return imu.getYComplementaryAngle();
+  }
+
+  /** Gets the left encoder rate. @return The speed in m/s */
   public double getLeftEncoderRate() {
     return drvLeftEncoder.getRate();
   }
 
-  /** Gets the right encoder rate. @return The speed. m/s */
+  /** Gets the right encoder rate. @return The speed in m/s */
   public double getRightEncoderRate() {
     return drvRightEncoder.getRate();
   }
 
-  /** Gets the average encoder rate. @return speed of COM. m/s */
-  private double getCOMSpeed() {
-    return (getLeftEncoderRate() + getRightEncoderRate()) / 2;
-  }
-
-  /** gets the average turn rate. @return rate of turn. deg/s */
-  private double getTurnRate() {
-    double arcL = drvRightEncoder.getDistance() - drvLeftEncoder.getDistance();
-
-    return (arcL / (Math.PI * cnst.ROBOT_WHEEL_WIDTH)) * 360;
-
-    //if (vL == vR) {
-    //  double centRad = (vL * cnst.ROBOT_WHEEL_WIDTH) / (vR - vL) + 0.5 * cnst.ROBOT_WHEEL_WIDTH;
-    //  return centRad == 0 ? 0 : Math.toDegrees(getCOMSpeed() / centRad);
-    //}
-    //return 0;
-  }
-
+  /** Resets the drive base encoders. */
   public void resetEncoders() {
     drvLeftEncoder.reset();
     drvRightEncoder.reset();
+  }
+
+  /** @return the reported drive encoder distances */
+  public Translation2d getEncoderDistances() {
+    return new Translation2d(drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
+  }
+
+  /** @return the average reported drive encoder distance */
+  public double getAvgEncoderDistance() {
+    Translation2d encoderDistances = getEncoderDistances();
+    return (encoderDistances.getX() + encoderDistances.getY()) / 2.0;
   }
 
   /**
@@ -117,19 +153,25 @@ public class NavigationSub extends SubsystemBase {
   public void resetOdometry(Pose2d pose) {
     resetEncoders();
     imu.reset();
-    odometry.resetPosition(
-      Rotation2d.fromDegrees(imu.getAngle()),
-      0., 0., pose);
+    poseEstimator.resetPosition(
+        Rotation2d.fromDegrees(imu.getAngle()),
+        0., 0., pose);
+
+    // sim
+    Subsystems.drive.drivetrainSimulator.setPose(pose);
   }
 
-  /** @return The roll angle of the robot */
-  public double getRoll() {
-    return imu.getXComplementaryAngle();
+  // Simulation Functions
+  @Override
+  public void simulationPeriodic() {
+    DifferentialDrivetrainSim drvTrnSim = Subsystems.drive.drivetrainSimulator;
 
-  }
+    drvLeftEncoderSim.setDistance(drvTrnSim.getLeftPositionMeters());
+    drvLeftEncoderSim.setRate(drvTrnSim.getLeftVelocityMetersPerSecond());
 
-  /** @return The pitch angle of the robot */
-  public double getPitch() {
-    return imu.getYComplementaryAngle();
+    drvRightEncoderSim.setDistance(drvTrnSim.getRightPositionMeters());
+    drvRightEncoderSim.setRate(drvTrnSim.getRightVelocityMetersPerSecond());
+
+    imuSim.setGyroAngleZ(drvTrnSim.getHeading().getDegrees());
   }
 }

@@ -9,25 +9,23 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.auto.AutoProvider;
+import frc.robot.constants.Constants;
 import frc.robot.teleop.TeleopProvider;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including
  * Subsystemsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Variables vars = Variables.getInstance();
   private final AutoProvider autoProvider = AutoProvider.getInstance();
   private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
-  private final OI oi = OI.getInstance();
 
   /**
-   * The container for the robot. Contains Subsystemsystems, OI devices, and commands.
+   * The container for the robot. Contains Subsystemsystems, OI devices, and
+   * commands.
    */
   public RobotContainer() {
     // Configure the button bindings
@@ -36,18 +34,31 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
-   * created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
-   * it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * created by instantiating a {@link GenericHID} or one of its subclasses
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
+   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Invert Drive
-    oi.pilot.start().onTrue(
-        new InstantCommand(() -> vars.invertDriveDirection = !vars.invertDriveDirection));
+    // +----------------+
+    // | PILOT CONTROLS |
+    // +----------------+
 
-    // Drive binddings handled in teleop command
+    // Invert Drive
+    OI.pilot.start().onTrue(new InstantCommand(() -> {
+      Variables.invertDriveDirection = !Variables.invertDriveDirection;
+      // CommandScheduler.getInstance().schedule(LEDShow.direction());
+    }));
+
+    // OI.pilot.rightBumper().onTrue(LEDShow.cone());
+    // OI.pilot.leftBumper().onTrue(LEDShow.cube());
+
+    // Drive bindings handled in teleop command
+
+    // +------------------+
+    // | COPILOT CONTROLS |
+    // +------------------+
+
+    // ...there aren't any lol
   }
 
   /**
@@ -56,7 +67,7 @@ public class RobotContainer {
    * @return the command to run in teleop
    */
   public Command getTeleopCommand() {
-    return teleopProvider.getTeleop();
+    return teleopProvider.getSelected();
   }
 
   /**
@@ -65,6 +76,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoProvider.getMiddleAuto();
+    return autoProvider.getSelected();
   }
 }
