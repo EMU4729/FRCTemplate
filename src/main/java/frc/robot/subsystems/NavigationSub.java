@@ -55,15 +55,15 @@ public class NavigationSub extends SubsystemBase {
 
     Optional<EstimatedRobotPose> result = photon.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition());
 
-    if (result.isPresent()) {
-      EstimatedRobotPose camPose = result.get();
+    // result is always empty in sim - why?
+    result.ifPresentOrElse(est -> {
       poseEstimator.addVisionMeasurement(
-          camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-      field.getObject("Cam Est Pos").setPose(camPose.estimatedPose.toPose2d());
-    } else {
+          est.estimatedPose.toPose2d(), est.timestampSeconds);
+      field.getObject("Cam Est Pos").setPose(est.estimatedPose.toPose2d());
+    }, () -> {
       // move it way off the screen to make it disappear
       field.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
-    }
+    });
 
     field.getObject("Actual Pos").setPose(Subsystems.drive.drivetrainSimulator.getPose());
     field.setRobotPose(poseEstimator.getEstimatedPosition());
@@ -79,7 +79,6 @@ public class NavigationSub extends SubsystemBase {
   /** @return The currently-estimated pose of the robot. */
   public Pose2d getPose() {
     // Not sure why, but poseEstimator is null for the first few seconds of runtime.
-    // Too bad!
     if (poseEstimator == null)
       return new Pose2d();
 
@@ -156,6 +155,7 @@ public class NavigationSub extends SubsystemBase {
     poseEstimator.resetPosition(
         Rotation2d.fromDegrees(imu.getAngle()),
         0., 0., pose);
+    photon.reset(pose);
 
     // sim
     Subsystems.drive.drivetrainSimulator.setPose(pose);
@@ -171,6 +171,8 @@ public class NavigationSub extends SubsystemBase {
 
     drvRightEncoderSim.setDistance(drvTrnSim.getRightPositionMeters());
     drvRightEncoderSim.setRate(drvTrnSim.getRightVelocityMetersPerSecond());
+
+    photon.simulationPeriodic(drvTrnSim.getPose());
 
     imuSim.setGyroAngleZ(drvTrnSim.getHeading().getDegrees());
   }

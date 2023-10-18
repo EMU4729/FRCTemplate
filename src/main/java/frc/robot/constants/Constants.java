@@ -16,4 +16,5 @@ public final class Constants {
   public static final LEDConstants led = new LEDConstants();
   public static final LoggerConstants logger = new LoggerConstants();
   public static final SimConstants sim = new SimConstants();
+  public static final VisionConstants vision = new VisionConstants();
 }
