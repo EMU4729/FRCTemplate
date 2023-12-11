@@ -9,9 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -20,11 +18,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystems;
 import frc.robot.constants.Constants;
 import frc.robot.shufflecontrol.ShuffleControl;
+import frc.robot.utils.ADIS16470_INS;
 import frc.robot.utils.PhotonBridge;
 
 /** Subsystem that handles all robot navigation */
 public class NavigationSub extends SubsystemBase {
-  public final ADIS16470_IMU imu = new ADIS16470_IMU();
+  public final ADIS16470_INS imu = new ADIS16470_INS();
 
   private final Encoder drvLeftEncoder = Constants.drive.ENCODER_ID_L.build();
   private final Encoder drvRightEncoder = Constants.drive.ENCODER_ID_R.build();
@@ -35,9 +34,11 @@ public class NavigationSub extends SubsystemBase {
       Constants.drive.KINEMATICS, getHeadingRot2d(), 0, 0, new Pose2d());
 
   // Simulation Variables
-  private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
+  // private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
   private final EncoderSim drvLeftEncoderSim = new EncoderSim(drvLeftEncoder);
   private final EncoderSim drvRightEncoderSim = new EncoderSim(drvRightEncoder);
+
+  private int logCountdown = 50;
 
   public NavigationSub() {
     SmartDashboard.putData("Field", field);
@@ -47,9 +48,16 @@ public class NavigationSub extends SubsystemBase {
   public void periodic() {
     updateOdometry();
     updateShuffleboard();
+    logCountdown -= 1;
+    if (logCountdown < 0) {
+      System.out.println(imu.toString());
+      logCountdown = 50;
+    }
   }
 
   private void updateOdometry() {
+    if (true)
+      return;
     poseEstimator.update(
         Rotation2d.fromDegrees(imu.getAngle()), drvLeftEncoder.getDistance(), drvRightEncoder.getDistance());
 
@@ -109,12 +117,12 @@ public class NavigationSub extends SubsystemBase {
 
   /** @return The roll angle of the robot in degrees */
   public double getRoll() {
-    return imu.getXComplementaryAngle();
+    return imu.getRoll();
   }
 
   /** @return The pitch angle of the robot in degrees */
   public double getPitch() {
-    return imu.getYComplementaryAngle();
+    return imu.getPitch();
   }
 
   /** Gets the left encoder rate. @return The speed in m/s */
@@ -174,6 +182,6 @@ public class NavigationSub extends SubsystemBase {
 
     photon.simulationPeriodic(drvTrnSim.getPose());
 
-    imuSim.setGyroAngleZ(drvTrnSim.getHeading().getDegrees());
+    // imuSim.setGyroAngleZ(drvTrnSim.getHeading().getDegrees());
   }
 }
