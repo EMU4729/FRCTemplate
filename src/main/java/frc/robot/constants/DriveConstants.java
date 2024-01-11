@@ -1,8 +1,11 @@
 package frc.robot.constants;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import frc.robot.utils.EncoderBuilder;
-import frc.robot.utils.MotorBuilder;
+import frc.robot.utils.motorbuilder.MotorBuilder;
+import frc.robot.utils.motorbuilder.TalonMotorBuilder;
 
 public class DriveConstants {
   protected DriveConstants() {
@@ -12,7 +15,7 @@ public class DriveConstants {
    * Information for left master drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorBuilder MOTOR_ID_LM = new MotorBuilder(1, MotorBuilder.Type.TalonSRX)
+  public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_LM = new TalonMotorBuilder(1)
       .withSafety().withInvert();
 
   /** Drive left encoder builder */
@@ -22,7 +25,7 @@ public class DriveConstants {
    * Information for right master drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorBuilder MOTOR_ID_RM = new MotorBuilder(3, MotorBuilder.Type.TalonSRX)
+  public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_RM = new TalonMotorBuilder(3)
       .withSafety();
 
   /** Drive left encoder builder */
@@ -33,13 +36,13 @@ public class DriveConstants {
    * Information for left slave drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorBuilder MOTOR_ID_LS = new MotorBuilder(2, MotorBuilder.Type.TalonSRX)
+  public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_LS = new TalonMotorBuilder(2)
       .withSafety().withInvert();
   /**
    * Information for right slave drive [Port,controller type,
    * {invert,brake,connectionSaftey}]
    */
-  public final MotorBuilder MOTOR_ID_RS = new MotorBuilder(4, MotorBuilder.Type.TalonSRX)
+  public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_RS = new TalonMotorBuilder(4)
       .withSafety();
 
   /** KS value from SysId */

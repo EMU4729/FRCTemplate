@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
@@ -8,7 +10,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -18,15 +19,13 @@ import frc.robot.constants.Constants;
  * Handles all drive functionality.
  */
 public class DriveSub extends SubsystemBase {
-  private final MotorController leftMaster = Constants.drive.MOTOR_ID_LM.build();
-  private final MotorController leftSlave = Constants.drive.MOTOR_ID_LS.build();
-  private final MotorControllerGroup leftMotors = new MotorControllerGroup(leftMaster, leftSlave);
+  private final WPI_TalonSRX leftMaster = Constants.drive.MOTOR_ID_LM.build();
+  private final WPI_TalonSRX leftSlave = Constants.drive.MOTOR_ID_LS.build();
 
-  private final MotorController rightMaster = Constants.drive.MOTOR_ID_RM.build();
-  private final MotorController rightSlave = Constants.drive.MOTOR_ID_RS.build();
-  private final MotorControllerGroup rightMotors = new MotorControllerGroup(rightMaster, rightSlave);
+  private final WPI_TalonSRX rightMaster = Constants.drive.MOTOR_ID_RM.build();
+  private final WPI_TalonSRX rightSlave = Constants.drive.MOTOR_ID_RS.build();
 
-  public final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors); // pub for shuffleboard
+  public final DifferentialDrive drive; // pub for shuffleboard
 
   // Simulation Variables
   /** @wip add corrected values */
@@ -40,6 +39,12 @@ public class DriveSub extends SubsystemBase {
       Constants.features.ROBOT_WHEEL_RAD, null);
 
   public DriveSub() {
+    leftSlave.follow(leftMaster);
+    rightSlave.follow(rightMaster);
+
+    // This is a big no no but our dumb code structure has forced my hand
+    drive = new DifferentialDrive((MotorController) leftMaster, (MotorController) rightMaster);
+
     addChild("Differential Drive", drive);
   }
 
@@ -63,8 +68,8 @@ public class DriveSub extends SubsystemBase {
    * @param rightVoltage The right output
    */
   public void tankVoltage(double leftVoltage, double rightVoltage) {
-    leftMotors.setVoltage(leftVoltage);
-    rightMotors.setVoltage(rightVoltage);
+    leftMaster.setVoltage(leftVoltage);
+    rightMaster.setVoltage(rightVoltage);
     drive.feed();
   }
 
@@ -89,12 +94,13 @@ public class DriveSub extends SubsystemBase {
   public void simulationPeriodic() {
     // set sim motor volts to cur motor throt * bat volts
 
-    // the order is reversed because otherwise, simulation direction is the opposite of real life
-    // this is probably a result of a deeper issue with the code that i don't want to fix right now
+    // the order is reversed because otherwise, simulation direction is the opposite
+    // of real life
+    // this is probably a result of a deeper issue with the code that i don't want
+    // to fix right now
     drivetrainSimulator.setInputs(
-        rightMotors.get() * RobotController.getInputVoltage(),
-        leftMotors.get() * RobotController.getInputVoltage()
-    );
+        rightMaster.get() * RobotController.getInputVoltage(),
+        leftMaster.get() * RobotController.getInputVoltage());
     drivetrainSimulator.update(0.02);
   }
 }

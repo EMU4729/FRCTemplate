@@ -1,6 +1,6 @@
 package frc.robot.teleop;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
@@ -11,7 +11,7 @@ import frc.robot.utils.CurveFit;
 /**
  * The Arcade Teleop command
  */
-public class TeleopDriveArcade extends CommandBase {
+public class TeleopDriveArcade extends Command {
   private final CurveFit throtFit;
   private final CurveFit steerFit;
 

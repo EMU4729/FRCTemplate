@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.SimPhotonCamera;
-import org.photonvision.SimVisionSystem;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.VisionSystemSim;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -28,8 +28,8 @@ public class PhotonBridge {
   private final PhotonPoseEstimator poseEstimator;
 
   // Simulation
-  private SimVisionSystem visionSim;
-  private SimPhotonCamera camSim;
+  private VisionSystemSim visionSim;
+  private PhotonCameraSim camSim;
 
   public PhotonBridge() {
     AprilTagFieldLayout tempFieldLayout;
@@ -42,19 +42,12 @@ public class PhotonBridge {
     }
 
     fieldLayout = tempFieldLayout;
-    poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP, cam, robotToCam);
+    poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, cam, robotToCam);
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     if (RobotBase.isSimulation()) {
-      visionSim = new SimVisionSystem(
-          Constants.vision.PHOTON_CAMERA_NAME,
-          Constants.sim.CAM_DIAG_FOV,
-          robotToCam,
-          Constants.sim.MAX_LED_RANGE,
-          Constants.sim.CAM_RES_WIDTH,
-          Constants.sim.CAM_RES_HEIGHT,
-          Constants.sim.MIN_TARGET_AREA);
-      visionSim.addVisionTargets(fieldLayout);
+      visionSim = new VisionSystemSim(Constants.vision.PHOTON_CAMERA_NAME);
+      visionSim.addAprilTags(fieldLayout);
     }
   }
 
@@ -73,7 +66,7 @@ public class PhotonBridge {
   }
 
   public void simulationPeriodic(Pose2d pose) {
-    visionSim.processFrame(pose);
+    visionSim.update(pose);
 
     // todo: find out why the hell this always gives empty results
     System.out.println(cam.getLatestResult().targets.stream().map((target) -> target.toString()).toList());

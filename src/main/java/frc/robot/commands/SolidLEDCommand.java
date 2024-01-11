@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
 
-public class SolidLEDCommand extends CommandBase {
+public class SolidLEDCommand extends Command {
   private final Color color;
 
   public SolidLEDCommand(Color color) {
