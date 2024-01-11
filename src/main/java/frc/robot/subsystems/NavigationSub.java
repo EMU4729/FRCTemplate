@@ -25,13 +25,13 @@ import frc.robot.utils.PhotonBridge;
 public class NavigationSub extends SubsystemBase {
   public final ADIS16470_INS imu = new ADIS16470_INS();
 
-  private final Encoder drvLeftEncoder = Constants.drive.ENCODER_ID_L.build();
-  private final Encoder drvRightEncoder = Constants.drive.ENCODER_ID_R.build();
+  private final Encoder drvLeftEncoder = Constants.diffDrive.ENCODER_ID_L.build();
+  private final Encoder drvRightEncoder = Constants.diffDrive.ENCODER_ID_R.build();
 
   private final Field2d field = new Field2d();
   private final PhotonBridge photon = new PhotonBridge();
   private final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
-      Constants.drive.KINEMATICS, getHeadingRot2d(), 0, 0, new Pose2d());
+      Constants.diffDrive.KINEMATICS, getHeadingRot2d(), 0, 0, new Pose2d());
 
   // Simulation Variables
   // private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
@@ -73,7 +73,7 @@ public class NavigationSub extends SubsystemBase {
       field.getObject("Cam Est Pos").setPose(new Pose2d(-100, -100, new Rotation2d()));
     });
 
-    field.getObject("Actual Pos").setPose(Subsystems.drive.drivetrainSimulator.getPose());
+    field.getObject("Actual Pos").setPose(Subsystems.diffDrive.drivetrainSimulator.getPose());
     field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
 
@@ -166,13 +166,13 @@ public class NavigationSub extends SubsystemBase {
     photon.reset(pose);
 
     // sim
-    Subsystems.drive.drivetrainSimulator.setPose(pose);
+    Subsystems.diffDrive.drivetrainSimulator.setPose(pose);
   }
 
   // Simulation Functions
   @Override
   public void simulationPeriodic() {
-    DifferentialDrivetrainSim drvTrnSim = Subsystems.drive.drivetrainSimulator;
+    DifferentialDrivetrainSim drvTrnSim = Subsystems.diffDrive.drivetrainSimulator;
 
     drvLeftEncoderSim.setDistance(drvTrnSim.getLeftPositionMeters());
     drvLeftEncoderSim.setRate(drvTrnSim.getLeftVelocityMetersPerSecond());

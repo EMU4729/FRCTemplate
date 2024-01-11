@@ -17,12 +17,12 @@ import frc.robot.constants.Constants;
  * Drive Subsystem.
  * Handles all drive functionality.
  */
-public class DriveSub extends SubsystemBase {
-  private final WPI_TalonSRX leftMaster = Constants.drive.MOTOR_ID_LM.build();
-  private final WPI_TalonSRX leftSlave = Constants.drive.MOTOR_ID_LS.build();
+public class DifferentialDriveSub extends SubsystemBase {
+  private final WPI_TalonSRX leftMaster = Constants.diffDrive.MOTOR_ID_LM.build();
+  private final WPI_TalonSRX leftSlave = Constants.diffDrive.MOTOR_ID_LS.build();
 
-  private final WPI_TalonSRX rightMaster = Constants.drive.MOTOR_ID_RM.build();
-  private final WPI_TalonSRX rightSlave = Constants.drive.MOTOR_ID_RS.build();
+  private final WPI_TalonSRX rightMaster = Constants.diffDrive.MOTOR_ID_RM.build();
+  private final WPI_TalonSRX rightSlave = Constants.diffDrive.MOTOR_ID_RS.build();
 
   public final DifferentialDrive drive; // pub for shuffleboard
 
@@ -37,7 +37,7 @@ public class DriveSub extends SubsystemBase {
       drivetrainSystem, DCMotor.getCIM(2), 10.71, Constants.features.ROBOT_WHEEL_WIDTH,
       Constants.features.ROBOT_WHEEL_RAD, null);
 
-  public DriveSub() {
+  public DifferentialDriveSub() {
     leftSlave.follow(leftMaster);
     rightSlave.follow(rightMaster);
 

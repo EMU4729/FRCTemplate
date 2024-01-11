@@ -8,9 +8,9 @@ import frc.robot.Subsystems;
 public class SimpleAuto extends SequentialCommandGroup {
   public SimpleAuto() {
     addCommands(
-        new InstantCommand(() -> Subsystems.drive.tank(0.5, 0.5), Subsystems.drive),
+        new InstantCommand(() -> Subsystems.diffDrive.tank(0.5, 0.5), Subsystems.diffDrive),
         new WaitCommand(2),
-        new InstantCommand(Subsystems.drive::off, Subsystems.drive));
+        new InstantCommand(Subsystems.diffDrive::off, Subsystems.diffDrive));
   }
 
 }

@@ -45,19 +45,19 @@ public class PathWeaverCommand extends SequentialCommandGroup {
         trajectory,
         Subsystems.nav::getPose,
         new RamseteController(
-            Constants.drive.RAMSETE_B,
-            Constants.drive.RAMSETE_ZETA),
+            Constants.diffDrive.RAMSETE_B,
+            Constants.diffDrive.RAMSETE_ZETA),
         new SimpleMotorFeedforward(
-            Constants.drive.KS_VOLTS,
-            Constants.drive.KV_VOLT_SECONDS_PER_METER,
-            Constants.drive.KA_VOLT_SECONDS_SQUARED_PER_METER),
-        Constants.drive.KINEMATICS,
+            Constants.diffDrive.KS_VOLTS,
+            Constants.diffDrive.KV_VOLT_SECONDS_PER_METER,
+            Constants.diffDrive.KA_VOLT_SECONDS_SQUARED_PER_METER),
+        Constants.diffDrive.KINEMATICS,
         Subsystems.nav::getWheelSpeeds,
         new PIDController(0, 0, 0),
         new PIDController(0, 0, 0),
-        Subsystems.drive::tankVoltage,
-        Subsystems.drive);
+        Subsystems.diffDrive::tankVoltage,
+        Subsystems.diffDrive);
 
-    addCommands(ramseteCommand, new InstantCommand(Subsystems.drive::off));
+    addCommands(ramseteCommand, new InstantCommand(Subsystems.diffDrive::off));
   }
 }

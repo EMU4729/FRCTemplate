@@ -16,14 +16,14 @@ public class TeleopDriveTank extends Command {
   private final CurveFit copilotThrotFit;
 
   public TeleopDriveTank() {
-    this(Constants.drive.PILOT_SETTINGS);
+    this(Constants.diffDrive.PILOT_SETTINGS);
   }
 
   public TeleopDriveTank(double[][] settings) {
     throtFit = CurveFit.throtFromDriveSettings(settings);
-    copilotThrotFit = CurveFit.throtFromDriveSettings(Constants.drive.COPILOT_SETTINGS);
+    copilotThrotFit = CurveFit.throtFromDriveSettings(Constants.diffDrive.COPILOT_SETTINGS);
 
-    addRequirements(Subsystems.drive);
+    addRequirements(Subsystems.diffDrive);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class TeleopDriveTank extends Command {
 
     ShuffleControl.driveTab.setControlAxis(-OI.pilot.getLeftY(), OI.pilot.getRightY());
 
-    Subsystems.drive.tank(throttleL, throttleR);
+    Subsystems.diffDrive.tank(throttleL, throttleR);
   }
 
   @Override

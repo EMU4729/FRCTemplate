@@ -11,7 +11,8 @@ package frc.robot.constants;
 public final class Constants {
   public static final FeaturesConstants features = new FeaturesConstants(); // do not move
   public static final ControllerConstants controller = new ControllerConstants();
-  public static final DriveConstants drive = new DriveConstants();
+  public static final DifferentialDriveConstants diffDrive = new DifferentialDriveConstants();
+  public static final SwerveDriveConstants swerveDrive = new SwerveDriveConstants();
   public static final FileConstants file = new FileConstants();
   public static final LEDConstants led = new LEDConstants();
   public static final LoggerConstants logger = new LoggerConstants();
