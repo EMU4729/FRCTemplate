@@ -9,7 +9,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -42,8 +41,7 @@ public class DriveSub extends SubsystemBase {
     leftSlave.follow(leftMaster);
     rightSlave.follow(rightMaster);
 
-    // This is a big no no but our dumb code structure has forced my hand
-    drive = new DifferentialDrive((MotorController) leftMaster, (MotorController) rightMaster);
+    drive = new DifferentialDrive(leftMaster, rightMaster);
 
     addChild("Differential Drive", drive);
   }
