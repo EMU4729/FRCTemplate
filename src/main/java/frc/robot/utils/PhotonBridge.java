@@ -52,7 +52,6 @@ public class PhotonBridge {
       visionSim = new VisionSystemSim(Constants.vision.PHOTON_CAMERA_NAME);
       visionSim.addAprilTags(fieldLayout);
 
-
       camProps = new SimCameraProperties();
       // A 640 x 480 camera with a 100 degree diagonal FOV.
       camProps.setCalibration(640, 480, Rotation2d.fromDegrees(100));
@@ -104,6 +103,7 @@ public class PhotonBridge {
     visionSim.update(pose);
 
     // todo: find out why the hell this always gives empty results
-    System.out.println(cam.getLatestResult().targets.stream().map((target) -> target.toString()).toList());
+    // System.out.println(cam.getLatestResult().targets.stream().map((target) ->
+    // target.toString()).toList());
   }
 }

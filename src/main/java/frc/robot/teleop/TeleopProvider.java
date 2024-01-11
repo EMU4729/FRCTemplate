@@ -20,6 +20,8 @@ public class TeleopProvider {
   private final Command teleopTank = new TeleopDriveTank();
   private final Command demoTeleopTank = new TeleopDriveTank(Constants.diffDrive.DEMO_SETTINGS);
 
+  private final Command teleopSwerve = new TeleopDriveSwerve();
+
   public final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
 
   private TeleopProvider() {
@@ -31,6 +33,9 @@ public class TeleopProvider {
     chooser.addOption("Tank Teleop", teleopTank);
     chooser.addOption("Demo Tank Teleop", demoTeleopTank);
     chooser.addOption("Disable Teleop", new InstantCommand());
+
+    // swerve
+    chooser.addOption("Swerve Teleop", teleopSwerve);
 
     SmartDashboard.putData("Teleop Chooser", chooser);
   }

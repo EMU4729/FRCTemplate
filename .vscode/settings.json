@@ -19,7 +19,9 @@
     {
       "name": "WPIlibUnitTests",
       "workingDirectory": "${workspaceFolder}/build/jni/release",
-      "vmargs": ["-Djava.library.path=${workspaceFolder}/build/jni/release"],
+      "vmargs": [
+        "-Djava.library.path=${workspaceFolder}/build/jni/release"
+      ],
       "env": {
         "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
@@ -27,10 +29,13 @@
     }
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-
   // Our settings
-  "editor.rulers": [100, 120],
+  "editor.rulers": [
+    100,
+    120
+  ],
   "editor.insertSpaces": true,
   "editor.tabSize": 2,
-  "editor.indentSize": "tabSize"
+  "editor.indentSize": "tabSize",
+  "java.debug.settings.onBuildFailureProceed": true
 }

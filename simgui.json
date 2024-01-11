@@ -1,4 +1,13 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [17]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -11,7 +20,7 @@
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
-      "/SmartDashboard/Field": {
+      "/Shuffleboard/Drive/TeleopType": {
         "window": {
           "visible": true
         }
