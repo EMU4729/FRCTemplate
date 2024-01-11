@@ -43,7 +43,7 @@ public class PathWeaverCommand extends SequentialCommandGroup {
     // All I know is that it works and no one should touch it
     RamseteCommand ramseteCommand = new RamseteCommand(
         trajectory,
-        Subsystems.nav::getPose,
+        Subsystems.diffDrive::getPose,
         new RamseteController(
             Constants.diffDrive.RAMSETE_B,
             Constants.diffDrive.RAMSETE_ZETA),
@@ -52,7 +52,7 @@ public class PathWeaverCommand extends SequentialCommandGroup {
             Constants.diffDrive.KV_VOLT_SECONDS_PER_METER,
             Constants.diffDrive.KA_VOLT_SECONDS_SQUARED_PER_METER),
         Constants.diffDrive.KINEMATICS,
-        Subsystems.nav::getWheelSpeeds,
+        Subsystems.diffDrive::getWheelSpeeds,
         new PIDController(0, 0, 0),
         new PIDController(0, 0, 0),
         Subsystems.diffDrive::tankVoltage,

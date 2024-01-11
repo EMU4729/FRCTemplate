@@ -253,4 +253,9 @@ public class SwerveDriveSub extends SubsystemBase {
   public double getTurnRate() {
     return m_gyro.getRate(IMUAxis.kZ) * (Constants.swerveDrive.kGyroReversed ? -1.0 : 1.0);
   }
+
+  @Override
+  public void simulationPeriodic() {
+    // TODO: Add simulation capabilities to swerve
+  }
 }

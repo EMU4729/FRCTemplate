@@ -3,15 +3,25 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.utils.PhotonBridge;
 
 /**
  * Drive Subsystem.
@@ -24,7 +34,16 @@ public class DifferentialDriveSub extends SubsystemBase {
   private final WPI_TalonSRX rightMaster = Constants.diffDrive.MOTOR_ID_RM.build();
   private final WPI_TalonSRX rightSlave = Constants.diffDrive.MOTOR_ID_RS.build();
 
+  private final ADIS16470_IMU imu = new ADIS16470_IMU();
+  private final Encoder leftEncoder = Constants.diffDrive.ENCODER_ID_L.build();
+  private final Encoder rightEncoder = Constants.diffDrive.ENCODER_ID_R.build();
+  private final PhotonBridge photon = new PhotonBridge();
+
   public final DifferentialDrive drive; // pub for shuffleboard
+  public final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
+      Constants.diffDrive.KINEMATICS,
+      Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
+      0, 0, new Pose2d());
 
   // Simulation Variables
   /** @wip add corrected values */
@@ -33,6 +52,11 @@ public class DifferentialDriveSub extends SubsystemBase {
       Constants.sim.KA_LINEAR,
       Constants.sim.KV_ANGULAR,
       Constants.sim.KA_ANGULAR);
+
+  public final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
+  public final EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
+  public final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
+
   public final DifferentialDrivetrainSim drivetrainSimulator = new DifferentialDrivetrainSim(
       drivetrainSystem, DCMotor.getCIM(2), 10.71, Constants.features.ROBOT_WHEEL_WIDTH,
       Constants.features.ROBOT_WHEEL_RAD, null);
@@ -44,6 +68,25 @@ public class DifferentialDriveSub extends SubsystemBase {
     drive = new DifferentialDrive(leftMaster, rightMaster);
 
     addChild("Differential Drive", drive);
+  }
+
+  @Override
+  public void periodic() {
+    poseEstimator.update(
+        Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
+        leftEncoder.getDistance(), rightEncoder.getDistance());
+  }
+
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(leftEncoder.getRate(), rightEncoder.getRate());
+  }
+
+  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+    poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 
   /**
@@ -100,5 +143,13 @@ public class DifferentialDriveSub extends SubsystemBase {
         rightMaster.get() * RobotController.getInputVoltage(),
         leftMaster.get() * RobotController.getInputVoltage());
     drivetrainSimulator.update(0.02);
+
+    leftEncoderSim.setDistance(drivetrainSimulator.getLeftPositionMeters());
+    leftEncoderSim.setRate(drivetrainSimulator.getLeftVelocityMetersPerSecond());
+    rightEncoderSim.setDistance(drivetrainSimulator.getRightPositionMeters());
+    rightEncoderSim.setRate(drivetrainSimulator.getRightVelocityMetersPerSecond());
+
+    photon.simulationPeriodic(drivetrainSimulator.getPose());
+    imuSim.setGyroAngleZ(drivetrainSimulator.getHeading().getDegrees());
   }
 }

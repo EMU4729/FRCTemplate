@@ -15,6 +15,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/VisionSystemSim-photonvision/Sim Field": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
