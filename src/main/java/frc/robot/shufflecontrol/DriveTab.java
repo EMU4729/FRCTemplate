@@ -26,10 +26,11 @@ public class DriveTab {
   }
 
   protected DriveTab() {
-    drive
-        .add("DriveOutput", Subsystems.diffDrive.drive)
-        .withSize(4, 2).withPosition(0, 0)
-        .withWidget(BuiltInWidgets.kDifferentialDrive);
+    // TODO: Add swerve equivalent of following code
+    // drive
+    // .add("DriveOutput", Subsystems.diffDrive.drive)
+    // .withSize(4, 2).withPosition(0, 0)
+    // .withWidget(BuiltInWidgets.kDifferentialDrive);
 
     drive
         .add("TeleopType", TeleopProvider.getInstance().chooser)
