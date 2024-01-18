@@ -24,7 +24,7 @@ import frc.robot.utils.PhotonBridge;
 import frc.robot.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSub extends SubsystemBase {
+public class SwerveDriveSub extends SubsystemBase {
   // Create MAXSwerveModules
   private final MAXSwerveModule frontLeft = new MAXSwerveModule(
       Constants.swerveDrive.kFrontLeftDrivingCanId,
@@ -76,7 +76,7 @@ public class DriveSub extends SubsystemBase {
   ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
 
   /** Creates a new DriveSubsystem. */
-  public DriveSub() {
+  public SwerveDriveSub() {
   }
 
   @Override
