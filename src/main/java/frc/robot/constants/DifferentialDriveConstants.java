@@ -74,13 +74,15 @@ public class DifferentialDriveConstants {
     public static final double MIN_THROT = 0.3;
     /** min throttle for turning */
     public static final double MIN_TURN = 0.3;
+
+    
     /**
      * settings for robot drive in default teleop
-     * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
-     * power}
+     * 
+     * modRFromX ?
+     * set to zero for now
      */
-    public double[][] PILOT_SETTINGS = { { MIN_THROT, 1, 2 }, { MIN_TURN, 1, 3, 0.3 } };
-    // public static final RangeSettings PILOT_SETTINGS = RangeSettings.InitTankBot(0, 0, 0, 0, false, 0, 0, 0, 0, false, 0, 0)
+    public static final RangeSettings PILOT_SETTINGS = RangeSettings.InitTankBot(MIN_THROT, 1, 2, 0.1, false, MIN_TURN, 1, 3, 0.1, false, 0, 0.85);
     /**
      * settings for robot drive in demo mode
      * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve

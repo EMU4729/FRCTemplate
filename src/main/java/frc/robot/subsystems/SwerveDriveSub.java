@@ -34,7 +34,7 @@ import frc.robot.utils.PhotonBridge;
 import frc.robot.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class DriveSub extends SubsystemBase {
+public class SwerveDriveSub extends SubsystemBase {
   // Swerve Modules
   public final SwerveModule frontLeft = new SwerveModule(
       DriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
@@ -98,7 +98,7 @@ public class DriveSub extends SubsystemBase {
   private Pose2d poseSim = new Pose2d();
 
   /** Creates a new DriveSubsystem. */
-  public DriveSub() {
+  public SwerveDriveSub() {
     // Configure PathPlanner auto
     AutoBuilder.configureHolonomic(
         this::getPose,

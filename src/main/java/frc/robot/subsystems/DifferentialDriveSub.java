@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DifferentialDriveConstants;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.SimConstants;
 import frc.robot.utils.PhotonBridge;
 
 /**
@@ -48,18 +50,18 @@ public class DifferentialDriveSub extends SubsystemBase {
   // Simulation Variables
   /** @wip add corrected values */
   private final LinearSystem<N2, N2, N2> drivetrainSystem = LinearSystemId.identifyDrivetrainSystem(
-      Constants.sim.KV_LINEAR,
-      Constants.sim.KA_LINEAR,
-      Constants.sim.KV_ANGULAR,
-      Constants.sim.KA_ANGULAR);
+      SimConstants.KV_LINEAR,
+      SimConstants.KA_LINEAR,
+      SimConstants.KV_ANGULAR,
+      SimConstants.KA_ANGULAR);
 
   public final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
   public final EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
   public final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
 
   public final DifferentialDrivetrainSim drivetrainSimulator = new DifferentialDrivetrainSim(
-      drivetrainSystem, DCMotor.getCIM(2), 10.71, Constants.features.ROBOT_WHEEL_WIDTH,
-      Constants.features.ROBOT_WHEEL_RAD, null);
+      drivetrainSystem, DCMotor.getCIM(2), 10.71, DriveConstants.WHEEL_BASE,
+      DriveConstants.WHEEL_DIAMETER_METERS / 2, null);
 
   public DifferentialDriveSub() {
     leftSlave.follow(leftMaster);

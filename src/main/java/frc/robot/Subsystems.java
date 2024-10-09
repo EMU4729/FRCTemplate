@@ -1,6 +1,8 @@
 package frc.robot;
 
 import frc.robot.subsystems.LEDSub;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import frc.robot.subsystems.DifferentialDriveSub;
 import frc.robot.subsystems.DriveSub;
 
 /**
@@ -9,4 +11,5 @@ import frc.robot.subsystems.DriveSub;
 public class Subsystems {
   public static final DriveSub drive = new DriveSub();
   public static final LEDSub led = new LEDSub();
+  public static final DifferentialDriveSub diffDrive = new DifferentialDriveSub();
 }

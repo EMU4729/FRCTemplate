@@ -4,24 +4,22 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
-import frc.robot.constants.Constants;
+import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.shufflecontrol.ShuffleControl;
-import frc.robot.utils.CurveFit;
+import frc.robot.utils.RangeMath.RangeSettings;
 
 /**
  * The Arcade Teleop command
  */
 public class TeleopDriveArcade extends Command {
-  private final CurveFit throtFit;
-  private final CurveFit steerFit;
+  private final RangeSettings settings;
 
   public TeleopDriveArcade() {
-    this(Constants.diffDrive.PILOT_SETTINGS);
+    this(DifferentialDriveConstants.PILOT_SETTINGS);
   }
 
-  public TeleopDriveArcade(double[][] settings) {
-    throtFit = CurveFit.throtFromDriveSettings(settings);
-    steerFit = CurveFit.steerFromDriveSettings(settings);
+  public TeleopDriveArcade(RangeSettings settings) {
+    this.settings = settings;
 
     addRequirements(Subsystems.diffDrive);
   }
@@ -31,9 +29,9 @@ public class TeleopDriveArcade extends Command {
     double throttle = 0;
     double steering = 0;
 
-    throttle = throtFit.fit(OI.applyAxisDeadband(OI.pilot.getLeftY()));
-    // limiting max steering based on throttle
-    steering = steerFit.fit(OI.applyAxisDeadband(OI.pilot.getRightX()), throttle);
+    // TODO: apply curve fit to throttle and steering - make compatible with arcade drive
+    throttle = OI.pilot.getLeftY();
+    steering = OI.pilot.getRightX();
 
     // Invert steering when throttle >= 0 to mimic car controls
     // if (throttle > 0) {

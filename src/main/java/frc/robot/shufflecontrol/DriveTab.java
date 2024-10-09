@@ -4,8 +4,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Subsystems;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 import java.util.Map;
@@ -60,10 +58,22 @@ public class DriveTab {
       .withWidget(BuiltInWidgets.kDial).withProperties(Map.of("min", -1, "max", 1))
       .getEntry();
 
+
+  /*
+   * Set control inputs for swerve
+   */
   public void setControlAxis(double contX, double contY, double contR) {
     driveX.setDouble(contX);
     driveY.setDouble(contY);
     driveR.setDouble(contR);
+  }
+
+  /*
+   * Set control inputs for tank
+   */
+  public void setControlAxis(double contY, double contX) {
+    driveY.setDouble(contY);
+    driveX.setDouble(contX);
   }
 
   public void setWheelAxes(SwerveModuleState FL, SwerveModuleState FR, SwerveModuleState RL, SwerveModuleState RR) {
