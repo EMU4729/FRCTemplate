@@ -22,7 +22,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.utils.logger.Logger;
 
 public class SwerveModule {
@@ -36,10 +36,11 @@ public class SwerveModule {
 
   private int lastOptimise = 0;
 
-  private double angularOffset = 0; //radians
+  private double angularOffset = 0; // radians
   private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   private Logger logger;
+
   /**
    * Constructs a new SwerveModule for a MAX Swerve Module housing a Falcon
    * driving motor and a Neo 550 Turning Motor.
@@ -51,7 +52,7 @@ public class SwerveModule {
   public SwerveModule(int drivingCANId, int turningCANId, double angularOffset) {
 
     // create loggger
-    logger = new Logger("swerve-" + drivingCANId, new String[] {"Pos", "Vel", "Ang", "Ang Rate"});
+    logger = new Logger("swerve-" + drivingCANId, new String[] { "Pos", "Vel", "Ang", "Ang Rate" });
 
     driveMotor = new TalonFX(drivingCANId);
     turnMotor = new CANSparkMax(turningCANId, MotorType.kBrushless);
@@ -60,22 +61,20 @@ public class SwerveModule {
     // Configure Drive Motor
     final var driveMotorConfig = new TalonFXConfiguration();
     /* Motor Inverts and Neutral Mode */
-    driveMotorConfig.MotorOutput.Inverted = DriveConstants.DRIVE_MOTOR_INVERTED;
+    driveMotorConfig.MotorOutput.Inverted = SwerveDriveConstants.DRIVE_MOTOR_INVERTED;
     driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     /* Gear Ratio Config */
-    driveMotorConfig.Feedback.SensorToMechanismRatio = DriveConstants.DRIVE_GEAR_RATIO;
+    driveMotorConfig.Feedback.SensorToMechanismRatio = SwerveDriveConstants.DRIVE_GEAR_RATIO;
 
     /* Current Limiting */
     driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
 
-    
     /* PID Config */
-    driveMotorConfig.Slot0.kP = DriveConstants.DRIVE_P;
-    driveMotorConfig.Slot0.kI = DriveConstants.DRIVE_I;
-    driveMotorConfig.Slot0.kD = DriveConstants.DRIVE_D;
-    
+    driveMotorConfig.Slot0.kP = SwerveDriveConstants.DRIVE_P;
+    driveMotorConfig.Slot0.kI = SwerveDriveConstants.DRIVE_I;
+    driveMotorConfig.Slot0.kD = SwerveDriveConstants.DRIVE_D;
 
     driveMotor.getConfigurator().apply(driveMotorConfig);
     driveController = new VelocityVoltage(0).withSlot(0);
@@ -91,30 +90,30 @@ public class SwerveModule {
     // Apply position and velocity conversion factors for the turning encoder. We
     // want these in radians and radians per second to use with WPILib's swerve
     // APIs.
-    turnEncoder.setPositionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR);
-    turnEncoder.setVelocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-    //turnEncoder.setZeroOffset(angularOffset); dont use
+    turnEncoder.setPositionConversionFactor(SwerveDriveConstants.TURNING_ENCODER_POSITION_FACTOR);
+    turnEncoder.setVelocityConversionFactor(SwerveDriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+    // turnEncoder.setZeroOffset(angularOffset); dont use
 
     // Invert the turning encoder, since the output shaft rotates in the opposite
     // direction of
     // the steering motor in the MAXSwerve Module.
-    turnEncoder.setInverted(DriveConstants.TURNING_ENCODER_INVERTED);
+    turnEncoder.setInverted(SwerveDriveConstants.TURNING_ENCODER_INVERTED);
 
     // Enable PID wrap around for the turning motor. This will allow the PID
     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
     // to 10 degrees will go through 0 rather than the other direction which is a
     // longer route.
     turnController.setPositionPIDWrappingEnabled(true);
-    turnController.setPositionPIDWrappingMinInput(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT);
-    turnController.setPositionPIDWrappingMaxInput(DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
+    turnController.setPositionPIDWrappingMinInput(SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT);
+    turnController.setPositionPIDWrappingMaxInput(SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
     // Set the PID gains for the turning motor. Note these are example gains, and
     // you
     // may need to tune them for your own robot!
-    turnController.setP(DriveConstants.TURNING_P);
-    turnController.setI(DriveConstants.TURNING_I);
-    turnController.setD(DriveConstants.TURNING_D);
-    turnController.setFF(DriveConstants.TURNING_FF);
+    turnController.setP(SwerveDriveConstants.TURNING_P);
+    turnController.setI(SwerveDriveConstants.TURNING_I);
+    turnController.setD(SwerveDriveConstants.TURNING_D);
+    turnController.setFF(SwerveDriveConstants.TURNING_FF);
     turnController.setOutputRange(-1, 1);
 
     turnMotor.setIdleMode(IdleMode.kBrake);
@@ -158,9 +157,9 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    double angle = (getRotation2d().getRadians() - Math.toRadians(angularOffset)) % (2*Math.PI);
+    double angle = (getRotation2d().getRadians() - Math.toRadians(angularOffset)) % (2 * Math.PI);
     return new SwerveModulePosition(
-        Math.abs(driveMotor.getPosition().getValue())  ,// * angle > Math.PI ? -1 : 1,
+        Math.abs(driveMotor.getPosition().getValue()), // * angle > Math.PI ? -1 : 1,
         new Rotation2d(angle));
   }
 
@@ -176,36 +175,33 @@ public class SwerveModule {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    SwerveModuleState optimizedDesiredState = /*SwerveModuleState.*/optimize(
+    SwerveModuleState optimizedDesiredState = /* SwerveModuleState. */optimize(
         correctedDesiredState,
         getRotation2d());
 
     driveMotor.setControl(
-      driveController
-      .withVelocity(
-        // withVelocity accepts rps, not mps
-        optimizedDesiredState.speedMetersPerSecond / DriveConstants.WHEEL_CIRCUMFERENCE_METERS )
-        );//.withFeedForward(DriveConstants.DRIVING_FF));
-      turnController.setReference(
+        driveController
+            .withVelocity(
+                // withVelocity accepts rps, not mps
+                optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
+    turnController.setReference(
         optimizedDesiredState.angle.getRadians() + Math.PI,
         ControlType.kPosition);
-            
+
     this.desiredState = desiredState;
-    
 
     logger.log(new double[] {
-      driveMotor.getPosition().getValue(),
-      driveMotor.getVelocity().getValue(),
-      getRotation2d().getDegrees(),
-      turnEncoder.getVelocity() * (180/Math.PI)
+        driveMotor.getPosition().getValue(),
+        driveMotor.getVelocity().getValue(),
+        getRotation2d().getDegrees(),
+        turnEncoder.getVelocity() * (180 / Math.PI)
     });
 
   }
 
-
   public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
     var delta = desiredState.angle.minus(currentAngle);
-    int limit = lastOptimise == 0 ? 90 : (lastOptimise>0 ? 135 : 45);
+    int limit = lastOptimise == 0 ? 90 : (lastOptimise > 0 ? 135 : 45);
 
     double error = Math.abs(delta.getDegrees());
     if (error < limit) {
@@ -225,12 +221,13 @@ public class SwerveModule {
   }
 
   /** reset turn motor pid I accumulation to 0 */
-  public void resetIntegral(){
+  public void resetIntegral() {
     turnController.setIAccum(0);
   }
 
   public Rotation2d getRotation2d() {
-    //take care, get position only returns as rotations when a scale factor is not set
+    // take care, get position only returns as rotations when a scale factor is not
+    // set
     return Rotation2d.fromRadians(turnEncoder.getPosition());
   }
 }

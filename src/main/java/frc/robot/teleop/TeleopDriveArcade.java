@@ -6,6 +6,7 @@ import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.shufflecontrol.ShuffleControl;
+import frc.robot.utils.RangeMath.CurveFit;
 import frc.robot.utils.RangeMath.RangeSettings;
 
 /**
@@ -26,12 +27,10 @@ public class TeleopDriveArcade extends Command {
 
   @Override
   public void execute() {
-    double throttle = 0;
-    double steering = 0;
-
-    // TODO: apply curve fit to throttle and steering - make compatible with arcade drive
-    throttle = OI.pilot.getLeftY();
-    steering = OI.pilot.getRightX();
+    double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftY(), 0, OI.pilot.getRightX(), 0 },
+        settings);
+    double throttle = control[0];
+    double steering = control[2];
 
     // Invert steering when throttle >= 0 to mimic car controls
     // if (throttle > 0) {

@@ -67,7 +67,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     Logger.pauseAllLoggers();
-    System.out.println("Disabled ----------------------------------------------------------------------------------------");
+    System.out
+        .println("Disabled ----------------------------------------------------------------------------------------");
   }
 
   @Override
@@ -87,8 +88,9 @@ public class Robot extends TimedRobot {
       autoCommand.schedule();
     }
     Logger.unpauseAllLoggers();
-    System.out.println("Auto Start --------------------------------------------------------------------------------------");
-    Subsystems.drive.resetIntegral();
+    System.out
+        .println("Auto Start --------------------------------------------------------------------------------------");
+    Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during autonomous. */
@@ -106,8 +108,9 @@ public class Robot extends TimedRobot {
       autoCommand.cancel();
     }
     Logger.unpauseAllLoggers();
-    System.out.println("Teleop Start ------------------------------------------------------------------------------------");
-    Subsystems.drive.resetIntegral();
+    System.out
+        .println("Teleop Start ------------------------------------------------------------------------------------");
+    Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during operator control. */
@@ -120,7 +123,8 @@ public class Robot extends TimedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
     Logger.unpauseAllLoggers();
-    System.out.println("Test Start --------------------------------------------------------------------------------------");
+    System.out
+        .println("Test Start --------------------------------------------------------------------------------------");
   }
 
   /** This function is called periodically during test mode. */

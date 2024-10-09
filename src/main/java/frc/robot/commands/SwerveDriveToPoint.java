@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
 import frc.robot.constants.AutoConstants;
 
-public class DriveToPoint extends Command {
+public class SwerveDriveToPoint extends Command {
   private final PIDController xController = AutoConstants.TRANSLATION_PID.get();
   private final PIDController yController = AutoConstants.TRANSLATION_PID.get();
   private final PIDController rotController = AutoConstants.ROT_PID.get();
 
-  public DriveToPoint(Pose2d targetPose) {
+  public SwerveDriveToPoint(Pose2d targetPose) {
     xController.setSetpoint(targetPose.getX());
     yController.setSetpoint(targetPose.getY());
     rotController.setSetpoint(targetPose.getRotation().getRadians());
@@ -22,7 +22,7 @@ public class DriveToPoint extends Command {
 
     rotController.enableContinuousInput(-Math.PI, Math.PI);
 
-    addRequirements(Subsystems.drive);
+    addRequirements(Subsystems.swerveDrive);
   }
 
   @Override
@@ -34,13 +34,13 @@ public class DriveToPoint extends Command {
 
   @Override
   public void execute() {
-    final var currentPose = Subsystems.drive.getPose();
+    final var currentPose = Subsystems.swerveDrive.getPose();
 
     final var xSpeed = xController.calculate(currentPose.getX());
     final var ySpeed = yController.calculate(currentPose.getY());
     final var rotSpeed = rotController.calculate(currentPose.getRotation().getRadians());
 
-    Subsystems.drive.drive(xSpeed, ySpeed, rotSpeed, true, false);
+    Subsystems.swerveDrive.drive(xSpeed, ySpeed, rotSpeed, true, false);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class DriveToPoint extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    Subsystems.drive.setX();
+    Subsystems.swerveDrive.setX();
   }
 
 }

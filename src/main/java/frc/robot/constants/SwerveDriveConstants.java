@@ -17,7 +17,7 @@ import frc.robot.utils.RangeMath.RangeSettings;
 // values. Therefore, most of these are completely innaccurate! Please update them to be accurate before testing.
 // - Neel
 
-public class DriveConstants {
+public class SwerveDriveConstants {
   // NEO Motor Constants
   /** Free speed of the driving motor in rpm */
   public static final double FREE_SPEED_RPM = 6380;
@@ -151,8 +151,8 @@ public class DriveConstants {
   /**
    * 45 teeth on the wheel's bevel gear, 15 teeth on the bevel pinion
    */
-  public static final double DRIVING_MOTOR_REDUCTION = 
-      ((double)DRIVING_MOTOR_SPUR_TEETH/DRIVING_MOTOR_PINION_TEETH) * (45.0/15.0);
+  public static final double DRIVING_MOTOR_REDUCTION = ((double) DRIVING_MOTOR_SPUR_TEETH / DRIVING_MOTOR_PINION_TEETH)
+      * (45.0 / 15.0);
 
   /** Free speed of the wheel in rps */
   public static final double DRIVE_WHEEL_FREE_SPEED_RPS = (DRIVING_MOTOR_FREE_SPEED_RPS
@@ -174,7 +174,7 @@ public class DriveConstants {
 
   // TODO tune PID
   public static final double DRIVE_P = 0.7;
-  public static final double DRIVE_I = 0.0;//5;
+  public static final double DRIVE_I = 0.0;// 5;
   public static final double DRIVE_D = 0.05;
   public static final double DRIVING_FF = 1 / DRIVE_WHEEL_FREE_SPEED_RPS;
 
@@ -203,14 +203,13 @@ public class DriveConstants {
       MAX_ANGULAR_SPEED,
       MAX_ANGULAR_ACCELERATION);
 
-
   public static RangeSettings PILOT_SETTINGS = RangeSettings.InitSwerveBot(0, 1, 4, 0.1, true,
-                                                                           0, 1, 4, 0.1, false,
-                                                                           0, 1, 3, 0.1, false,
-                                                                           0.85);
+      0, 1, 4, 0.1, false,
+      0, 1, 3, 0.1, false,
+      0.85);
   public static RangeSettings PILOT_DEMO_SETTINGS = RangeSettings.InitSwerveBot(0, 0.2, 1, 0.1, true,
-                                                                           0, 0.2, 1, 0.1, false,
-                                                                           0, 0.2, 1, 0.1, false,
-                                                                           0.6);
+      0, 0.2, 1, 0.1, false,
+      0, 0.2, 1, 0.1, false,
+      0.6);
 
 }

@@ -4,25 +4,15 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoProvider;
 import frc.robot.commands.FlashLEDCommand;
-import frc.robot.commands.SolidLEDCommand;
-import frc.robot.commands.WaitProgressCommand;
 import frc.robot.teleop.TeleopProvider;
 
 /**
@@ -41,7 +31,7 @@ public class RobotContainer {
    * commands.
    */
   public RobotContainer() {
-        // Configure the button bindings
+    // Configure the button bindings
     configureButtonBindings();
   }
 
@@ -71,11 +61,9 @@ public class RobotContainer {
     // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->
     // Variables.fieldRelative = !Variables.fieldRelative));
 
-    
-
     OI.pilot.start()
         .onTrue(
-            new InstantCommand(() -> Subsystems.drive.zeroHeading(), Subsystems.drive));
+            new InstantCommand(() -> Subsystems.swerveDrive.zeroHeading(), Subsystems.swerveDrive));
 
     // Drive bindings handled in teleop command
   }

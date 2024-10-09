@@ -17,10 +17,10 @@ public class AutoProvider {
   private final SendableChooser<Command> chooser;
 
   private AutoProvider() {
-
     chooser = new SendableChooser<>(); // pub for shuffle board
-    //chooser = AutoBuilder.buildAutoChooser();
-    chooser.setDefaultOption("disabled", new InstantCommand(() -> {}, Subsystems.drive));
+    // chooser = AutoBuilder.buildAutoChooser();
+    chooser.setDefaultOption("disabled", new InstantCommand(() -> {
+    }, Subsystems.swerveDrive));
     chooser.addOption("test", new TestAuto());
     SmartDashboard.putData("Auto Chooser", chooser);
   }

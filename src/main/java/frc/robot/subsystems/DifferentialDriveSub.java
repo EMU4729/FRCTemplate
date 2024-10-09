@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.DifferentialDriveConstants;
-import frc.robot.constants.DriveConstants;
+import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.constants.SimConstants;
 import frc.robot.utils.PhotonBridge;
 
@@ -60,8 +60,8 @@ public class DifferentialDriveSub extends SubsystemBase {
   public final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
 
   public final DifferentialDrivetrainSim drivetrainSimulator = new DifferentialDrivetrainSim(
-      drivetrainSystem, DCMotor.getCIM(2), 10.71, DriveConstants.WHEEL_BASE,
-      DriveConstants.WHEEL_DIAMETER_METERS / 2, null);
+      drivetrainSystem, DCMotor.getCIM(2), 10.71, SwerveDriveConstants.WHEEL_BASE,
+      SwerveDriveConstants.WHEEL_DIAMETER_METERS / 2, null);
 
   public DifferentialDriveSub() {
     leftSlave.follow(leftMaster);

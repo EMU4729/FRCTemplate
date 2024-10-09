@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.constants.DriveConstants;
-import frc.robot.utils.RangeMath.RangeSettings;
-
 /**
  * Variables - use this class to define and set globally-accessed
  * settings/options/variables.
