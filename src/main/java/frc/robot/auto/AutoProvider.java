@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Subsystems;
 
 /**
  * Provides the default command for autonomous.
@@ -13,13 +14,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 public class AutoProvider {
   private static Optional<AutoProvider> inst = Optional.empty();
 
-  private final SendableChooser<Command> chooser = new SendableChooser<>();
+  private final SendableChooser<Command> chooser;
 
   private AutoProvider() {
-    chooser.addOption("Simple Auto", new SimpleAuto());
-    chooser.addOption("PathWeaver Test", new PathWeaverCommand("paths/Sample.wpilib.json"));
-    chooser.addOption("Disable Auto", new InstantCommand());
 
+    chooser = new SendableChooser<>(); // pub for shuffle board
+    //chooser = AutoBuilder.buildAutoChooser();
+    chooser.setDefaultOption("disabled", new InstantCommand(() -> {}, Subsystems.drive));
+    chooser.addOption("test", new TestAuto());
     SmartDashboard.putData("Auto Chooser", chooser);
   }
 

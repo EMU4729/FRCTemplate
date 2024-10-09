@@ -1,24 +1,26 @@
 package frc.robot.utils;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj.Encoder;
 
-public class EncoderBuilder {
+public class EncoderSupplier implements Supplier<Encoder> {
   private final int[] port;
   private final double steps;
 
   private boolean invert = false;
 
-  public EncoderBuilder(int[] port, double steps) {
+  public EncoderSupplier(int[] port, double steps) {
     this.port = port;
     this.steps = steps;
   }
 
-  public EncoderBuilder withInvert() {
+  public EncoderSupplier withInvert() {
     this.invert = true;
     return this;
   }
 
-  public Encoder build() {
+  public Encoder get() {
     if (port[0] < 0) {
       throw new IllegalStateException("MotorInfo : encoder port 1 < 0, check port is setup");
     }

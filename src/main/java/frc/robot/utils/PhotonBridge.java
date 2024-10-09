@@ -11,6 +11,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -20,13 +21,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.constants.Constants;
-import frc.robot.utils.logger.Logger;
+import frc.robot.constants.VisionConstants;
 
 public class PhotonBridge {
   private final AprilTagFieldLayout fieldLayout;
   private final Transform3d robotToCam = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
-  private final PhotonCamera cam = new PhotonCamera(Constants.vision.PHOTON_CAMERA_NAME);
+  private final PhotonCamera cam = new PhotonCamera(VisionConstants.PHOTON_CAMERA_NAME);
   private final PhotonPoseEstimator poseEstimator;
 
   // Simulation
@@ -41,7 +41,7 @@ public class PhotonBridge {
       tempFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
     } catch (IOException e) {
       tempFieldLayout = new AprilTagFieldLayout(List.of(), 0, 0);
-      Logger.error("PhotonSub : Error reading AprilTag field layout: " + e);
+      System.out.println("PhotonSub : Error reading AprilTag field layout: " + e);
     }
 
     fieldLayout = tempFieldLayout;
@@ -49,25 +49,18 @@ public class PhotonBridge {
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     if (RobotBase.isSimulation()) {
-      visionSim = new VisionSystemSim(Constants.vision.PHOTON_CAMERA_NAME);
+      visionSim = new VisionSystemSim(VisionConstants.PHOTON_CAMERA_NAME);
       visionSim.addAprilTags(fieldLayout);
 
       camProps = new SimCameraProperties();
-      // A 640 x 480 camera with a 100 degree diagonal FOV.
-      camProps.setCalibration(640, 480, Rotation2d.fromDegrees(100));
-      // Approximate detection noise with average and standard deviation error in
-      // pixels.
+      camProps.setCalibration(960, 720, Rotation2d.fromDegrees(90));
       camProps.setCalibError(0.25, 0.08);
-      // Set the camera image capture framerate (Note: this is limited by robot loop
-      // rate).
-      camProps.setFPS(20);
-      // The average and standard deviation in milliseconds of image data latency.
+      camProps.setFPS(45);
       camProps.setAvgLatencyMs(35);
       camProps.setLatencyStdDevMs(5);
 
-      // TODO: Find out why instantiating PhotonCameraSim crashes the robot
-      // camSim = new PhotonCameraSim(cam, camProps);
-      // camSim.enableProcessedStream(true);
+      camSim = new PhotonCameraSim(cam, camProps);
+      camSim.enableProcessedStream(true);
 
       // Our camera is mounted 0.1 meters forward and 0.5 meters up from the robot
       // pose,
@@ -80,14 +73,21 @@ public class PhotonBridge {
 
       // Add this camera to the vision system simulation with the given
       // robot-to-camera transform.
-      // visionSim.addCamera(camSim, robotToCamera);
-
+      visionSim.addCamera(camSim, robotToCamera);
     }
   }
 
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-    poseEstimator.setReferencePose(prevEstimatedRobotPose);
-    return poseEstimator.update();
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+    if (cam.isConnected()) {
+      return poseEstimator.update();
+    } else {
+      // System.out.println("Photon Bridge Error: Camera Not Found");
+      return Optional.empty();
+    }
+  }
+
+  public PhotonPipelineResult getLatestPipelineResult() {
+    return cam.getLatestResult();
   }
 
   public void reset() {
@@ -101,9 +101,5 @@ public class PhotonBridge {
 
   public void simulationPeriodic(Pose2d pose) {
     visionSim.update(pose);
-
-    // todo: find out why the hell this always gives empty results
-    // System.out.println(cam.getLatestResult().targets.stream().map((target) ->
-    // target.toString()).toList());
   }
 }

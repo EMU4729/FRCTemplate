@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
+import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.utils.PhotonBridge;
 
 /**
@@ -28,20 +28,20 @@ import frc.robot.utils.PhotonBridge;
  * Handles all drive functionality.
  */
 public class DifferentialDriveSub extends SubsystemBase {
-  private final WPI_TalonSRX leftMaster = Constants.diffDrive.MOTOR_ID_LM.build();
-  private final WPI_TalonSRX leftSlave = Constants.diffDrive.MOTOR_ID_LS.build();
+  private final WPI_TalonSRX leftMaster = DifferentialDriveConstants.MOTOR_ID_LM.get();
+  private final WPI_TalonSRX leftSlave = DifferentialDriveConstants.MOTOR_ID_LS.get();
 
-  private final WPI_TalonSRX rightMaster = Constants.diffDrive.MOTOR_ID_RM.build();
-  private final WPI_TalonSRX rightSlave = Constants.diffDrive.MOTOR_ID_RS.build();
+  private final WPI_TalonSRX rightMaster = DifferentialDriveConstants.MOTOR_ID_RM.get();
+  private final WPI_TalonSRX rightSlave = DifferentialDriveConstants.MOTOR_ID_RS.get();
 
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
-  private final Encoder leftEncoder = Constants.diffDrive.ENCODER_ID_L.build();
-  private final Encoder rightEncoder = Constants.diffDrive.ENCODER_ID_R.build();
+  private final Encoder leftEncoder = DifferentialDriveConstants.ENCODER_ID_L.get();
+  private final Encoder rightEncoder = DifferentialDriveConstants.ENCODER_ID_R.get();
   private final PhotonBridge photon = new PhotonBridge();
 
   public final DifferentialDrive drive; // pub for shuffleboard
   public final DifferentialDrivePoseEstimator poseEstimator = new DifferentialDrivePoseEstimator(
-      Constants.diffDrive.KINEMATICS,
+      DifferentialDriveConstants.KINEMATICS,
       Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
       0, 0, new Pose2d());
 

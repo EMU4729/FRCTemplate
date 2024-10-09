@@ -3,9 +3,11 @@ package frc.robot.constants;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import frc.robot.utils.EncoderBuilder;
-import frc.robot.utils.motorbuilder.MotorBuilder;
-import frc.robot.utils.motorbuilder.TalonMotorBuilder;
+import frc.robot.utils.EncoderSupplier;
+import frc.robot.utils.Range;
+import frc.robot.utils.RangeMath.RangeSettings;
+import frc.robot.utils.motorsupplier.MotorSupplier;
+import frc.robot.utils.motorsupplier.TalonMotorSupplier;
 
 public class DifferentialDriveConstants {
     protected DifferentialDriveConstants() {
@@ -15,69 +17,70 @@ public class DifferentialDriveConstants {
      * Information for left master drive [Port,controller type,
      * {invert,brake,connectionSaftey}]
      */
-    public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_LM = new TalonMotorBuilder(1)
+    public final static MotorSupplier<WPI_TalonSRX> MOTOR_ID_LM = new TalonMotorSupplier(1)
             .withSafety().withInvert();
 
     /** Drive left encoder builder */
-    public final EncoderBuilder ENCODER_ID_L = new EncoderBuilder(new int[] { 19, 20 }, 60.078 / 256. / 1000);
+    public final static EncoderSupplier ENCODER_ID_L = new EncoderSupplier(new int[] { 19, 20 }, 60.078 / 256. / 1000);
 
     /**
      * Information for right master drive [Port,controller type,
      * {invert,brake,connectionSaftey}]
      */
-    public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_RM = new TalonMotorBuilder(3)
+    public final static MotorSupplier<WPI_TalonSRX> MOTOR_ID_RM = new TalonMotorSupplier(3)
             .withSafety();
 
     /** Drive left encoder builder */
-    public final EncoderBuilder ENCODER_ID_R = new EncoderBuilder(new int[] { 14, 15 }, 59.883 / 256. / 1000)
+    public final static EncoderSupplier ENCODER_ID_R = new EncoderSupplier(new int[] { 14, 15 }, 59.883 / 256. / 1000)
             .withInvert();
 
     /**
      * Information for left slave drive [Port,controller type,
      * {invert,brake,connectionSaftey}]
      */
-    public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_LS = new TalonMotorBuilder(2)
+    public final static MotorSupplier<WPI_TalonSRX> MOTOR_ID_LS = new TalonMotorSupplier(2)
             .withSafety().withInvert();
     /**
      * Information for right slave drive [Port,controller type,
      * {invert,brake,connectionSaftey}]
      */
-    public final MotorBuilder<WPI_TalonSRX> MOTOR_ID_RS = new TalonMotorBuilder(4)
+    public final static MotorSupplier<WPI_TalonSRX> MOTOR_ID_RS = new TalonMotorSupplier(4)
             .withSafety();
 
     /** KS value from SysId */
-    public final double KS_VOLTS = 0.88881;
+    public final static double KS_VOLTS = 0.88881;
     /** KV value from SysId */
-    public final double KV_VOLT_SECONDS_PER_METER = 3.0288;
+    public final static double KV_VOLT_SECONDS_PER_METER = 3.0288;
     /** KA value from SysId */
-    public final double KA_VOLT_SECONDS_SQUARED_PER_METER = 1.036;
+    public final static double KA_VOLT_SECONDS_SQUARED_PER_METER = 1.036;
     /** Horizontal distance between the drive wheels, in meters */
-    public final double TRACK_WIDTH_METERS = 0.55;
+    public final static double TRACK_WIDTH_METERS = 0.55;
     /** Drive kinematics */
-    public final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(
+    public final static DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(
             TRACK_WIDTH_METERS);
     /** Auto max velocity */
-    public final double AUTO_MAX_SPEED = 2;
+    public final static double AUTO_MAX_SPEED = 2;
     /** Auto max acceleration */
-    public final double AUTO_MAX_ACCELERATION = 1;
+    public final static double AUTO_MAX_ACCELERATION = 1;
     /** Auto ramsete b variable */
-    public final double RAMSETE_B = 2;
+    public final static double RAMSETE_B = 2;
     /** Auto ramsete zeta variable */
-    public final double RAMSETE_ZETA = 0.7;
+    public final static double RAMSETE_ZETA = 0.7;
 
     // Drive Settings
     /** max speed of robot m/s */
-    public double MAX_SPEED = 3.850;
+    public static double MAX_SPEED = 3.850;
     /** min throttle for movement */
-    public double MIN_THROT = 0.3;
+    public static final double MIN_THROT = 0.3;
     /** min throttle for turning */
-    public double MIN_TURN = 0.3;
+    public static final double MIN_TURN = 0.3;
     /**
      * settings for robot drive in default teleop
      * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
      * power}
      */
     public double[][] PILOT_SETTINGS = { { MIN_THROT, 1, 2 }, { MIN_TURN, 1, 3, 0.3 } };
+    // public static final RangeSettings PILOT_SETTINGS = RangeSettings.InitTankBot(0, 0, 0, 0, false, 0, 0, 0, 0, false, 0, 0)
     /**
      * settings for robot drive in demo mode
      * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
