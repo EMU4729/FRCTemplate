@@ -22,13 +22,30 @@ public class TeleopDriveSwerve extends Command {
   public void execute() {
     double limiter = (1 - OI.pilot.getRightTriggerAxis()); // TODO enable this when everything else is tested
     // organise field relitive switch
-    double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftX(), OI.pilot.getLeftY(),
+    double LeftX = OI.pilot.getLeftX();
+    double leftY = OI.pilot.getLeftY();
+
+    //Converted into Polar coordinates, with the hypotenuse found
+    double r = Math.sqrt(Math.pow(LeftX, 2.0)+Math.pow(leftY, 2.0));
+    double theta = Math.atan(leftY/LeftX);
+
+    //deadbanded the change to 0.1
+    if (r<0.1){
+      r = 0;
+    }
+
+    //converted the polar coordinates back into cartesian
+    double deadbandedX = r * Math.cos(theta);  // X = r * cos(theta)
+    double deadbandedY = r * Math.sin(theta);  // Y = r * sin(theta)
+
+    double[] control = CurveFit.fitDrive(new double[] { deadbandedX, deadbandedY,
         OI.pilot.getRightX(), limiter }, settings);
     var translateX = control[0];
     var translateY = control[1];
     var rotate = control[2];
     // System.out.println(control[0]+" "+control[1]+" "+control[2]+" "+control[3]+"
     // "+Subsystems.drive.getSpeedMS());
+
     if (updateShuffleCounter > SwerveDriveConstants.updateShuffleInterval) {
       ShuffleControl.driveTab.setControlAxis(translateX, translateY, rotate);
       updateShuffleCounter = 0;
