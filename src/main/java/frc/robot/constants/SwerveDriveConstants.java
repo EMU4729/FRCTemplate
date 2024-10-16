@@ -32,6 +32,8 @@ public class SwerveDriveConstants {
   public static final double MAX_ANGULAR_SPEED = 2 * Math.PI;
   /** Max angular acceleration of robot in radians per second squared */
   public static final double MAX_ANGULAR_ACCELERATION = MAX_ANGULAR_SPEED / 60;
+  /**Deadband value for the units obtained from the controllers */
+  public static final double DEADBAND_VALUE = 0.1;
 
   /** Direction slew rate in radians per second */
   public static final double DIRECTION_SLEW_RATE = 1.2;

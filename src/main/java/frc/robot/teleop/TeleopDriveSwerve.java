@@ -24,19 +24,18 @@ public class TeleopDriveSwerve extends Command {
     // organise field relitive switch
     double LeftX = OI.pilot.getLeftX();
     double leftY = OI.pilot.getLeftY();
-
-    //Converted into Polar coordinates, with the hypotenuse found
+   //Converted into Polar coordinates, with the hypotenuse found
     double r = Math.hypot(LeftX, leftY);
     double theta = Math.atan(leftY/LeftX);
-
-    //deadbanded the change to 0.1
-    if (r<0.1){
+   //deadbanded the change to 0.1
+    if (r < SwerveDriveConstants.DEADBAND_VALUE){
       r = 0;
     }
-
     //converted the polar coordinates back into cartesian
     double deadbandedX = r * Math.cos(theta);  // X = r * cos(theta)
     double deadbandedY = r * Math.sin(theta);  // Y = r * sin(theta)
+
+    
 
     double[] control = CurveFit.fitDrive(new double[] { deadbandedX, deadbandedY,
         OI.pilot.getRightX(), limiter }, settings);

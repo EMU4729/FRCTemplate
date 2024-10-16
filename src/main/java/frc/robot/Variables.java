@@ -18,5 +18,5 @@ public final class Variables {
   public static double ledBrightnessMod = 1;
   public static boolean driveSlow = false;
 
-  public static boolean fieldRelative = true;
+  public static boolean fieldRelative = !OI.pilotIsActive();
 }
