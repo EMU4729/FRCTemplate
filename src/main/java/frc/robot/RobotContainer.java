@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoProvider;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.FlashLEDCommand;
+import frc.robot.subsystems.SwerveDriveSub;
 import frc.robot.teleop.TeleopProvider;
 
 /**
@@ -33,6 +35,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    Subsystems.swerveDrive.setDefaultCommand(new DefaultDriveCommand(Subsystems.swerveDrive, OI.pilot.getLeftX(),OI.pilot.getLeftY(),OI.pilot.getRightX()));
   }
 
   /**
