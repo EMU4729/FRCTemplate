@@ -26,7 +26,7 @@ public class TeleopDriveSwerve extends Command {
     double leftY = OI.pilot.getLeftY();
 
     //Converted into Polar coordinates, with the hypotenuse found
-    double r = Math.sqrt(Math.pow(LeftX, 2.0)+Math.pow(leftY, 2.0));
+    double r = Math.hypot(LeftX, leftY);
     double theta = Math.atan(leftY/LeftX);
 
     //deadbanded the change to 0.1
