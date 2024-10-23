@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Subsystems;
 import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.constants.SwerveDriveConstants;
+import frc.robot.subsystems.DifferentialDriveSub;
 
 /**
  * Provides the default command for teleop.
@@ -25,8 +26,9 @@ public class TeleopProvider {
 
   private TeleopProvider() {
     // disabled
-    chooser.setDefaultOption("Disable Teleop", new InstantCommand());
+    //chooser.setDefaultOption("Disable Teleop", new InstantCommand());
 
+    
     // swerve
     chooser.addOption("Swerve Teleop", teleopSwerve);
     chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
@@ -48,6 +50,10 @@ public class TeleopProvider {
   }
 
   public Command getSelected() {
-    return chooser.getSelected();
+    return chooser.getSelected() != null ? chooser.getSelected() : teleopArcade;
+  }
+
+  public void setDefaultDriveMode(){
+    DifferentialDriveSub driveMode = new DifferentialDriveSub();
   }
 }

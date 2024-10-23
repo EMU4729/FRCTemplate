@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 //import frc.robot.commands.RainbowLEDCommand;
 import frc.robot.shufflecontrol.ShuffleControl;
+import frc.robot.subsystems.DifferentialDriveSub;
 import frc.robot.utils.logger.Logger;
 
 /**
@@ -107,6 +108,7 @@ public class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.cancel();
     }
+
     Logger.unpauseAllLoggers();
     System.out
         .println("Teleop Start ------------------------------------------------------------------------------------");
