@@ -74,6 +74,13 @@ public class DifferentialDriveConstants {
   /** min throttle for turning */
   public static final double MIN_TURN = 0.3;
 
+
+  //Constants for algorithms of opitmising the turning acceleration
+  public static final double SNAP_THRESHOLD = 90.0; // Degrees
+  public static final double MAX_TURN_SPEED = 1.0;  // Max steering speed
+  public static final double MIN_TURN_SPEED = 0.1;  // Min steering speed to avoid stalling
+  public static final double ACCEL_LIMIT = 0.05;    // Max acceleration change per tick
+
   /**
    * settings for robot drive in default teleop
    * 

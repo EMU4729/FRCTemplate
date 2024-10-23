@@ -64,6 +64,7 @@ public class DifferentialDriveSub extends SubsystemBase {
       SwerveDriveConstants.WHEEL_DIAMETER_METERS / 2, null);
 
   public DifferentialDriveSub() {
+    
     leftSlave.follow(leftMaster);
     rightSlave.follow(rightMaster);
 
@@ -71,7 +72,39 @@ public class DifferentialDriveSub extends SubsystemBase {
 
     addChild("Differential Drive", drive);
   }
+  public double OptimiseSteeringAngle(double currentAngle, double targetAngle, double currentTurnSpeed ){
 
+    double AngleDifference = targetAngle - currentAngle;
+
+    //Normalise angle diff between -180 to 180
+    AngleDifference = (AngleDifference +180) %360-180;
+
+    //Determine if it needs to be target + 180
+    if (Math.abs(AngleDifference) > DifferentialDriveConstants.SNAP_THRESHOLD){
+      AngleDifference = AngleDifference -180;
+    }
+
+    //Adjust the steering speed based on proximity to the snap threshold
+    double adjustedTurnSpeed = adjustTurnSpeed(currentTurnSpeed, AngleDifference);
+    return adjustedTurnSpeed;
+  }
+
+  private double adjustTurnSpeed(double currentTurnSpeed, double AngleDifference){
+    double targetTurnSpeed;
+
+    if (Math.abs(AngleDifference) > DifferentialDriveConstants.SNAP_THRESHOLD - 10 && Math.abs(AngleDifference) < DifferentialDriveConstants.SNAP_THRESHOLD +10){
+      targetTurnSpeed = Math.signum(AngleDifference) * DifferentialDriveConstants.MIN_TURN_SPEED;
+    }else{
+      targetTurnSpeed = Math.signum(AngleDifference) * DifferentialDriveConstants.MAX_TURN_SPEED;
+    }
+
+    //Limit acc to avoid susden jumps
+    double speedDifference = targetTurnSpeed - currentTurnSpeed;
+    if (Math.abs(speedDifference) > DifferentialDriveConstants.ACCEL_LIMIT){
+      targetTurnSpeed = currentTurnSpeed + Math.signum(speedDifference);
+    }
+    return targetTurnSpeed;
+  }
   @Override
   public void periodic() {
     poseEstimator.update(
