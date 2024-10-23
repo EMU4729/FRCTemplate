@@ -102,14 +102,17 @@ public class DifferentialDriveConstants {
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power}
    */
+  /* UNUSED
   public static final RangeSettings PID1_SETTINGS = RangeSettings.InitTankBot(0, MAX_SPEED, 3, 0, false, 0, 1, 3, 0,
       false, 0, 0);
-
+*/
   /**
    * settings for robot drive in PID drive
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power}
    */
+  /* UNUSED
   public static final RangeSettings PID2_SETTINGS = RangeSettings.InitTankBot(MIN_THROT, 1, 1, 0, false, MIN_TURN, 1, 1,
       0, false, 0, 0);
+      */
 }

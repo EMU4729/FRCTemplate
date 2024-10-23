@@ -8,7 +8,8 @@ public class LEDConstants {
   /**
    * Max number of colour changes/s (red -> black -> red -> black = 4) for leds
    */
-  public static final int MAX_FLASH_RATE = 8;
+
+  // UNUSED : public static final int MAX_FLASH_RATE = 8;
   /**  */
-  public static final int[] ZONES = { 0, 3, 14, 17 };
+  // UNUSED : public static final int[] ZONES = { 0, 3, 14, 17 };
 }
