@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.Dictionary;
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.MathUtil;
@@ -36,6 +39,8 @@ public class DifferentialDriveSub extends SubsystemBase {
   private final WPI_TalonSRX rightMaster = DifferentialDriveConstants.MOTOR_ID_RM.get();
   private final WPI_TalonSRX rightSlave = DifferentialDriveConstants.MOTOR_ID_RS.get();
 
+  private final List<WPI_TalonSRX> motors = List.of(leftMaster, leftSlave, rightMaster, rightSlave);
+
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
   private final Encoder leftEncoder = DifferentialDriveConstants.ENCODER_ID_L.get();
   private final Encoder rightEncoder = DifferentialDriveConstants.ENCODER_ID_R.get();
@@ -63,12 +68,16 @@ public class DifferentialDriveSub extends SubsystemBase {
       drivetrainSystem, DCMotor.getCIM(2), 10.71, SwerveDriveConstants.WHEEL_BASE,
       SwerveDriveConstants.WHEEL_DIAMETER_METERS / 2, null);
 
+  private boolean Condition;
+  private long startTime;
+  private double totalCurrent;
   public DifferentialDriveSub() {
     
     leftSlave.follow(leftMaster);
     rightSlave.follow(rightMaster);
 
     drive = new DifferentialDrive(leftMaster, rightMaster);
+    
 
     addChild("Differential Drive", drive);
   }
@@ -110,6 +119,7 @@ public class DifferentialDriveSub extends SubsystemBase {
     poseEstimator.update(
         Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
         leftEncoder.getDistance(), rightEncoder.getDistance());
+    
   }
 
   public Pose2d getPose() {
@@ -133,8 +143,50 @@ public class DifferentialDriveSub extends SubsystemBase {
   public void tank(double leftSpeed, double rightSpeed) {
     leftSpeed = MathUtil.clamp(leftSpeed, -1, 1);
     rightSpeed = MathUtil.clamp(rightSpeed, -1, 1);
-    drive.tankDrive(leftSpeed, rightSpeed, false);
+    
+    if (Condition && !IsMotorRunning()){
+        drive.tankDrive(leftSpeed, rightSpeed, false);
+        startTime = System.currentTimeMillis();
+      } else if(!Condition || MotorTimedOut() || isOverCurrent()){
+          drive.tankDrive(0, 0);
+      }
+    
   }
+
+  public void CheckandLimitCurrent(){
+    if (getTotalMotorCurrent() > DifferentialDriveConstants.MAX_CURRENT_IN_MOTOR){
+      for (WPI_TalonSRX motor: motors){
+        motor.neutralOutput(); //stops motor to prevent overcurrent
+      }
+      System.out.println("Current limit exceeded");
+    }
+  }
+
+  private boolean MotorTimedOut(){
+    return System.currentTimeMillis() - startTime > DifferentialDriveConstants.TIMED_OUT_MS; 
+   }
+  
+  private double getTotalMotorCurrent(){
+    totalCurrent = 0.0;
+    for (WPI_TalonSRX motor :motors){
+      totalCurrent += motor.getStatorCurrent();
+    }
+    return totalCurrent;
+  }
+  private boolean isOverCurrent(){
+    return totalCurrent > DifferentialDriveConstants.MAX_CURRENT_IN_MOTOR;
+  }
+
+  public boolean IsMotorRunning(){
+    if(drive.isAlive()){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  
+  
 
   /**
    * Tank drives the robot using the specified voltages.

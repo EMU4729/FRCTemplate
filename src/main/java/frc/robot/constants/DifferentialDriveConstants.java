@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -81,6 +83,10 @@ public class DifferentialDriveConstants {
   public static final double MIN_TURN_SPEED = 0.1;  // Min steering speed to avoid stalling
   public static final double ACCEL_LIMIT = 0.05;    // Max acceleration change per tick
 
+
+  //Constants for controlling the motor, and timer for motor
+  public static final long TIMED_OUT_MS = 3600000;
+  public static final double MAX_CURRENT_IN_MOTOR = 40.0;
   /**
    * settings for robot drive in default teleop
    * 
