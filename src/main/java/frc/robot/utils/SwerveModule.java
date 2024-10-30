@@ -37,10 +37,12 @@ public class SwerveModule {
   private final SparkPIDController turnController;
 
   private int lastOptimise = 0;
+  private double targetVelocity;
+  private double currentTargetVelocity;
 
   private boolean isFlipped = false;
 
-  private Rotation2d angularOffset = new Rotation2d(0); // radians
+  private Rotation2d angularOffset = new Rotation2d(0);
   private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   private Logger logger;
@@ -167,6 +169,49 @@ public class SwerveModule {
     return new SwerveModulePosition(Math.abs(driveMotor.getPosition().getValue()), angle);
   }
 
+  private static double calculateAccelerationSimple(double currentVelocity) {
+    double initialAcceleration = 1; // c
+    double rampingRate = 8; // a;
+    double maxAcceleration = 5; // m
+    double maxVelocity = 5; // v
+
+    double pointA = maxAcceleration / rampingRate;
+    double pointB = maxVelocity - pointA;
+
+    if (currentVelocity < pointA) {
+      return rampingRate * currentVelocity + initialAcceleration;
+    } else if (currentVelocity >= pointA && currentVelocity < pointB) {
+      return maxAcceleration + initialAcceleration;
+    } else if (currentVelocity < maxVelocity) {
+      return rampingRate * (-currentVelocity + maxVelocity) + initialAcceleration;
+    } else {
+      return 0;
+    }
+
+  }
+
+  private static double calculateAcceleration(double currentVelocity) {
+    double g = 2.3;
+    double d = 4.8;
+    double c = 1;
+
+    double x = currentVelocity;
+
+    double y = -Math.pow((-x / d) + Math.pow(g, 1/10), 10) + g + c;
+
+    return y;
+  }
+
+  public void updateVelocity() {
+    double currentVelocity = driveMotor.getVelocity().getValueAsDouble();
+    currentTargetVelocity += calculateAcceleration(currentVelocity) / 0.020;
+    
+    driveMotor.setControl(
+        driveController
+        .withVelocity(currentTargetVelocity / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));
+    
+  }
+
   /**
    * Sets the desired state for the module.
    *
@@ -183,14 +228,14 @@ public class SwerveModule {
         correctedDesiredState,
         getRotation2d());
 
-    driveMotor.setControl(
-        driveController
-            .withVelocity(
-                // withVelocity accepts rps, not mps
-                optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
-    turnController.setReference(
-        optimizedDesiredState.angle.getRadians() + Math.PI,
-        ControlType.kPosition);
+    
+
+    // driveMotor.setControl(
+        // driveController
+            // .withVelocity(optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
+    targetVelocity = optimizedDesiredState.speedMetersPerSecond;
+    
+    turnController.setReference(optimizedDesiredState.angle.getRadians() + Math.PI, ControlType.kPosition);
 
     this.desiredState = desiredState;
 

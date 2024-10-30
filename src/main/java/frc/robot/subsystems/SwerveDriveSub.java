@@ -132,6 +132,10 @@ public class SwerveDriveSub extends SubsystemBase {
       updateShuffleCounter++;
     }
     updateOdometry();
+    backLeft.updateVelocity();
+    backRight.updateVelocity();
+    frontLeft.updateVelocity();
+    frontRight.updateVelocity();
   }
 
   /**
