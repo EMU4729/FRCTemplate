@@ -6,6 +6,7 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -22,6 +23,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import frc.robot.Subsystems;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.utils.logger.Logger;
 
@@ -36,7 +38,9 @@ public class SwerveModule {
 
   private int lastOptimise = 0;
 
-  private double angularOffset = 0; // radians
+  private boolean isFlipped = false;
+
+  private Rotation2d angularOffset = new Rotation2d(0); // radians
   private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   private Logger logger;
@@ -56,7 +60,7 @@ public class SwerveModule {
 
     driveMotor = new TalonFX(drivingCANId);
     turnMotor = new CANSparkMax(turningCANId, MotorType.kBrushless);
-    this.angularOffset = angularOffset;
+    this.angularOffset = Rotation2d.fromRadians(angularOffset);
 
     // Configure Drive Motor
     final var driveMotorConfig = new TalonFXConfiguration();
@@ -157,10 +161,10 @@ public class SwerveModule {
   public SwerveModulePosition getPosition() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    double angle = (getRotation2d().getRadians() - Math.toRadians(angularOffset)) % (2 * Math.PI);
-    return new SwerveModulePosition(
-        Math.abs(driveMotor.getPosition().getValue()), // * angle > Math.PI ? -1 : 1,
-        new Rotation2d(angle));
+    Rotation2d angle = getRotation2d().minus(angularOffset);
+    // if the wheel is flipped, flip the returned angle too
+    if (isFlipped) angle = angle.minus(Rotation2d.fromDegrees(180));
+    return new SwerveModulePosition(Math.abs(driveMotor.getPosition().getValue()), angle);
   }
 
   /**
@@ -172,7 +176,7 @@ public class SwerveModule {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
+    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
     SwerveModuleState optimizedDesiredState = /* SwerveModuleState. */optimize(
@@ -198,7 +202,7 @@ public class SwerveModule {
     });
 
   }
-
+  /*
   public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
     var delta = desiredState.angle.minus(currentAngle);
     int limit = lastOptimise == 0 ? 90 : (lastOptimise > 0 ? 135 : 45);
@@ -211,6 +215,25 @@ public class SwerveModule {
           desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
     } else {
       lastOptimise = error > 160 ? 0 : -1;
+      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+    }
+  }*/
+
+  private static final double intertia = 45;
+
+  /* Optimises wheel angle, using an inertia based system */
+  public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
+    var turnSpeed = Subsystems.swerveDrive.getTurnRate();
+    double threshold = 90 + MathUtil.clamp(turnSpeed * intertia, -80, 80);
+
+    var delta = desiredState.angle.minus(currentAngle);
+    if (delta.getDegrees() > threshold || delta.getDegrees() < 180-threshold) {
+      isFlipped = true;
+      return new SwerveModuleState(
+          -desiredState.speedMetersPerSecond,
+          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+    } else {
+      isFlipped = false;
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }
   }
@@ -226,8 +249,7 @@ public class SwerveModule {
   }
 
   public Rotation2d getRotation2d() {
-    // take care, get position only returns as rotations when a scale factor is not
-    // set
+    // take care, get position only returns as rotations when a scale factor is not set
     return Rotation2d.fromRadians(turnEncoder.getPosition());
   }
 }
