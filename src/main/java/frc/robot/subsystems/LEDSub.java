@@ -22,12 +22,22 @@ public class LEDSub extends SubsystemBase {
   public LEDSub() {
     led.setLength(LEDConstants.STRING_LENGTH);
     led.setData(new AddressableLEDBuffer(LEDConstants.STRING_LENGTH));
-    led.start();
+    try {
+      led.start();
+  } catch (Exception e) {
+      System.out.println("Error starting LEDs: " + e.getMessage());
+      // Handle error, such as retrying, logging, or alerting the user.
+  }
     ledSim.setInitialized(true);
   }
 
   /** Applies the data in the buffer to the LEDs */
   public void apply() {
-    led.setData(buffer);
+    try {
+      led.setData(buffer);
+  } catch (Exception e) {
+      System.out.println("Error applying LED data: " + e.getMessage());
+      // Additional handling, such as resetting the buffer or retrying.
+  }
   }
 }
