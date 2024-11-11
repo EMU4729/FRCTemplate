@@ -13,20 +13,26 @@ public class TalonMotorSupplier extends MotorSupplier<WPI_TalonSRX> {
       System.out.println("MotorInfo : motor port num < 0, check port is defined : " + port);
       return new WPI_TalonSRX(99);
     }
-    WPI_TalonSRX talon = new WPI_TalonSRX(port);
+
+    final var talon = new WPI_TalonSRX(port);
+
     if (!talon.isAlive()) {
       System.out.println(
           "MotorInfo : new WPI_TalonSRX on port " + port + "not found, may not exist or be of wrong type");
     }
+
     talon.setInverted(invert);
+
     if (brake) {
       talon.setNeutralMode(NeutralMode.Brake);
     } else {
       talon.setNeutralMode(NeutralMode.Coast);
     }
+
     talon.setSafetyEnabled(safety);
     talon.enableVoltageCompensation(voltageComp);
     talon.configVoltageCompSaturation(12);
+
     return talon;
   }
 }
