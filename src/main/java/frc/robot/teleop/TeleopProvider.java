@@ -1,7 +1,5 @@
 package frc.robot.teleop;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,16 +12,14 @@ import frc.robot.constants.SwerveDriveConstants;
  * Provides the default command for teleop.
  */
 public class TeleopProvider {
-  private static Optional<TeleopProvider> inst = Optional.empty();
-
   private final Command teleopSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_SETTINGS);
   private final Command teleopDemoSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_DEMO_SETTINGS);
   private final Command teleopArcade = new TeleopDriveArcade(DifferentialDriveConstants.PILOT_SETTINGS);
   private final Command teleopDemoArcade = new TeleopDriveArcade(DifferentialDriveConstants.DEMO_SETTINGS);
 
-  private final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
+  private final SendableChooser<Command> chooser = new SendableChooser<>();
 
-  private TeleopProvider() {
+  public TeleopProvider() {
     // disabled
     chooser.setDefaultOption("Disable Teleop", new InstantCommand());
 
@@ -38,13 +34,6 @@ public class TeleopProvider {
     chooser.onChange(Subsystems.swerveDrive::setDefaultCommand);
 
     SmartDashboard.putData("Teleop Chooser", chooser);
-  }
-
-  public static TeleopProvider getInstance() {
-    if (!inst.isPresent()) {
-      inst = Optional.of(new TeleopProvider());
-    }
-    return inst.get();
   }
 
   public Command getSelected() {

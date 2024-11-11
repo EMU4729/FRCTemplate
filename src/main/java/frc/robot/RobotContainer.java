@@ -23,8 +23,8 @@ import frc.robot.teleop.TeleopProvider;
  * Subsystemsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final AutoProvider autoProvider = AutoProvider.getInstance();
-  private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
+  private final AutoProvider autos = new AutoProvider();
+  private final TeleopProvider teleops = new TeleopProvider();
 
   /**
    * The container for the robot. Contains Subsystemsystems, OI devices, and
@@ -74,7 +74,7 @@ public class RobotContainer {
    * @return the command to run in teleop
    */
   public Command getTeleopCommand() {
-    return teleopProvider.getSelected();
+    return teleops.getSelected();
   }
 
   /**
@@ -83,6 +83,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoProvider.getSelected();
+    return autos.getSelected();
   }
 }
