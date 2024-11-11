@@ -20,7 +20,7 @@ public class DifferentialDriveConstants {
       .withSafety().withInvert();
 
   /** Drive left encoder builder */
-  public static final EncoderSupplier ENCODER_ID_L = new EncoderSupplier(new int[] { 19, 20 }, 60.078 / 256. / 1000);
+  public static final EncoderSupplier ENCODER_ID_L = new EncoderSupplier(19, 20, 60.078 / 256. / 1000);
 
   /**
    * Information for right master drive [Port,controller type,
@@ -30,7 +30,7 @@ public class DifferentialDriveConstants {
       .withSafety();
 
   /** Drive left encoder builder */
-  public static final EncoderSupplier ENCODER_ID_R = new EncoderSupplier(new int[] { 14, 15 }, 59.883 / 256. / 1000)
+  public static final EncoderSupplier ENCODER_ID_R = new EncoderSupplier(14, 15, 59.883 / 256. / 1000)
       .withInvert();
 
   /**
