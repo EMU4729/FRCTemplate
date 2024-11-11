@@ -17,6 +17,4 @@ public final class Variables {
   /** LED string brightness modifier (0-1) */
   public static double ledBrightnessMod = 1;
   public static boolean driveSlow = false;
-
-  public static boolean fieldRelative = true;
 }
