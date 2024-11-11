@@ -6,57 +6,36 @@
 
 package frc.robot.utils;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.constants.SwerveDriveConstants;
-import frc.robot.utils.logger.Logger;
 
 public class SwerveModule {
   private final TalonFX driveMotor;
   private final CANSparkMax turnMotor;
 
-  private final AbsoluteEncoder turnEncoder;
+  private final SparkAbsoluteEncoder turnEncoder;
 
   private final VelocityVoltage driveController;
   private final SparkPIDController turnController;
 
-  private int lastOptimise = 0;
+  private SwerveModuleState desiredState = new SwerveModuleState();
 
-  private double angularOffset = 0; // radians
-  private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
-
-  private Logger logger;
-
-  /**
-   * Constructs a new SwerveModule for a MAX Swerve Module housing a Falcon
-   * driving motor and a Neo 550 Turning Motor.
-   * 
-   * @param drivingCANId  CAN ID for the driving motor
-   * @param turningCANId  CAN ID for the turning motor
-   * @param angularOffset Angular offset of the module in radians.
-   */
-  public SwerveModule(int drivingCANId, int turningCANId, double angularOffset) {
-
-    // create loggger
-    logger = new Logger("swerve-" + drivingCANId, new String[] { "Pos", "Vel", "Ang", "Ang Rate" });
-
-    driveMotor = new TalonFX(drivingCANId);
-    turnMotor = new CANSparkMax(turningCANId, MotorType.kBrushless);
-    this.angularOffset = angularOffset;
+  public SwerveModule(int driveMotorId, int turningMotorId) {
+    driveMotor = new TalonFX(driveMotorId);
+    turnMotor = new CANSparkMax(turningMotorId, MotorType.kBrushless);
 
     // Configure Drive Motor
     final var driveMotorConfig = new TalonFXConfiguration();
@@ -83,7 +62,7 @@ public class SwerveModule {
     turnMotor.restoreFactoryDefaults();
 
     // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
-    turnEncoder = turnMotor.getAbsoluteEncoder(Type.kDutyCycle);
+    turnEncoder = turnMotor.getAbsoluteEncoder();
     turnController = turnMotor.getPIDController();
     turnController.setFeedbackDevice(turnEncoder);
 
@@ -92,7 +71,6 @@ public class SwerveModule {
     // APIs.
     turnEncoder.setPositionConversionFactor(SwerveDriveConstants.TURNING_ENCODER_POSITION_FACTOR);
     turnEncoder.setVelocityConversionFactor(SwerveDriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-    // turnEncoder.setZeroOffset(angularOffset); dont use
 
     // Invert the turning encoder, since the output shaft rotates in the opposite
     // direction of
@@ -104,8 +82,8 @@ public class SwerveModule {
     // to 10 degrees will go through 0 rather than the other direction which is a
     // longer route.
     turnController.setPositionPIDWrappingEnabled(true);
-    turnController.setPositionPIDWrappingMinInput(SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT);
-    turnController.setPositionPIDWrappingMaxInput(SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
+    turnController.setPositionPIDWrappingMinInput(-Math.PI);
+    turnController.setPositionPIDWrappingMaxInput(Math.PI);
 
     // Set the PID gains for the turning motor. Note these are example gains, and
     // you
@@ -123,111 +101,67 @@ public class SwerveModule {
     // operation, it will maintain the above configurations.
     turnMotor.burnFlash();
 
-    desiredState.angle = new Rotation2d(turnEncoder.getPosition());
-    driveMotor.setPosition(0);
-  }
-
-  /**
-   * Returns the current state of the module.
-   *
-   * @return The current state of the module.
-   */
-  public SwerveModuleState getState() {
-    // Apply chassis angular offset to the encoder position to get the position
-    // relative to the chassis.
-    return new SwerveModuleState(
-        driveMotor.getVelocity().getValue(),
-        getRotation2d());
-  }
-
-  /**
-   * Returns the current desired state of the module
-   * 
-   * @return The current desired state of the module
-   */
-  public SwerveModuleState getDesiredState() {
-    return desiredState;
-  }
-
-  /**
-   * Returns the current position of the module.
-   *
-   * @return The current position of the module.
-   */
-  public SwerveModulePosition getPosition() {
-    // Apply chassis angular offset to the encoder position to get the position
-    // relative to the chassis.
-    double angle = (getRotation2d().getRadians() - Math.toRadians(angularOffset)) % (2 * Math.PI);
-    return new SwerveModulePosition(
-        Math.abs(driveMotor.getPosition().getValue()), // * angle > Math.PI ? -1 : 1,
-        new Rotation2d(angle));
-  }
-
-  /**
-   * Sets the desired state for the module.
-   *
-   * @param desiredState Desired state with speed and angle.
-   */
-  public void setDesiredState(SwerveModuleState desiredState) {
-    // Apply chassis angular offset to the desired state.
-    SwerveModuleState correctedDesiredState = new SwerveModuleState();
-    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(angularOffset));
-
-    // Optimize the reference state to avoid spinning further than 90 degrees.
-    SwerveModuleState optimizedDesiredState = /* SwerveModuleState. */optimize(
-        correctedDesiredState,
-        getRotation2d());
-
-    driveMotor.setControl(
-        driveController
-            .withVelocity(
-                // withVelocity accepts rps, not mps
-                optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
-    turnController.setReference(
-        optimizedDesiredState.angle.getRadians() + Math.PI,
-        ControlType.kPosition);
-
-    this.desiredState = desiredState;
-
-    logger.log(new double[] {
-        driveMotor.getPosition().getValue(),
-        driveMotor.getVelocity().getValue(),
-        getRotation2d().getDegrees(),
-        turnEncoder.getVelocity() * (180 / Math.PI)
-    });
+    resetEncoders();
 
   }
 
-  public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    var delta = desiredState.angle.minus(currentAngle);
-    int limit = lastOptimise == 0 ? 90 : (lastOptimise > 0 ? 135 : 45);
-
-    double error = Math.abs(delta.getDegrees());
-    if (error < limit) {
-      lastOptimise = error < 20 ? 0 : 1;
-      return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond,
-          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
-    } else {
-      lastOptimise = error > 160 ? 0 : -1;
-      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
-    }
+  /** @return the module's drive motor position, in meters */
+  public double getDrivePosition() {
+    return driveMotor.getPosition().getValueAsDouble() * SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS;
   }
 
-  /** Zeroes the drive encoder. */
+  /** @return the module's drive motor velocity, in meters per second */
+  public double getDriveVelocity() {
+    return driveMotor.getVelocity().getValueAsDouble() * SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  /** @return the module's turn motor position, in radians */
+  public double getTurnPosition() {
+    return turnEncoder.getPosition();
+  }
+
+  public Rotation2d getTurnRotation2d() {
+    return new Rotation2d(getTurnPosition());
+  }
+
+  /** @return the module's turn motor velocity, in radians per second */
+  public double getTurnVelocity() {
+    return turnEncoder.getVelocity();
+  }
+
+  /** resets the drive encoder */
   public void resetEncoders() {
     driveMotor.setPosition(0);
   }
 
-  /** reset turn motor pid I accumulation to 0 */
-  public void resetIntegral() {
-    turnController.setIAccum(0);
+  public SwerveModuleState getState() {
+    return new SwerveModuleState(getDriveVelocity(), getTurnRotation2d());
   }
 
-  public Rotation2d getRotation2d() {
-    // take care, get position only returns as rotations when a scale factor is not
-    // set
-    return Rotation2d.fromRadians(turnEncoder.getPosition());
+  public SwerveModulePosition getPosition() {
+    return new SwerveModulePosition(getDrivePosition(), getTurnRotation2d());
+  }
+
+  public void setDesiredState(SwerveModuleState state) {
+    if (Math.abs(state.speedMetersPerSecond) < 0.001) {
+      desiredState = state;
+      stop();
+      return;
+    }
+
+    state = SwerveModuleState.optimize(state, getState().angle);
+    driveMotor.setControl(
+        driveController.withVelocity(state.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));
+    turnController.setReference(state.angle.getRadians(), ControlType.kPosition);
+    desiredState = state;
+  }
+
+  public SwerveModuleState getDesiredState() {
+    return desiredState;
+  }
+
+  public void stop() {
+    driveMotor.set(0);
+    turnMotor.set(0);
   }
 }

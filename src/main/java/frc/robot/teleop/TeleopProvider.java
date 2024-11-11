@@ -12,10 +12,7 @@ import frc.robot.constants.SwerveDriveConstants;
  * Provides the default command for teleop.
  */
 public class TeleopProvider {
-  private final Command teleopSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_SETTINGS);
-  private final Command teleopDemoSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_DEMO_SETTINGS);
-  private final Command teleopArcade = new TeleopDriveArcade(DifferentialDriveConstants.PILOT_SETTINGS);
-  private final Command teleopDemoArcade = new TeleopDriveArcade(DifferentialDriveConstants.DEMO_SETTINGS);
+  private final Command teleopSwerve = new TeleopDriveSwerve();
 
   private final SendableChooser<Command> chooser = new SendableChooser<>();
 
@@ -25,11 +22,11 @@ public class TeleopProvider {
 
     // swerve
     chooser.addOption("Swerve Teleop", teleopSwerve);
-    chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
+    // chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
 
     // tank
-    chooser.addOption("Arcade Teleop", teleopArcade);
-    chooser.addOption("Arcade Demo Teleop", teleopDemoArcade);
+    // chooser.addOption("Arcade Teleop", teleopArcade);
+    // chooser.addOption("Arcade Demo Teleop", teleopDemoArcade);
 
     chooser.onChange(Subsystems.swerveDrive::setDefaultCommand);
 

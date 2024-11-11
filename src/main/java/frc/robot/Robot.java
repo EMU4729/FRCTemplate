@@ -90,7 +90,6 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Auto Start --------------------------------------------------------------------------------------");
-    Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during autonomous. */
@@ -110,7 +109,6 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Teleop Start ------------------------------------------------------------------------------------");
-    Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during operator control. */

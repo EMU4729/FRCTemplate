@@ -1,41 +1,65 @@
 package frc.robot.teleop;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.OI;
 import frc.robot.Subsystems;
-import frc.robot.Variables;
 import frc.robot.constants.SwerveDriveConstants;
-import frc.robot.shufflecontrol.ShuffleControl;
-import frc.robot.utils.RangeMath.CurveFit;
-import frc.robot.utils.RangeMath.RangeSettings;
 
 public class TeleopDriveSwerve extends Command {
-  private int updateShuffleCounter = 0;
-  public RangeSettings settings;
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(SwerveDriveConstants.MAX_ACCELERATION);
+  private final SlewRateLimiter yLimiter = new SlewRateLimiter(SwerveDriveConstants.MAX_ACCELERATION);
+  private final SlewRateLimiter turnLimiter = new SlewRateLimiter(SwerveDriveConstants.MAX_ANGULAR_ACCELERATION);
 
-  public TeleopDriveSwerve(RangeSettings settings) {
-    this.settings = settings;
+  private boolean robotRelative = false;
+
+  public TeleopDriveSwerve() {
+    OI.pilot.back().whileTrue(new StartEndCommand(() -> {
+      robotRelative = true;
+    }, () -> {
+      robotRelative = false;
+    }));
+
     addRequirements(Subsystems.swerveDrive);
   }
 
   @Override
   public void execute() {
-    double limiter = (1 - OI.pilot.getRightTriggerAxis()); // TODO enable this when everything else is tested
-    // organise field relitive switch
-    double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftX(), OI.pilot.getLeftY(),
-        OI.pilot.getRightX(), limiter }, settings);
-    var translateX = control[0];
-    var translateY = control[1];
-    var rotate = control[2];
-    // System.out.println(control[0]+" "+control[1]+" "+control[2]+" "+control[3]+"
-    // "+Subsystems.drive.getSpeedMS());
-    if (updateShuffleCounter > SwerveDriveConstants.updateShuffleInterval) {
-      ShuffleControl.driveTab.setControlAxis(translateX, translateY, rotate);
-      updateShuffleCounter = 0;
+    // TODO: Use RangeSettings for throttle control
+
+    double x = OI.pilot.getLeftX();
+    double y = OI.pilot.getLeftY();
+    double turn = OI.pilot.getRightX();
+
+    if (Math.abs(x) < 0.05)
+      x = 0;
+    if (Math.abs(y) < 0.05)
+      y = 0;
+    if (Math.abs(turn) < 0.05)
+      turn = 0;
+
+    x = xLimiter.calculate(x) * SwerveDriveConstants.MAX_SPEED;
+    y = yLimiter.calculate(y) * SwerveDriveConstants.MAX_SPEED;
+    turn = turnLimiter.calculate(turn) * SwerveDriveConstants.MAX_ANGULAR_SPEED;
+
+    ChassisSpeeds chassisSpeeds;
+    if (robotRelative) {
+      chassisSpeeds = new ChassisSpeeds(x, y, turn);
     } else {
-      updateShuffleCounter++;
+      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(x, y, turn,
+          Subsystems.swerveDrive.getRotation2d());
     }
-    Subsystems.swerveDrive.drive(translateX, translateY, rotate, Variables.fieldRelative, true); // TODO fix rate limit
+    SwerveModuleState[] states = SwerveDriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+    Subsystems.swerveDrive.setModuleStates(states);
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    Subsystems.swerveDrive.stopModules();
   }
 
   @Override
