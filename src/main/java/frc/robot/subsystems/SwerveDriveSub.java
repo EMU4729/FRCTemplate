@@ -127,7 +127,12 @@ public class SwerveDriveSub extends SubsystemBase {
 
   /** @return the heading of the robot, in degrees */
   public double getHeading() {
-    return imu.getAngle();
+    return imu.getAngle() * (SwerveDriveConstants.GYRO_REVERSED ? -1 : 1);
+  }
+
+  /** @return the rate of change of the robot's heading, in degrees per second */
+  public double getTurnRate() {
+    return imu.getRate() * (SwerveDriveConstants.GYRO_REVERSED ? -1 : 1);
   }
 
   /** @return the heading of the robot as a {@link Rotation2d} */
