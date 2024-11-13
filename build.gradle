@@ -70,7 +70,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'edu.wpi.first.wpilibj:wpilibj-java:2024.+'
-    implementation 'com.photonvision:photonlib:2024.+'
+    
 }
 
 test {
