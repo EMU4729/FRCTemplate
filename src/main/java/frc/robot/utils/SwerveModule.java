@@ -169,47 +169,47 @@ public class SwerveModule {
     return new SwerveModulePosition(Math.abs(driveMotor.getPosition().getValue()), angle);
   }
 
-  private static double calculateAccelerationSimple(double currentVelocity) {
+  private static double calculateAccelerationSimple(double targetVelocity/*v*/, double currentVelocity) {
     double initialAcceleration = 1; // c
-    double rampingRate = 8; // a;
+    double rampingRate = 8; // a
     double maxAcceleration = 5; // m
-    double maxVelocity = 5; // v
 
     double pointA = maxAcceleration / rampingRate;
-    double pointB = maxVelocity - pointA;
+    double pointB = targetVelocity - pointA;
 
     if (currentVelocity < pointA) {
       return rampingRate * currentVelocity + initialAcceleration;
     } else if (currentVelocity >= pointA && currentVelocity < pointB) {
       return maxAcceleration + initialAcceleration;
-    } else if (currentVelocity < maxVelocity) {
-      return rampingRate * (-currentVelocity + maxVelocity) + initialAcceleration;
+    } else if (currentVelocity < targetVelocity) {
+      return rampingRate * (-currentVelocity + targetVelocity) + initialAcceleration;
     } else {
       return 0;
     }
 
   }
 
-  private static double calculateAcceleration(double currentVelocity) {
-    double g = 2.3;
-    double d = 4.8;
-    double c = 1;
+  private static double calculateAcceleration(double targetVelocity/*g*/, double currentVelocity) {
 
-    double x = currentVelocity;
+    // y=\tanh\left(\left(\left|x\right|\right)\cdot\frac{d}{g}\right)\cdot\left|g\right|+c
 
-    double y = -Math.pow((-x / d) + Math.pow(g, 1/10), 10) + g + c;
+    double rampingRate = 4.8; // d
+    double initialVel = 1; // c
+    double velocityDiff = Math.abs(targetVelocity - currentVelocity); // x
 
-    return y;
+    // y
+    double acceleration = -Math.pow(-Math.min(velocityDiff / rampingRate, 1) + Math.pow(targetVelocity, 1/10), 10) + targetVelocity + initialVel;
+
+    return acceleration;
   }
 
   public void updateVelocity() {
     double currentVelocity = driveMotor.getVelocity().getValueAsDouble();
-    currentTargetVelocity += calculateAcceleration(currentVelocity) / 0.020;
+    currentTargetVelocity += calculateAcceleration(targetVelocity, currentVelocity) / 0.020;
     
     driveMotor.setControl(
         driveController
         .withVelocity(currentTargetVelocity / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));
-    
   }
 
   /**
@@ -234,6 +234,7 @@ public class SwerveModule {
         // driveController
             // .withVelocity(optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
     targetVelocity = optimizedDesiredState.speedMetersPerSecond;
+    currentTargetVelocity = driveMotor.getVelocity().getValueAsDouble();
     
     turnController.setReference(optimizedDesiredState.angle.getRadians() + Math.PI, ControlType.kPosition);
 
