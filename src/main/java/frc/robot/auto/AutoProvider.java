@@ -15,7 +15,6 @@ public class AutoProvider {
   public AutoProvider() {
     chooser.setDefaultOption("disabled", new InstantCommand(() -> {
     }, Subsystems.swerveDrive));
-    chooser.addOption("test", new TestAuto());
     SmartDashboard.putData("Auto Chooser", chooser);
   }
 
