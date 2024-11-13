@@ -6,20 +6,25 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.SparkPIDController;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.Subsystems;
 import frc.robot.constants.SwerveDriveConstants;
 
 public class SwerveModule {
@@ -100,14 +105,49 @@ public class SwerveModule {
     // Save the SPARK MAX configurations. If a SPARK MAX browns out during
     // operation, it will maintain the above configurations.
     turnMotor.burnFlash();
-
     resetEncoders();
-
   }
 
   /** @return the module's drive motor position, in meters */
   public double getDrivePosition() {
     return driveMotor.getPosition().getValueAsDouble() * SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS;
+  }
+
+  /*
+   * private SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d
+   * currentAngle) {
+   * var delta = desiredState.angle.minus(currentAngle);
+   * int limit = lastOptimise == 0 ? 90 : (lastOptimise > 0 ? 135 : 45);
+   * 
+   * double error = Math.abs(delta.getDegrees());
+   * if (error < limit) {
+   * lastOptimise = error < 20 ? 0 : 1;
+   * return new SwerveModuleState(
+   * -desiredState.speedMetersPerSecond,
+   * desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+   * } else {
+   * lastOptimise = error > 160 ? 0 : -1;
+   * return new SwerveModuleState(desiredState.speedMetersPerSecond,
+   * desiredState.angle);
+   * }
+   * }
+   */
+
+  private static final double inertia = 45;
+
+  /* Optimises wheel angle, using an inertia based system */
+  private SwerveModuleState optimize_unused(SwerveModuleState desiredState, Rotation2d currentAngle) {
+    var turnSpeed = Subsystems.swerveDrive.getTurnRate();
+    double threshold = 90 + MathUtil.clamp(turnSpeed * inertia, -80, 80);
+
+    var delta = desiredState.angle.minus(currentAngle);
+    if (delta.getDegrees() > threshold || delta.getDegrees() < 180 - threshold) {
+      return new SwerveModuleState(
+          -desiredState.speedMetersPerSecond,
+          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
+    } else {
+      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+    }
   }
 
   /** @return the module's drive motor velocity, in meters per second */

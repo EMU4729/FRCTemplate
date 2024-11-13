@@ -46,6 +46,9 @@ public class DifferentialDriveConstants {
   public static final MotorSupplier<WPI_TalonSRX> MOTOR_ID_RS = new TalonMotorSupplier(4)
       .withSafety();
 
+  /* Whether to clamp drive/turn before setting the motors */
+  public static final boolean USE_CLAMPING = true;
+
   /** KS value from SysId */
   public static final double KS_VOLTS = 0.88881;
   /** KV value from SysId */
