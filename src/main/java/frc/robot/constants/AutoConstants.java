@@ -12,4 +12,5 @@ public class AutoConstants {
   public static final double TRANSLATION_TOLERANCE = 0.1;
   /** Tolerance for rotation PID in radians */
   public static final double ROT_TOLERANCE = 0.1;
+  public static final double TIMEOUT_FOR_AUTODRIVE =5.0;
 }

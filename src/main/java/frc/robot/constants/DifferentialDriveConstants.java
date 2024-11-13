@@ -22,6 +22,8 @@ public class DifferentialDriveConstants {
   /** Drive left encoder builder */
   public static final EncoderSupplier ENCODER_ID_L = new EncoderSupplier(new int[] { 19, 20 }, 60.078 / 256. / 1000);
 
+
+  public static double distancePerPulse = (Math.PI * 6) / 360.0; // Assuming a 6-inch wheel and 360 pulses per revolution
   /**
    * Information for right master drive [Port,controller type,
    * {invert,brake,connectionSaftey}]

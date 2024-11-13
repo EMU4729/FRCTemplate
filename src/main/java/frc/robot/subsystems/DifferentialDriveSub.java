@@ -79,9 +79,27 @@ public class DifferentialDriveSub extends SubsystemBase {
 
     drive = new DifferentialDrive(leftMaster, rightMaster);
 
+    leftEncoder.setDistancePerPulse(DifferentialDriveConstants.distancePerPulse);
+    rightEncoder.setDistancePerPulse(DifferentialDriveConstants.distancePerPulse);
     addChild("Differential Drive", drive);
   }
 
+  public void resetEconders(){
+    leftEncoder.reset();
+    rightEncoder.reset();
+    leftEncoderSim.setDistance(0.0);
+    rightEncoderSim.setDistance(0.0);
+  }
+
+  public double getHeading(){
+    return imu.getAngle();
+  }
+
+  public void stop(){
+    drive.arcadeDrive(0, 0);
+  }
+
+  
   @Override
   public void periodic() {
     poseEstimator.update(
