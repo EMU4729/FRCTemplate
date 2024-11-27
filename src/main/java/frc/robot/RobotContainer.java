@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -11,8 +13,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.LEDs.FlashSolidLEDCommand;
+import frc.robot.LEDs.RepeatedFlashLEDCommand;
 import frc.robot.auto.AutoProvider;
-import frc.robot.commands.FlashLEDCommand;
 import frc.robot.teleop.TeleopProvider;
 
 /**
@@ -45,7 +48,7 @@ public class RobotContainer {
     // Robot Automations
     // flash leds yellow during endgame
     new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
-        .whileTrue(new FlashLEDCommand(Color.kYellow, 1));
+        .whileTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1, 3, 39), 5));
 
     // +----------------+
     // | PILOT CONTROLS |
@@ -57,13 +60,19 @@ public class RobotContainer {
     // OI.pilot.start().onTrue(new InstantCommand(() ->
     // Variables.invertDriveDirection = !Variables.invertDriveDirection));
 
+    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kBrown, 1, 3, 39));
+    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1, 3, 39), 5));
+    OI.pilot.x().onTrue(new RepeatedFlashLEDCommand(
+        Arrays.asList(new FlashSolidLEDCommand(Color.kBlue, 0.05, 3, 39),
+                      new FlashSolidLEDCommand(Color.kRed, 0.05, 3, 39)), 5));
+
     // set field relitive
     // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->
     // Variables.fieldRelative = !Variables.fieldRelative));
 
-    OI.pilot.start()
-        .onTrue(
-            new InstantCommand(() -> Subsystems.swerveDrive.zeroHeading(), Subsystems.swerveDrive));
+    //OI.pilot.start()
+    //    .onTrue(
+    //        new InstantCommand(() -> Subsystems.swerveDrive.zeroHeading(), Subsystems.swerveDrive));
 
     // Drive bindings handled in teleop command
   }

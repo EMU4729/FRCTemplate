@@ -4,9 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
+import frc.robot.LEDs.ClearLEDCommand;
+import frc.robot.LEDs.RainbowLEDCommand;
+import frc.robot.LEDs.SolidLEDCommand;
+import frc.robot.LEDs.TeamColorLEDCommand;
 //import frc.robot.commands.RainbowLEDCommand;
 import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.utils.logger.Logger;
@@ -63,16 +70,24 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
+  
+  boolean ledsSet = false;
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    new RainbowLEDCommand().schedule();
     Logger.pauseAllLoggers();
     System.out
-        .println("Disabled ----------------------------------------------------------------------------------------");
+    .println("Disabled ----------------------------------------------------------------------------------------");
+    ledsSet = false;
   }
 
   @Override
   public void disabledPeriodic() {
+    if(!ledsSet && DriverStation.getAlliance().isPresent()){
+      new TeamColorLEDCommand().schedule();
+      ledsSet = true;
+    }
   }
 
   /**
@@ -81,6 +96,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    new ClearLEDCommand().schedule();
     autoCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -90,7 +106,7 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Auto Start --------------------------------------------------------------------------------------");
-    Subsystems.swerveDrive.resetIntegral();
+    //Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during autonomous. */
@@ -100,6 +116,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    new ClearLEDCommand().schedule();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -110,7 +127,7 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Teleop Start ------------------------------------------------------------------------------------");
-    Subsystems.swerveDrive.resetIntegral();
+    //Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during operator control. */

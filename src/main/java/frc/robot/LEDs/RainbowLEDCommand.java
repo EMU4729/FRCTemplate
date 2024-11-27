@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.LEDs;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
@@ -19,12 +19,17 @@ public class RainbowLEDCommand extends Command {
       // Set the value
       Subsystems.led.buffer.setHSV(i, hue, 255, 128);
     }
-
+    
     // Increase by to make the rainbow "move"
     firstPixel += 3;
     // Check bounds
     firstPixel %= 180;
 
     Subsystems.led.apply();
+  }
+
+  @Override
+  public boolean runsWhenDisabled(){
+    return true;
   }
 }
