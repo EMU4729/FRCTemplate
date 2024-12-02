@@ -223,8 +223,8 @@ public class SwerveModule {
 
   /* Optimises wheel angle, using an inertia based system */
   public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    var turnSpeed = Subsystems.swerveDrive.getTurnRate();
-    double threshold = 90 + MathUtil.clamp(turnSpeed * intertia, -80, 80);
+    var turnSpeed = 0;//Subsystems.swerveDrive.getTurnRate();
+    double threshold = 0;//90 + MathUtil.clamp(turnSpeed * intertia, -80, 80);
 
     var delta = desiredState.angle.minus(currentAngle);
     if (delta.getDegrees() > threshold || delta.getDegrees() < 180-threshold) {

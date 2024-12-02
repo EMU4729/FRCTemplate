@@ -1,5 +1,11 @@
 package frc.robot.LEDs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.sound.sampled.Port;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
@@ -14,17 +20,38 @@ import frc.robot.constants.LEDConstants;
  * `apply`.
  */
 public class LEDSub extends SubsystemBase {
-  public final AddressableLEDBuffer buffer = new AddressableLEDBuffer(LEDConstants.STRING_LENGTH);
+  public final AddressableLEDBuffer buffer;
 
-  private final AddressableLED led = new AddressableLED(LEDConstants.STRING_PORT);
-  private final AddressableLEDSim ledSim = new AddressableLEDSim(led);
+  private final AddressableLED led;
+  //private final AddressableLEDSim ledSim;
 
-  public LEDSub() {
-    led.setLength(LEDConstants.STRING_LENGTH);
-    led.setData(new AddressableLEDBuffer(LEDConstants.STRING_LENGTH));
-    led.start();
-    ledSim.setInitialized(true);
+  /** the first led in each zone + (last+1) */
+  public final List<Integer> zoneEdges;
+
+  public LEDSub(int port, int length) {
+    this(port, new ArrayList<Integer>(Arrays.asList(0, length)));
   }
+  public LEDSub(int port, List<Integer> zones) {
+    buffer = new AddressableLEDBuffer(zones.get(zones.size()-1));
+    led = new AddressableLED(port);
+    //ledSim = new AddressableLEDSim(led);
+
+    led.setLength(buffer.getLength());
+    led.setData(new AddressableLEDBuffer(buffer.getLength()));
+    led.start();
+    //ledSim.setInitialized(true);
+
+    this.zoneEdges = zones;
+  }
+
+  List<Integer> getZonesList(){
+    List<Integer> zones = new ArrayList<Integer>();
+    for(int i = 0; i < zoneEdges.size()-1; i++){
+      zones.add(i);
+    }
+    return zones;
+  }
+
 
   /** Applies the data in the buffer to the LEDs */
   public void apply() {

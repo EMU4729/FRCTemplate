@@ -15,7 +15,7 @@ public class TeleopDriveSwerve extends Command {
 
   public TeleopDriveSwerve(RangeSettings settings) {
     this.settings = settings;
-    addRequirements(Subsystems.swerveDrive);
+    //addRequirements(Subsystems.swerveDrive);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class TeleopDriveSwerve extends Command {
     } else {
       updateShuffleCounter++;
     }
-    Subsystems.swerveDrive.drive(translateX, translateY, rotate, Variables.fieldRelative, true); // TODO fix rate limit
+    //Subsystems.swerveDrive.drive(translateX, translateY, rotate, Variables.fieldRelative, true); // TODO fix rate limit
   }
 
   @Override

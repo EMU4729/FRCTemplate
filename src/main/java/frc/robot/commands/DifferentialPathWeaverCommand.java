@@ -40,9 +40,9 @@ public class DifferentialPathWeaverCommand extends SequentialCommandGroup {
 
     // Don't even ask me what this does
     // All I know is that it works and no one should touch it
-    RamseteCommand ramseteCommand = new RamseteCommand(
+    /*RamseteCommand ramseteCommand = new RamseteCommand(
         trajectory,
-        Subsystems.diffDrive::getPose,
+        //Subsystems.diffDrive::getPose,
         new RamseteController(
             DifferentialDriveConstants.RAMSETE_B,
             DifferentialDriveConstants.RAMSETE_ZETA),
@@ -51,12 +51,13 @@ public class DifferentialPathWeaverCommand extends SequentialCommandGroup {
             DifferentialDriveConstants.KV_VOLT_SECONDS_PER_METER,
             DifferentialDriveConstants.KA_VOLT_SECONDS_SQUARED_PER_METER),
         DifferentialDriveConstants.KINEMATICS,
-        Subsystems.diffDrive::getWheelSpeeds,
+        //Subsystems.diffDrive::getWheelSpeeds,
         new PIDController(0, 0, 0),
-        new PIDController(0, 0, 0),
-        Subsystems.diffDrive::tankVoltage,
-        Subsystems.diffDrive);
+        new PIDController(0, 0, 0)
+        //Subsystems.diffDrive::tankVoltage,
+        //Subsystems.diffDrive
+        );*/
 
-    addCommands(ramseteCommand, new InstantCommand(Subsystems.diffDrive::off));
+    //addCommands(ramseteCommand, new InstantCommand(Subsystems.diffDrive::off));
   }
 }

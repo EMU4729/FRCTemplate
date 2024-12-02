@@ -16,10 +16,10 @@ import frc.robot.constants.SwerveDriveConstants;
 public class TeleopProvider {
   private static Optional<TeleopProvider> inst = Optional.empty();
 
-  private final Command teleopSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_SETTINGS);
-  private final Command teleopDemoSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_DEMO_SETTINGS);
-  private final Command teleopArcade = new TeleopDriveArcade(DifferentialDriveConstants.PILOT_SETTINGS);
-  private final Command teleopDemoArcade = new TeleopDriveArcade(DifferentialDriveConstants.DEMO_SETTINGS);
+  //private final Command teleopSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_SETTINGS);
+  //private final Command teleopDemoSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_DEMO_SETTINGS);
+  //private final Command teleopArcade = new TeleopDriveArcade(DifferentialDriveConstants.PILOT_SETTINGS);
+  //private final Command teleopDemoArcade = new TeleopDriveArcade(DifferentialDriveConstants.DEMO_SETTINGS);
 
   private final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
 
@@ -28,14 +28,14 @@ public class TeleopProvider {
     chooser.setDefaultOption("Disable Teleop", new InstantCommand());
 
     // swerve
-    chooser.addOption("Swerve Teleop", teleopSwerve);
-    chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
+    //chooser.addOption("Swerve Teleop", teleopSwerve);
+    //chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
 
     // tank
-    chooser.addOption("Arcade Teleop", teleopArcade);
-    chooser.addOption("Arcade Demo Teleop", teleopDemoArcade);
+    //chooser.addOption("Arcade Teleop", teleopArcade);
+    //chooser.addOption("Arcade Demo Teleop", teleopDemoArcade);
 
-    chooser.onChange(Subsystems.swerveDrive::setDefaultCommand);
+    //chooser.onChange(Subsystems.swerveDrive::setDefaultCommand);
 
     SmartDashboard.putData("Teleop Chooser", chooser);
   }

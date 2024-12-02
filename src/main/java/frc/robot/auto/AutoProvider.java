@@ -19,8 +19,8 @@ public class AutoProvider {
   private AutoProvider() {
     chooser = new SendableChooser<>(); // pub for shuffle board
     // chooser = AutoBuilder.buildAutoChooser();
-    chooser.setDefaultOption("disabled", new InstantCommand(() -> {
-    }, Subsystems.swerveDrive));
+    //chooser.setDefaultOption("disabled", new InstantCommand(() -> {
+    //}, Subsystems.swerveDrive));
     chooser.addOption("test", new TestAuto());
     SmartDashboard.putData("Auto Chooser", chooser);
   }

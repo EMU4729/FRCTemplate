@@ -48,7 +48,7 @@ public class RobotContainer {
     // Robot Automations
     // flash leds yellow during endgame
     new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
-        .whileTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1, 3, 39), 5));
+        .whileTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1), 5));
 
     // +----------------+
     // | PILOT CONTROLS |
@@ -60,11 +60,11 @@ public class RobotContainer {
     // OI.pilot.start().onTrue(new InstantCommand(() ->
     // Variables.invertDriveDirection = !Variables.invertDriveDirection));
 
-    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kBrown, 1, 3, 39));
-    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1, 3, 39), 5));
+    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kBrown, 1));
+    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1), 5));
     OI.pilot.x().onTrue(new RepeatedFlashLEDCommand(
-        Arrays.asList(new FlashSolidLEDCommand(Color.kBlue, 0.05, 3, 39),
-                      new FlashSolidLEDCommand(Color.kRed, 0.05, 3, 39)), 5));
+        Arrays.asList(new FlashSolidLEDCommand(Color.kBlue, 0.05),
+                      new FlashSolidLEDCommand(Color.kRed, 0.05)), 5));
 
     // set field relitive
     // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->

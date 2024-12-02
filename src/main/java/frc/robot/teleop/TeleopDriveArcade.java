@@ -22,7 +22,7 @@ public class TeleopDriveArcade extends Command {
   public TeleopDriveArcade(RangeSettings settings) {
     this.settings = settings;
 
-    addRequirements(Subsystems.diffDrive);
+    //addRequirements(Subsystems.diffDrive);
   }
 
   @Override
@@ -44,7 +44,7 @@ public class TeleopDriveArcade extends Command {
 
     ShuffleControl.driveTab.setControlAxis(-OI.pilot.getLeftY(), OI.pilot.getRightX());
 
-    Subsystems.diffDrive.arcade(throttle, steering);
+    //Subsystems.diffDrive.arcade(throttle, steering);
   }
 
   @Override

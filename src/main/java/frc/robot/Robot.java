@@ -71,7 +71,8 @@ public class Robot extends TimedRobot {
   }
 
   
-  boolean ledsSet = false;
+  int ledsSet = 0;
+  boolean justDisabled;
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
@@ -79,15 +80,18 @@ public class Robot extends TimedRobot {
     Logger.pauseAllLoggers();
     System.out
     .println("Disabled ----------------------------------------------------------------------------------------");
-    ledsSet = false;
+    ledsSet = 0;
+    justDisabled = true;
   }
 
   @Override
   public void disabledPeriodic() {
-    if(!ledsSet && DriverStation.getAlliance().isPresent()){
-      new TeamColorLEDCommand().schedule();
-      ledsSet = true;
+    if(ledsSet > 20 && DriverStation.getAlliance().isPresent()){
+      new TeamColorLEDCommand(justDisabled).schedule();
+      ledsSet = 0;
     }
+    ledsSet++;
+    justDisabled = false;
   }
 
   /**
