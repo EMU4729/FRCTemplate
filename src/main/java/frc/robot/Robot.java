@@ -15,7 +15,7 @@ import frc.robot.LEDs.RainbowLEDCommand;
 import frc.robot.LEDs.SolidLEDCommand;
 import frc.robot.LEDs.TeamColorLEDCommand;
 //import frc.robot.commands.RainbowLEDCommand;
-import frc.robot.shufflecontrol.ShuffleControl;
+//import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.utils.logger.Logger;
 
 /**
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     // LEDControl.getInstance().runDirectionLights();
-    new ShuffleControl();
+    //new ShuffleControl();
   }
 
   /**
