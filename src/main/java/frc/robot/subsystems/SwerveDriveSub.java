@@ -22,46 +22,24 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.SwerveDriveConstants;
-import frc.robot.shufflecontrol.ShuffleControl;
+import frc.robot.shufflecontrol.ShuffleTabController;
 import frc.robot.utils.SwerveModule;
 import frc.robot.utils.SwerveUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSub extends SubsystemBase {
   // Swerve Modules
-  public final SwerveModule frontLeft = new SwerveModule(
-      SwerveDriveConstants.FRONT_LEFT_DRIVING_CAN_ID,
-      SwerveDriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
-
-  private final SwerveModule frontRight = new SwerveModule(
-      SwerveDriveConstants.FRONT_RIGHT_DRIVING_CAN_ID,
-      SwerveDriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-  private final SwerveModule backLeft = new SwerveModule(
-      SwerveDriveConstants.BACK_LEFT_DRIVING_CAN_ID,
-      SwerveDriveConstants.BACK_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
-
-  private final SwerveModule backRight = new SwerveModule(
-      SwerveDriveConstants.BACK_RIGHT_DRIVING_CAN_ID,
-      SwerveDriveConstants.BACK_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
-
-  public SwerveModuleState[] lastStates = {
-      frontLeft.getState(),
-      frontRight.getState(),
-      backLeft.getState(),
-      backRight.getState()
-  };
-  private int updateShuffleCounter = 0;
+  private final SwerveModule frontLeft;
+  private final SwerveModule frontRight;
+  private final SwerveModule backLeft;
+  private final SwerveModule backRight;
 
   // The gyro sensor
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
@@ -82,7 +60,39 @@ public class SwerveDriveSub extends SubsystemBase {
   private double prevTime = WPIUtilJNI.now() * 1e-6;
 
   // Pose estimation class for tracking robot pose
-  SwerveDriveOdometry odometry = new SwerveDriveOdometry(
+  SwerveDriveOdometry odometry;
+
+  // Simulation Variables
+  ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
+  private Pose2d poseSim = new Pose2d();
+
+  private ShuffleTabController shuffleTab =  new ShuffleTabController("Swerve");
+
+  /** Creates a new DriveSubsystem. */
+  public SwerveDriveSub() {
+
+    // instantiate the swerve modules
+    frontLeft = new SwerveModule(
+      SwerveDriveConstants.FRONT_LEFT_DRIVING_CAN_ID, SwerveDriveConstants.FRONT_LEFT_TURNING_CAN_ID,
+      SwerveDriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET,
+      shuffleTab);
+
+    frontRight = new SwerveModule(
+      SwerveDriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, SwerveDriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
+      SwerveDriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET,
+      shuffleTab);
+
+    backLeft = new SwerveModule(
+      SwerveDriveConstants.BACK_LEFT_DRIVING_CAN_ID, SwerveDriveConstants.BACK_LEFT_TURNING_CAN_ID,
+      SwerveDriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET,
+      shuffleTab);
+
+    backRight = new SwerveModule(
+      SwerveDriveConstants.BACK_RIGHT_DRIVING_CAN_ID, SwerveDriveConstants.BACK_RIGHT_TURNING_CAN_ID,
+      SwerveDriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET,
+      shuffleTab);
+    
+    odometry = new SwerveDriveOdometry(
       SwerveDriveConstants.DRIVE_KINEMATICS,
       Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
       new SwerveModulePosition[] {
@@ -90,14 +100,10 @@ public class SwerveDriveSub extends SubsystemBase {
           frontRight.getPosition(),
           backLeft.getPosition(),
           backRight.getPosition()
-      }, new Pose2d());
-
-  // Simulation Variables
-  ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
-  private Pose2d poseSim = new Pose2d();
-
-  /** Creates a new DriveSubsystem. */
-  public SwerveDriveSub() {
+      },
+      new Pose2d());
+    
+    
     // Configure PathPlanner auto
     AutoBuilder.configureHolonomic(
         this::getPose,
@@ -125,12 +131,11 @@ public class SwerveDriveSub extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    if (updateShuffleCounter > SwerveDriveConstants.updateShuffleInterval) {
-      ShuffleControl.driveTab.setWheelAxes(lastStates[0], lastStates[1], lastStates[2], lastStates[3]);
-      updateShuffleCounter = 0;
-    } else {
-      updateShuffleCounter++;
-    }
+    frontLeft.updateShuffleTab();
+    frontRight.updateShuffleTab();
+    backLeft.updateShuffleTab();
+    backRight.updateShuffleTab();
+    
     updateOdometry();
   }
 
@@ -265,13 +270,6 @@ public class SwerveDriveSub extends SubsystemBase {
     frontRight.setDesiredState(swerveModuleStates[1]);
     backLeft.setDesiredState(swerveModuleStates[2]);
     backRight.setDesiredState(swerveModuleStates[3]);
-
-    lastStates = new SwerveModuleState[] {
-        frontLeft.getState(),
-        frontRight.getState(),
-        backLeft.getState(),
-        backRight.getState()
-    };
   }
 
   /**

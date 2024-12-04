@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
@@ -18,6 +19,9 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
+
+import java.util.Map;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,6 +29,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Subsystems;
 import frc.robot.constants.SwerveDriveConstants;
+import frc.robot.shufflecontrol.ShuffleTabController;
 import frc.robot.utils.logger.Logger;
 
 public class SwerveModule {
@@ -36,14 +41,17 @@ public class SwerveModule {
   private final VelocityVoltage driveController;
   private final SparkPIDController turnController;
 
+  private final int moduleId;
+
   private int lastOptimise = 0;
 
   private boolean isFlipped = false;
 
-  private Rotation2d angularOffset = new Rotation2d(0); // radians
+  private Rotation2d angularOffset = new Rotation2d(0);
   private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
   private Logger logger;
+  private ShuffleTabController shuffleTab;
 
   /**
    * Constructs a new SwerveModule for a MAX Swerve Module housing a Falcon
@@ -51,16 +59,26 @@ public class SwerveModule {
    * 
    * @param drivingCANId  CAN ID for the driving motor
    * @param turningCANId  CAN ID for the turning motor
-   * @param angularOffset Angular offset of the module in radians.
+   * @param angularOffset Angular offset of the module in radians
+   * @param shuffleTab    The shuffleboard tab to add widgets to
    */
-  public SwerveModule(int drivingCANId, int turningCANId, double angularOffset) {
+  public SwerveModule(int drivingCANId, int turningCANId, double angularOffset, ShuffleTabController shuffleTab) {
+    moduleId = drivingCANId;
+    this.angularOffset = Rotation2d.fromRadians(angularOffset);
 
     // create loggger
-    logger = new Logger("swerve-" + drivingCANId, new String[] { "Pos", "Vel", "Ang", "Ang Rate" });
+    logger = new Logger("swerve-" + moduleId, new String[] { "Pos", "Vel", "Ang", "Ang Rate" });
+
+    // create shuffle tab
+    this.shuffleTab = shuffleTab;
+    shuffleTab.createWidget("Drive " + moduleId, BuiltInWidgets.kNumberBar, 0 + (((moduleId-1) % 2) * 3), 0 + (((moduleId-1) / 2) * 2), 1, 2)
+      .withProperties(Map.of("Min", -10, "Max", 10));
+    shuffleTab.createWidget("Turn " + moduleId, BuiltInWidgets.kGyro, 1 + (((moduleId-1) % 2) * 3), 0 + (((moduleId-1) / 2) * 2), 2, 2)
+      .withProperties(Map.of("Starting Angle", this.angularOffset.unaryMinus().minus(Rotation2d.fromDegrees(270)).getDegrees() + 180));
+
 
     driveMotor = new TalonFX(drivingCANId);
     turnMotor = new CANSparkMax(turningCANId, MotorType.kBrushless);
-    this.angularOffset = Rotation2d.fromRadians(angularOffset);
 
     // Configure Drive Motor
     final var driveMotorConfig = new TalonFXConfiguration();
@@ -174,9 +192,9 @@ public class SwerveModule {
    */
   public void setDesiredState(SwerveModuleState desiredState) {
     // Apply chassis angular offset to the desired state.
-    SwerveModuleState correctedDesiredState = new SwerveModuleState();
-    correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(angularOffset);
+    SwerveModuleState correctedDesiredState = new SwerveModuleState(
+      desiredState.speedMetersPerSecond,
+      desiredState.angle.minus(angularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
     SwerveModuleState optimizedDesiredState = /* SwerveModuleState. */optimize(
@@ -192,7 +210,7 @@ public class SwerveModule {
         optimizedDesiredState.angle.getRadians() + Math.PI,
         ControlType.kPosition);
 
-    this.desiredState = desiredState;
+    this.desiredState = optimizedDesiredState;
 
     logger.log(new double[] {
         driveMotor.getPosition().getValue(),
@@ -236,6 +254,14 @@ public class SwerveModule {
       isFlipped = false;
       return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
     }
+  }
+
+  /* Updates the shuffleboard tab with new values */
+  public void updateShuffleTab() {
+    var state = desiredState;
+
+    shuffleTab.getEntry("Turn " + moduleId).setDouble(state.angle.getDegrees());
+    shuffleTab.getEntry("Drive " + moduleId).setDouble(state.speedMetersPerSecond);
   }
 
   /** Zeroes the drive encoder. */
