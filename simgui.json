@@ -40,6 +40,11 @@
       "/SmartDashboard/photonvision Sim Field": "Field2d"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Drive/TeleopType": {
         "window": {
           "visible": true
@@ -51,12 +56,13 @@
         }
       },
       "/SmartDashboard/Field": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+        "Robot": {
+          "length": 1.0,
+          "width": 1.0
+        },
+        "builtin": "",
+        "height": 32.0,
+        "width": 32.0,
         "window": {
           "visible": true
         }
@@ -80,6 +86,15 @@
     }
   },
   "NetworkTables Info": {
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "shuffleboard@1": {
+      "open": true
+    },
     "visible": true
   }
 }
