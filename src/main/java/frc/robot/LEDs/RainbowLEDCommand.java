@@ -1,38 +1,36 @@
 package frc.robot.LEDs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Subsystems;
 
-public class RainbowLEDCommand extends Command {
-  private int firstPixel = 0;
+public class RainbowLEDCommand extends LEDCommandBase {
+  private int firstHue = 0;
+  private final int hueStep = 2;
+  private int delayIdx = 0;
+  private final int delay = 3;
 
   public RainbowLEDCommand() {
-    addRequirements(Subsystems.led);
+    zones.forEach((zone)->addRequirements(zone));
   }
 
   @Override
   public void execute() {
-    //for(LEDSub led : leds){
-      for (int i = 0; i < Subsystems.led.buffer.getLength(); i++) {
-        // Calculate the hue - hue is easier for rainbows because the color
-        // shape is a circle so only one value needs to precess
-        final int hue = (firstPixel + (i * 180 / Subsystems.led.buffer.getLength())) % 180;
-        // Set the value
-        Subsystems.led.buffer.setHSV(i, hue, 255, 128);
+    if(delayIdx++ > delay){delayIdx = 0;}
+    else{return;}
+    for(LEDZone zone : zones){
+      List<Color> colors = new ArrayList<>(zone.zoneSize());
+      short[] leds = zone.getLedIds();
+      for (short led : leds) {
+        colors.add(Color.fromHSV((firstHue+led*hueStep)%180, 255, 128));
       }
       
       // Increase by to make the rainbow "move"
-      firstPixel += 3;
-      // Check bounds
-      firstPixel %= 180;
-
-      Subsystems.led.apply();
-    //}
+      
+      zone.apply(colors);
+    }
+    firstHue = (firstHue+hueStep)%180;
   }
 
   @Override

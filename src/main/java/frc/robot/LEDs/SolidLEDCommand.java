@@ -8,36 +8,25 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
 
-public class SolidLEDCommand extends Command {
+public class SolidLEDCommand extends LEDCommandBase {
   protected Color color;
 
-  private final List<Integer> zones;
-
   public SolidLEDCommand(Color color) {
-    this(color, Subsystems.led.getZonesList());
+    zones.forEach((zone)->addRequirements(zone));
+    this.color = color;
   }
-
-  public SolidLEDCommand(Color color, int zone) {
-    this(color, new ArrayList<Integer>(Arrays.asList(zone)));
-  }
-
-  public SolidLEDCommand(Color color, List<Integer> zones) {
-    addRequirements(Subsystems.led);
-    this.zones = zones;
-  }
-
 
   @Override
   public void initialize() {
-    for(int zone : zones){
-      int zoneStart = Subsystems.led.zoneEdges.get(zone);
-      int zoneEnd = Subsystems.led.zoneEdges.get(zone+1);
+    zones.forEach((zone)->zone.apply(color));
+  }
 
-      for (int i = zoneStart; i < zoneEnd && i < Subsystems.led.buffer.getLength(); i++) {
-        Subsystems.led.buffer.setLED(i, color);
-      }
-    }  
-    Subsystems.led.apply();
+  @Override
+  public void end(boolean interrupted) {
+    super.end(interrupted);
+    if(interrupted){
+      zones.forEach((zone)->zone.apply(Color.kBlack));
+    }
   }
 
   @Override

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.LEDs.FlashSolidLEDCommand;
+import frc.robot.LEDs.LEDCommandBase;
 import frc.robot.LEDs.RepeatedFlashLEDCommand;
 import frc.robot.auto.AutoProvider;
 import frc.robot.teleop.TeleopProvider;
@@ -61,10 +62,13 @@ public class RobotContainer {
     // Variables.invertDriveDirection = !Variables.invertDriveDirection));
 
     OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kBrown, 1));
-    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1), 5));
+    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(
+        new FlashSolidLEDCommand(Color.kYellow, 0.1, new LEDCommandBase().withZone(new int[]{1,2})),
+        5));
     OI.pilot.x().onTrue(new RepeatedFlashLEDCommand(
-        Arrays.asList(new FlashSolidLEDCommand(Color.kBlue, 0.05),
-                      new FlashSolidLEDCommand(Color.kRed, 0.05)), 5));
+        new FlashSolidLEDCommand(Arrays.asList(Color.kBlue, Color.kRed), 
+            0.1, new LEDCommandBase().withZone(new int[]{0})),
+        5));
 
     // set field relitive
     // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->

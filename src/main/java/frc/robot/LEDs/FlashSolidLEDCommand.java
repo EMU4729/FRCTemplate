@@ -11,13 +11,21 @@ import frc.robot.Subsystems;
 
 public class FlashSolidLEDCommand extends SequentialCommandGroup {
   public FlashSolidLEDCommand(Color color, double duration) {
-      addCommands(
-          new SolidLEDCommand(color, 0),
-          new WaitCommand(duration),
-          new ClearLEDCommand(),
-          new WaitCommand(duration));
-
-          
+    this(new ArrayList<Color>(Arrays.asList(color, Color.kBlack)), duration);
+  }
+  public FlashSolidLEDCommand(List<Color> colors, double duration) {
+    this(colors, duration, new LEDCommandBase().withZone(Subsystems.ledZones));
+  }
+  public FlashSolidLEDCommand(Color color, double duration, LEDCommandBase zones) {
+    this(new ArrayList<Color>(Arrays.asList(color, Color.kBlack)), duration, zones);
+  }
+  public FlashSolidLEDCommand(List<Color> colors, double duration, LEDCommandBase zones) {
+      for(Color color : colors){
+        addCommands(
+            new SolidLEDCommand(color).withZone(zones.getZones()),
+            new WaitCommand(duration));          
+      }
+      addCommands(new SolidLEDCommand(Color.kBlack).withZone(zones.getZones()));
   }
   
   @Override

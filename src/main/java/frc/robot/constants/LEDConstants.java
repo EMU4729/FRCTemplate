@@ -2,9 +2,9 @@ package frc.robot.constants;
 
 public class LEDConstants {
   /** LED string length (in leds) */
-  public static final int STRING_LENGTH = 42;
+  public static final int STRING_LENGTH = 102;
   /** LED string port num */
-  public static final int STRING_PORT = 8;
+  public static final int STRING_PORT = 3;
   /**
    * Max number of colour changes/s (red -> black -> red -> black = 4) for leds
    */

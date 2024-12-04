@@ -1,7 +1,5 @@
 package frc.robot.LEDs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,10 +12,7 @@ public class TeamColorLEDCommand extends SolidLEDCommand {
   private Color newColor = currentColor;
 
   public TeamColorLEDCommand(boolean hardSet) {
-    this(hardSet, Subsystems.led.getZonesList());
-  }
-  public TeamColorLEDCommand(boolean hardSet, List<Integer> zones) {
-    super(hardSet ? Color.kBlack : currentColor, zones);
+    super((currentColor = hardSet ? Color.kBlack : currentColor));
     if(DriverStation.waitForDsConnection(1) && DriverStation.getAlliance().isPresent()){
       newColor = DriverStation.getAlliance().get() == Alliance.Red ? Color.kRed : Color.kBlue;
     } else {
