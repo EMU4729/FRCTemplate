@@ -12,7 +12,6 @@ public class SolidLEDCommand extends LEDCommandBase {
   protected Color color;
 
   public SolidLEDCommand(Color color) {
-    zones.forEach((zone)->addRequirements(zone));
     this.color = color;
   }
 
@@ -24,18 +23,11 @@ public class SolidLEDCommand extends LEDCommandBase {
   @Override
   public void end(boolean interrupted) {
     super.end(interrupted);
-    if(interrupted){
-      zones.forEach((zone)->zone.apply(Color.kBlack));
-    }
+    zones.forEach((zone)->zone.apply(Color.kBlack));
   }
 
   @Override
   public boolean isFinished(){
-    return true;
+    return false;
   } 
-
-  @Override
-  public boolean runsWhenDisabled(){
-    return true;
-  }
 }

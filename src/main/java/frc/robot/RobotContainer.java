@@ -49,7 +49,7 @@ public class RobotContainer {
     // Robot Automations
     // flash leds yellow during endgame
     new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
-        .whileTrue(new RepeatedFlashLEDCommand(new FlashSolidLEDCommand(Color.kYellow, 0.1), 5));
+        .whileTrue(new RepeatedFlashLEDCommand((FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 300).withZone()), 5));
 
     // +----------------+
     // | PILOT CONTROLS |
@@ -61,16 +61,16 @@ public class RobotContainer {
     // OI.pilot.start().onTrue(new InstantCommand(() ->
     // Variables.invertDriveDirection = !Variables.invertDriveDirection));
 
-    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kBrown, 1));
+    OI.pilot.y().onTrue(new FlashSolidLEDCommand(Color.kDarkOliveGreen, 1000).withZone(new int[]{1,2}));
+    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kCrimson, 1000).withZone());
     OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(
-        new FlashSolidLEDCommand(Color.kYellow, 0.1, new LEDCommandBase().withZone(new int[]{1,2})),
+        (FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 200).withZone(new int[]{1,2})),
         5));
     OI.pilot.x().onTrue(new RepeatedFlashLEDCommand(
-        new FlashSolidLEDCommand(Arrays.asList(Color.kBlue, Color.kRed), 
-            0.1, new LEDCommandBase().withZone(new int[]{0})),
+        (FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kBlue, 200).withZone(new int[]{0})),
         5));
 
-    // set field relitive
+    // set field relitive  Arrays.asList(Color.kBlue, Color.kRed)
     // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->
     // Variables.fieldRelative = !Variables.fieldRelative));
 

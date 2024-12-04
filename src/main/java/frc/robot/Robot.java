@@ -70,28 +70,18 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-  
-  int ledsSetCounter = 0;
-  boolean justDisabled;
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    new RainbowLEDCommand().schedule();
+    new RainbowLEDCommand().withZone().schedule();
     Logger.pauseAllLoggers();
     System.out
     .println("Disabled ----------------------------------------------------------------------------------------");
-    ledsSetCounter = 0;
-    justDisabled = true;
+    new TeamColorLEDCommand().withZone().schedule();
   }
 
   @Override
   public void disabledPeriodic() {
-    if((justDisabled || ledsSetCounter > 20) && DriverStation.getAlliance().isPresent()){
-      new TeamColorLEDCommand(justDisabled).schedule();
-      ledsSetCounter = 0;
-    }
-    ledsSetCounter++;
-    justDisabled = false;
   }
 
   /**
@@ -100,7 +90,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    new ClearLEDCommand().schedule();
+    new ClearLEDCommand().withZone().schedule();
     autoCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -120,7 +110,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    new ClearLEDCommand().schedule();
+    new ClearLEDCommand().withZone().schedule();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

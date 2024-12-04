@@ -1,8 +1,6 @@
 package frc.robot.LEDs;
 
-import java.util.Arrays;
-import java.util.List;
-
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -11,8 +9,9 @@ public class RepeatedFlashLEDCommand extends Command{
   private int loopIdx = 0;
   private int iterations = 0;
 
-  public RepeatedFlashLEDCommand(SequentialCommandGroup flashCommand, int iterations){
+  public RepeatedFlashLEDCommand(FlashSolidLEDCommand flashCommand, int iterations){
     this.flashSequence.addCommands(flashCommand);
+    this.flashSequence.addCommands(new FlashSolidLEDCommand(Color.kBlack, flashCommand.getDuration()).withZone(flashCommand.getZones()));
     this.iterations = iterations;
   }
 
