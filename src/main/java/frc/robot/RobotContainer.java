@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.LEDs.BatteryPercentLEDCommand;
 import frc.robot.LEDs.FlashSolidLEDCommand;
 import frc.robot.LEDs.LEDCommandBase;
 import frc.robot.LEDs.RepeatedFlashLEDCommand;
@@ -61,7 +63,7 @@ public class RobotContainer {
     // OI.pilot.start().onTrue(new InstantCommand(() ->
     // Variables.invertDriveDirection = !Variables.invertDriveDirection));
 
-    OI.pilot.y().onTrue(new FlashSolidLEDCommand(Color.kDarkOliveGreen, 1000).withZone(new int[]{1,2}));
+    //OI.pilot.y().onTrue(new InstantCommand(()->BatteryPercentLEDCommand.runFor(50)));
     OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kCrimson, 1000).withZone());
     OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(
         (FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 200).withZone(new int[]{1,2})),
