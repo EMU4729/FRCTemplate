@@ -3,6 +3,7 @@ package frc.robot.LEDs;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.constants.LEDConstants;
 
 public class TeamColorLEDCommand extends SolidLEDCommand {
   private Color currentColor = Color.kBlack;
@@ -23,7 +24,8 @@ public class TeamColorLEDCommand extends SolidLEDCommand {
     else {return;}
 
     if(DriverStation.waitForDsConnection(1) && DriverStation.getAlliance().isPresent()){
-      newColor = DriverStation.getAlliance().get() == Alliance.Red ? Color.kRed : Color.kBlue;
+      newColor = DriverStation.getAlliance().get() == Alliance.Red ? 
+          Color.fromHSV(0, 255, LEDConstants.MAX_SUSTAINED_BRIGHTNESS) : Color.fromHSV(120, 255, LEDConstants.MAX_SUSTAINED_BRIGHTNESS);
     } else {
       newColor = Color.kYellow;
     }
