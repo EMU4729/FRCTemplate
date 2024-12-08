@@ -28,6 +28,11 @@
       }
     },
     "PowerDistributions": {
+      "0": {
+        "PowerDistribution[0]": {
+          "open": true
+        }
+      },
       "window": {
         "visible": true
       }
@@ -63,6 +68,7 @@
       "/SmartDashboard/Field": {
         "Robot": {
           "length": 1.0,
+          "style": "Box/Image",
           "width": 1.0
         },
         "bottom": 1476,

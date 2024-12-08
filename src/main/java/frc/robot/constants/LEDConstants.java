@@ -15,5 +15,5 @@ public class LEDConstants {
   /** 
    * max brightness for long periods (0-255)
    */
-  public static final int MAX_SUSTAINED_BRIGHTNESS = Robot.isReal() ? 20 : 127;
+  public static final int MAX_SUSTAINED_BRIGHTNESS = Robot.isReal() ? 20 : 255;
 }

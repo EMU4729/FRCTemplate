@@ -23,6 +23,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -321,7 +322,11 @@ public class SwerveDriveSub extends SubsystemBase {
    * @return the robot's heading as a Rotation2d
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ));
+    Rotation2d heading = Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ));
+    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red){
+      heading = heading.plus(Rotation2d.fromDegrees(180));
+    }
+    return heading;
   }
 
   public SwerveModulePosition[] getModulePositions(){
