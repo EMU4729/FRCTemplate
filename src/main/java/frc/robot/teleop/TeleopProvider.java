@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Subsystems;
 import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.constants.SwerveDriveConstants;
@@ -16,6 +17,7 @@ import frc.robot.constants.SwerveDriveConstants;
 public class TeleopProvider {
   private static Optional<TeleopProvider> inst = Optional.empty();
 
+  private final Command disableCommand = new InstantCommand();
   private final Command teleopSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_SETTINGS);
   private final Command teleopDemoSwerve = new TeleopDriveSwerve(SwerveDriveConstants.PILOT_DEMO_SETTINGS);
   private final Command teleopArcade = new TeleopDriveArcade(DifferentialDriveConstants.PILOT_SETTINGS);
@@ -25,7 +27,8 @@ public class TeleopProvider {
 
   private TeleopProvider() {
     // disabled
-    chooser.setDefaultOption("Disable Teleop", new InstantCommand());
+    disableCommand.addRequirements(Subsystems.swerveDrive);
+    chooser.setDefaultOption("Disable Teleop", disableCommand);
 
     // swerve
     chooser.addOption("Swerve Teleop", teleopSwerve);
@@ -36,6 +39,7 @@ public class TeleopProvider {
     chooser.addOption("Arcade Demo Teleop", teleopDemoArcade);
 
     chooser.onChange(Subsystems.swerveDrive::setDefaultCommand);
+    Subsystems.swerveDrive.setDefaultCommand(chooser.getSelected()); //set default on startup
 
     SmartDashboard.putData("Teleop Chooser", chooser);
   }

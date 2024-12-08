@@ -1,5 +1,7 @@
 package frc.robot.constants;
 
+import frc.robot.Robot;
+
 public class LEDConstants {
   /** LED string length (in leds) */
   public static final int STRING_LENGTH = 102;
@@ -13,5 +15,5 @@ public class LEDConstants {
   /** 
    * max brightness for long periods (0-255)
    */
-  public static final int MAX_SUSTAINED_BRIGHTNESS = 20;
+  public static final int MAX_SUSTAINED_BRIGHTNESS = Robot.isReal() ? 20 : 127;
 }

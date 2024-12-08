@@ -7,14 +7,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
 import frc.robot.Subsystems;
 import frc.robot.Variables;
-import frc.robot.constants.SwerveDriveConstants;
 //import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.shufflecontrol.ShuffleTabController;
 import frc.robot.utils.RangeMath.CurveFit;
 import frc.robot.utils.RangeMath.RangeSettings;
 
 public class TeleopDriveSwerve extends Command {
-  private int updateShuffleCounter = 0;
+  //private int updateShuffleCounter = 0;
   public RangeSettings settings;
   
   private ShuffleTabController shuffleTab;
@@ -38,7 +37,7 @@ public class TeleopDriveSwerve extends Command {
 
   @Override
   public void execute() {
-    double limiter = (1 - OI.pilot.getRightTriggerAxis()); // TODO enable this when everything else is tested
+    double limiter = (1 - OI.pilot.getRightTriggerAxis());
     // organise field relitive switch
     double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftX(), OI.pilot.getLeftY(),
         OI.pilot.getRightX(), limiter }, settings);

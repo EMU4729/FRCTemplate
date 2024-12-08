@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import frc.robot.LEDs.LEDZone;
-import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.DifferentialDriveSub;
 import frc.robot.subsystems.SwerveDriveSub;
 
@@ -19,5 +18,5 @@ public class Subsystems {
     new LEDZone(70, 91, 1),
     new LEDZone(0,59, 2)
   ));
-  public static final DifferentialDriveSub diffDrive = new DifferentialDriveSub();
+  //public static final DifferentialDriveSub diffDrive = new DifferentialDriveSub();
 }

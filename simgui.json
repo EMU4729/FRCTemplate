@@ -26,6 +26,11 @@
           "open": true
         }
       }
+    },
+    "PowerDistributions": {
+      "window": {
+        "visible": true
+      }
     }
   },
   "NTProvider": {
@@ -60,9 +65,17 @@
           "length": 1.0,
           "width": 1.0
         },
-        "builtin": "",
-        "height": 32.0,
-        "width": 32.0,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Teleop Chooser": {
         "window": {
           "visible": true
         }
@@ -81,11 +94,35 @@
     }
   },
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
+    "retained": {
+      "Shuffleboard": {
+        "Drive": {
+          "TeleopType": {
+            "open": true
+          },
+          "open": true
+        }
+      },
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "Shuffleboard": {
+        "Swerve": {
+          "open": true
+        },
+        "open": true
+      }
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Connections": {
+      "open": true
+    },
     "Server": {
       "Publishers": {
         "open": true

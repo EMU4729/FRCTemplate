@@ -49,67 +49,59 @@ public class SwerveDriveConstants {
   /** Distance between centers of left and right wheels on robot in meters */
   public static final double WHEEL_BASE = Units.inchesToMeters(20.7);
 
-  /**
-   * Position of front left swerve module relative to robot center. Mainly for sim
-   * purposes.
-   */
-  public static final Translation2d FRONT_LEFT_MODULE_TRANSLATION = new Translation2d(-TRACK_WIDTH / 2, WHEEL_BASE / 2);
-  /**
-   * Position of front right swerve module relative to robot center. Mainly for
-   * sim purposes.
-   */
-  public static final Translation2d FRONT_RIGHT_MODULE_TRANSLATION = new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2);
-  /**
-   * Position of back left swerve module relative to robot center. Mainly for sim
-   * purposes.
-   */
-  public static final Translation2d BACK_LEFT_MODULE_TRANSLATION = new Translation2d(-TRACK_WIDTH / 2, -WHEEL_BASE / 2);
-  /**
-   * Position of back right swerve module relative to robot center. Mainly for sim
-   * purposes.
-   */
-  public static final Translation2d BACK_RIGHT_MODULE_TRANSLATION = new Translation2d(TRACK_WIDTH / 2, -WHEEL_BASE / 2);
+  /** Position of front left swerve module relative to robot center. Mainly for sim purposes. */
+  //private static final Translation2d FRONT_LEFT_MODULE_TRANSLATION = new Translation2d(-TRACK_WIDTH / 2, WHEEL_BASE / 2);
+  /** Position of front right swerve module relative to robot center. Mainly for sim purposes.*/
+  //private static final Translation2d FRONT_RIGHT_MODULE_TRANSLATION = new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2);
+  /** Position of back left swerve module relative to robot center. Mainly for sim purposes.*/
+  //private static final Translation2d BACK_LEFT_MODULE_TRANSLATION = new Translation2d(-TRACK_WIDTH / 2, -WHEEL_BASE / 2);
+  /** Position of back right swerve module relative to robot center. Mainly for sim purposes.*/
+  //private static final Translation2d BACK_RIGHT_MODULE_TRANSLATION = new Translation2d(TRACK_WIDTH / 2, -WHEEL_BASE / 2);
 
-  /** Swerve Kinematics */
-  public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
-      FRONT_LEFT_MODULE_TRANSLATION,
-      FRONT_RIGHT_MODULE_TRANSLATION,
-      BACK_LEFT_MODULE_TRANSLATION,
-      BACK_RIGHT_MODULE_TRANSLATION);
 
   // Angular offsets of the modules relative to the chassis in radians
   /** Angular offset of front left module relative to chassis */
-  public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0;
+  //public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0;
   /** Angular offset of front right module relative to chassis */
-  public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
+  //public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
   /** Angular offset of back left module relative to chassis */
-  public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
+  //public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
   /** Angular offset of back right module relative to chassis */
-  public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI;
+  //public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI;
 
   // SPARK MAX CAN IDs
   /** CAN ID for Front Left Module Driving Motor */
-  public static final int FRONT_LEFT_DRIVING_CAN_ID = 1;
+  //public static final int FRONT_LEFT_DRIVING_CAN_ID = 1;
   /** CAN ID for Front Right Module Driving Motor */
-  public static final int FRONT_RIGHT_DRIVING_CAN_ID = 2;
+  //public static final int FRONT_RIGHT_DRIVING_CAN_ID = 2;
   /** CAN ID for Back Left Module Driving Motor */
-  public static final int BACK_LEFT_DRIVING_CAN_ID = 3;
+  //public static final int BACK_LEFT_DRIVING_CAN_ID = 3;
   /** CAN ID for Back Right Module Driving Motor */
-  public static final int BACK_RIGHT_DRIVING_CAN_ID = 4;
+  //public static final int BACK_RIGHT_DRIVING_CAN_ID = 4;
 
   /** CAN ID for Front Left Module Turning Motor */
-  public static final int FRONT_LEFT_TURNING_CAN_ID = 1;
+  //public static final int FRONT_LEFT_TURNING_CAN_ID = 1;
   /** CAN ID for Front Right Module Turning Motor */
-  public static final int FRONT_RIGHT_TURNING_CAN_ID = 2;
+  //public static final int FRONT_RIGHT_TURNING_CAN_ID = 2;
   /** CAN ID for Back Left Module Turning Motor */
-  public static final int BACK_LEFT_TURNING_CAN_ID = 3;
+  //public static final int BACK_LEFT_TURNING_CAN_ID = 3;
   /** CAN ID for Back Right Module Turning Motor */
-  public static final int BACK_RIGHT_TURNING_CAN_ID = 4;
+  //public static final int BACK_RIGHT_TURNING_CAN_ID = 4;
 
   /** IMU Gyro Inversion */
   public static final boolean GYRO_REVERSED = false;
 
   // Module Constants
+  /** Drive motor inversion. */
+  public static final InvertedValue DRIVE_MOTOR_INVERTED = InvertedValue.Clockwise_Positive;
+  
+  /**
+   * Whether the turning encoder is inverted or not.
+   * 
+   * In the MAXSwerve module, this should be set to `true`, since the output shaft
+   * rotates in the opposite direction of the steering motor.
+   */
+  public static final boolean TURNING_ENCODER_INVERTED = true;
 
   /**
    * Gear attached direct to the drive motor
@@ -125,17 +117,6 @@ public class SwerveDriveConstants {
    * [L:22,M:22,H:22,EH1:21,EH2:20,EH3:20,EH4:20,EH5:19]
    */
   public static final int DRIVING_MOTOR_SPUR_TEETH = 20;
-
-  /** Drive motor inversion. */
-  public static final InvertedValue DRIVE_MOTOR_INVERTED = InvertedValue.Clockwise_Positive;
-
-  /**
-   * Whether the turning encoder is inverted or not.
-   * 
-   * In the MAXSwerve module, this should be set to `true`, since the output shaft
-   * rotates in the opposite direction of the steering motor.
-   */
-  public static final boolean TURNING_ENCODER_INVERTED = true;
 
   // Calculations required for driving motor conversion factors and feed forward
   /** Free speed of the driving motor in rps */
@@ -203,13 +184,66 @@ public class SwerveDriveConstants {
       MAX_ANGULAR_SPEED,
       MAX_ANGULAR_ACCELERATION);
 
-  public static RangeSettings PILOT_SETTINGS = RangeSettings.InitSwerveBot(0, 1, 4, 0.1, true,
+  public static RangeSettings PILOT_SETTINGS = RangeSettings.InitSwerveBot(
+      0, 1, 4, 0.1, true,
       0, 1, 4, 0.1, false,
       0, 1, 3, 0.1, false,
       0.85);
-  public static RangeSettings PILOT_DEMO_SETTINGS = RangeSettings.InitSwerveBot(0, 0.2, 1, 0.1, true,
-      0, 0.2, 1, 0.1, false,
-      0, 0.2, 1, 0.1, false,
+  public static RangeSettings PILOT_DEMO_SETTINGS = RangeSettings.InitSwerveBot(
+      0, 0.2, 2, 0.1, true,
+      0, 0.2, 2, 0.1, false,
+      0, 0.2, 2, 0.1, false,
       0.6);
 
+
+  public static final S_MODULE_DETAILS SWERVE_MODULE_FL = new S_MODULE_DETAILS(
+    1, //Drive motor CAN ID
+    1, //Steer motor CAN ID
+    0, //Offset rel to FL module
+    new Translation2d(-TRACK_WIDTH / 2, WHEEL_BASE / 2) //location rel to centre
+  ); 
+  public static final S_MODULE_DETAILS SWERVE_MODULE_FR = new S_MODULE_DETAILS(
+    2, //Drive motor CAN ID
+    2, //Steer motor CAN ID
+    Math.PI / 2, //Offset rel to FL module
+    new Translation2d(TRACK_WIDTH / 2, WHEEL_BASE / 2) //location rel to centre
+  ); 
+  public static final S_MODULE_DETAILS SWERVE_MODULE_BL = new S_MODULE_DETAILS(
+    3, //Drive motor CAN ID
+    3, //Steer motor CAN ID
+    -Math.PI / 2, //Offset rel to FL module
+    new Translation2d(-TRACK_WIDTH / 2, -WHEEL_BASE / 2) //location rel to centre
+  ); 
+  public static final S_MODULE_DETAILS SWERVE_MODULE_BR = new S_MODULE_DETAILS(
+    4, //Drive motor CAN ID
+    4, //Steer motor CAN ID
+    Math.PI, //Offset rel to FL module
+    new Translation2d(TRACK_WIDTH / 2, -WHEEL_BASE / 2) //location rel to centre
+  ); 
+
+    /** Swerve Kinematics */
+  public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
+      SWERVE_MODULE_FL.LOCATION,
+      SWERVE_MODULE_FR.LOCATION,
+      SWERVE_MODULE_BL.LOCATION,
+      SWERVE_MODULE_BR.LOCATION
+  );
+
+  public static class S_MODULE_DETAILS{
+    /** CAN ID for the module's Driving Motor */
+    public final int CAN_ID_DRIVE;
+    /** CAN ID for the module's Steering Motor */
+    public final int CAN_ID_STEER;
+    /** Angular offset of the module around the robot's center, FL module is at 0, top down CW positive. */
+    public final double ANGULAR_OFFSET;
+    /** Location of module relative to robot center, top down, right and front pos. Mainly for sim purposes. */
+    public final Translation2d LOCATION;
+
+    protected S_MODULE_DETAILS(int CAN_ID_DRIVE, int CAN_ID_STEER, double ANGULAR_OFFSET, Translation2d LOCATION){
+      this.CAN_ID_DRIVE = CAN_ID_DRIVE;
+      this.CAN_ID_STEER = CAN_ID_STEER;
+      this.ANGULAR_OFFSET = ANGULAR_OFFSET;
+      this.LOCATION = LOCATION;
+    }
+  } 
 }

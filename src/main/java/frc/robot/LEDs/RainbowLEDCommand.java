@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.Subsystems;
 
 public class RainbowLEDCommand extends LEDCommandBase {
   private int firstHue = 0;

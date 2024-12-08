@@ -22,12 +22,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.shufflecontrol.ShuffleTabController;
 import frc.robot.utils.SwerveModule;
@@ -49,6 +49,7 @@ public class SwerveDriveSub extends SubsystemBase {
 
   // Field for robot viz
   private final Field2d field = new Field2d();
+  private boolean fieldRelative = false;
 
   // Slew rate filter variables for controlling lateral acceleration
   private double currentRotation = 0.0;
@@ -70,37 +71,27 @@ public class SwerveDriveSub extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public SwerveDriveSub() {
-
     // instantiate the swerve modules
     frontLeft = new SwerveModule(
-      SwerveDriveConstants.FRONT_LEFT_DRIVING_CAN_ID, SwerveDriveConstants.FRONT_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET,
+      SwerveDriveConstants.SWERVE_MODULE_FL,
       shuffleTab);
 
     frontRight = new SwerveModule(
-      SwerveDriveConstants.FRONT_RIGHT_DRIVING_CAN_ID, SwerveDriveConstants.FRONT_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET,
+      SwerveDriveConstants.SWERVE_MODULE_FR,
       shuffleTab);
 
     backLeft = new SwerveModule(
-      SwerveDriveConstants.BACK_LEFT_DRIVING_CAN_ID, SwerveDriveConstants.BACK_LEFT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET,
+      SwerveDriveConstants.SWERVE_MODULE_BL,
       shuffleTab);
 
     backRight = new SwerveModule(
-      SwerveDriveConstants.BACK_RIGHT_DRIVING_CAN_ID, SwerveDriveConstants.BACK_RIGHT_TURNING_CAN_ID,
-      SwerveDriveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET,
+      SwerveDriveConstants.SWERVE_MODULE_BR,
       shuffleTab);
-    
+      
     odometry = new SwerveDriveOdometry(
       SwerveDriveConstants.DRIVE_KINEMATICS,
       Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
-      new SwerveModulePosition[] {
-          frontLeft.getPosition(),
-          frontRight.getPosition(),
-          backLeft.getPosition(),
-          backRight.getPosition()
-      },
+      getModulePositions(),
       new Pose2d());
     
     
@@ -162,12 +153,7 @@ public class SwerveDriveSub extends SubsystemBase {
 
     odometry.resetPosition(
         getHeading(),
-        new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            backLeft.getPosition(),
-            backRight.getPosition()
-        },
+        getModulePositions(),
         pose);
   }
 
@@ -203,7 +189,8 @@ public class SwerveDriveSub extends SubsystemBase {
     }
     double xSpeedCommanded;
     double ySpeedCommanded;
-
+    this.fieldRelative = fieldRelative;
+    
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
@@ -265,6 +252,7 @@ public class SwerveDriveSub extends SubsystemBase {
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, SwerveDriveConstants.MAX_SPEED);
+
 
     frontLeft.setDesiredState(swerveModuleStates[0]);
     frontRight.setDesiredState(swerveModuleStates[1]);
@@ -336,6 +324,15 @@ public class SwerveDriveSub extends SubsystemBase {
     return Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ));
   }
 
+  public SwerveModulePosition[] getModulePositions(){
+    return new SwerveModulePosition[]{
+        frontLeft.getPosition(),
+        frontRight.getPosition(),
+        backLeft.getPosition(),
+        backRight.getPosition()
+    };
+  }
+
   /**
    * Returns the turn rate of the robot.
    *
@@ -358,12 +355,8 @@ public class SwerveDriveSub extends SubsystemBase {
   public void updateOdometry() {
     odometry.update(
         getHeading(),
-        new SwerveModulePosition[] {
-            frontLeft.getPosition(),
-            frontRight.getPosition(),
-            backLeft.getPosition(),
-            backRight.getPosition()
-        });
+        getModulePositions()
+        );
     // System.out.println(frontLeft.getPosition() + " " +
     // frontRight.getPosition() + " " +
     // backLeft.getPosition() + " " +
@@ -399,19 +392,21 @@ public class SwerveDriveSub extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    final var speeds = SwerveDriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
-        frontLeft.getDesiredState(),
-        frontRight.getDesiredState(),
-        backLeft.getDesiredState(),
-        backRight.getDesiredState());
+    final boolean optimizedAngle = false;
+    final boolean moduleRel = false;
+    var speeds = SwerveDriveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
+        frontLeft.getDesiredState(optimizedAngle, moduleRel),
+        frontRight.getDesiredState(optimizedAngle, moduleRel),
+        backLeft.getDesiredState(optimizedAngle, moduleRel),
+        backRight.getDesiredState(optimizedAngle, moduleRel));
 
     imuSim.setGyroRateZ(speeds.omegaRadiansPerSecond * (180 / Math.PI));
-    imuSim.setGyroAngleZ(getHeading().plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * 0.02)).getDegrees());
-
+    //imuSim.setGyroAngleZ(getHeading().plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * 0.02)).getDegrees());
+    imuSim.setGyroAngleZ(field.getRobotPose().getRotation().getDegrees());
     poseSim = poseSim.exp(
         new Twist2d(
-            speeds.vxMetersPerSecond * 0.02,
             speeds.vyMetersPerSecond * 0.02,
+            -speeds.vxMetersPerSecond * 0.02,
             speeds.omegaRadiansPerSecond * 0.02));
 
     // photon.simulationPeriodic(getPose());

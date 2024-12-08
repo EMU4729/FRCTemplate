@@ -28,7 +28,7 @@ public class TeleopDriveArcade extends Command {
   public TeleopDriveArcade(RangeSettings settings) {
     this.settings = settings;
 
-    addRequirements(Subsystems.diffDrive);
+    //addRequirements(Subsystems.diffDrive);
     shuffleTab = createShuffleTab();
   }
 

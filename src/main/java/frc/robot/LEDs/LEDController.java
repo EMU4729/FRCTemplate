@@ -1,19 +1,18 @@
 package frc.robot.LEDs;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.simulation.AddressableLEDSim;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.constants.LEDConstants;
-import pabeles.concurrency.IntOperatorTask.Min;
-
 
 public class LEDController extends SubsystemBase{
   private class LEDZone {
@@ -40,6 +39,7 @@ public class LEDController extends SubsystemBase{
     buffer = new AddressableLEDBuffer(LEDConstants.STRING_LENGTH);
     led = new AddressableLED(LEDConstants.STRING_PORT);
     ledSim = new AddressableLEDSim(led);
+    ledSim.setInitialized(true);
 
     led.setLength(buffer.getLength());
     led.setData(new AddressableLEDBuffer(buffer.getLength()));

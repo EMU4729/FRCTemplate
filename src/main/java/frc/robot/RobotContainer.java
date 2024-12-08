@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.Arrays;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -13,11 +11,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.LEDs.BatteryPercentLEDCommand;
 import frc.robot.LEDs.FlashSolidLEDCommand;
-import frc.robot.LEDs.LEDCommandBase;
 import frc.robot.LEDs.RepeatedFlashLEDCommand;
 import frc.robot.LEDs.SolidLEDCommand;
 import frc.robot.auto.AutoProvider;
@@ -77,8 +72,9 @@ public class RobotContainer {
         5));
 
     // set field relitive  Arrays.asList(Color.kBlue, Color.kRed)
-    // OI.pilot.rightBumper().onTrue(new InstantCommand(() ->
-    // Variables.fieldRelative = !Variables.fieldRelative));
+    OI.pilot.leftTrigger(0.5)
+        .onTrue(new InstantCommand(() -> Variables.fieldRelative = false))
+        .onFalse(new InstantCommand(()-> Variables.fieldRelative = true));
 
     //OI.pilot.start()
     //    .onTrue(
