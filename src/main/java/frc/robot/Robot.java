@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,6 +33,7 @@ import frc.robot.utils.logger.Logger;
 public class Robot extends TimedRobot {
   private Command autoCommand;
   private RobotContainer robotContainer;
+
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -71,6 +74,8 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
+
+  BatteryPercentLEDCommand batteryLEDDisplay;
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
@@ -79,7 +84,8 @@ public class Robot extends TimedRobot {
     System.out
     .println("Disabled ----------------------------------------------------------------------------------------");
     new TeamColorLEDCommand().withZone(new int[]{1,2}).schedule();
-    BatteryPercentLEDCommand.checkBattery();
+    batteryLEDDisplay = new BatteryPercentLEDCommand();
+    batteryLEDDisplay.schedule();
   }
 
   @Override
@@ -92,7 +98,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    BatteryPercentLEDCommand.finish();
+    batteryLEDDisplay.finish();
     new ClearLEDCommand().withZone().schedule();
     autoCommand = robotContainer.getAutonomousCommand();
 
@@ -113,7 +119,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    BatteryPercentLEDCommand.finish();
+    batteryLEDDisplay.finish();
     new ClearLEDCommand().withZone().schedule();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -135,7 +141,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    BatteryPercentLEDCommand.finish();
+    batteryLEDDisplay.finish();
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
     Logger.unpauseAllLoggers();

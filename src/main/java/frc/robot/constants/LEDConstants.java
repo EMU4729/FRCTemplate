@@ -8,11 +8,10 @@ public class LEDConstants {
   /**
    * Max number of colour changes/s (red -> black -> red -> black = 4) for leds
    */
-  public static final int MAX_FLASH_RATE = 8;
-  /**
-   * Max number of colour changes/s (red -> black -> red -> black = 4) for leds
+  public static final int MAX_FLASH_RATE = 6; // <= 6 please. We dont want to risk hurting someone.
+  
+  /** 
+   * max brightness for long periods (0-255)
    */
-  public static final int MAX_FLASHES = 15;
-  /**  */
-  public static final int[] ZONES = { 0, 3, 14, 17 };
+  public static final int MAX_SUSTAINED_BRIGHTNESS = 20;
 }

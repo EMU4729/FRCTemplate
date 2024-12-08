@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.Arrays;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,6 +19,7 @@ import frc.robot.LEDs.BatteryPercentLEDCommand;
 import frc.robot.LEDs.FlashSolidLEDCommand;
 import frc.robot.LEDs.LEDCommandBase;
 import frc.robot.LEDs.RepeatedFlashLEDCommand;
+import frc.robot.LEDs.SolidLEDCommand;
 import frc.robot.auto.AutoProvider;
 import frc.robot.teleop.TeleopProvider;
 
@@ -51,8 +53,10 @@ public class RobotContainer {
     // Robot Automations
     // flash leds yellow during endgame
     new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
-        .whileTrue(new RepeatedFlashLEDCommand((FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 300).withZone()), 5));
+        .onTrue(new RepeatedFlashLEDCommand((FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 300).withZone()), 5));
 
+    DigitalInput dio0 = new DigitalInput(0);
+    new Trigger(()->dio0.get()).whileTrue(new SolidLEDCommand(Color.kGreen).withZone(1));
     // +----------------+
     // | PILOT CONTROLS |
     // +----------------+
