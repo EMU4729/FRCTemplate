@@ -8,7 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import frc.robot.utils.RangeMath.RangeSettings;
+import frc.robot.utils.RangeMath.AxesFit;
+import frc.robot.utils.RangeMath.DriveBaseFit;
 
 // Originally from https://github.com/REVrobotics/MAXSwerve-Java-Template/blob/main/src/main/java/frc/robot/Constants.java
 // You can reference the above URL if you want to check the validity of any non-robot-specific constants.
@@ -184,16 +185,26 @@ public class SwerveDriveConstants {
       MAX_ANGULAR_SPEED,
       MAX_ANGULAR_ACCELERATION);
 
-  public static RangeSettings PILOT_SETTINGS = RangeSettings.InitSwerveBot(
-      0, 1, 4, 0.1, true,
-      0, 1, 4, 0.1, false,
-      0, 1, 3, 0.1, false,
-      0.85);
-  public static RangeSettings PILOT_DEMO_SETTINGS = RangeSettings.InitSwerveBot(
+  /*public static DriveBaseFit PILOT_SETTINGS = DriveBaseFit(
+    0, 1, 4, 0.1, true,
+    0, 1, 4, 0.1, false,
+    0, 1, 3, 0.1, false,
+    0.85, 0.8);*/
+  public static DriveBaseFit PILOT_SETTINGS = new DriveBaseFit(
+    new AxesFit().withOutputMinMax(0,0.7).withPow(4).withDeadBand(0.1)
+        .withLimiter(0.15).withBooster(1),
+    new AxesFit().withPow(3).withDeadBand(0.1).withLimiter(0.15)
+  );
+
+  /*public static DriveBaseFit PILOT_DEMO_SETTINGS = DriveBaseFit.InitSwerveBot(
       0, 0.2, 2, 0.1, true,
       0, 0.2, 2, 0.1, false,
       0, 0.2, 2, 0.1, false,
-      0.6);
+      0.6, 1);*/
+  public static DriveBaseFit PILOT_DEMO_SETTINGS = new DriveBaseFit(
+    new AxesFit().withOutputMinMax(0, 0.2).withPow(2).withDeadBand(0.1).withLimiter(0.15),
+    new AxesFit().withOutputMinMax(0, 0.2).withPow(2).withDeadBand(0.1).withLimiter(0.15)
+  );
 
 
   public static final S_MODULE_DETAILS SWERVE_MODULE_FL = new S_MODULE_DETAILS(

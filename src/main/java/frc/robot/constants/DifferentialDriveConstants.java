@@ -4,7 +4,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import frc.robot.utils.EncoderSupplier;
-import frc.robot.utils.RangeMath.RangeSettings;
+import frc.robot.utils.RangeMath.AxesFit;
+import frc.robot.utils.RangeMath.DriveBaseFit;
 import frc.robot.utils.motorsupplier.MotorSupplier;
 import frc.robot.utils.motorsupplier.TalonMotorSupplier;
 
@@ -83,29 +84,48 @@ public class DifferentialDriveConstants {
    * modRFromX ?
    * set to zero for now
    */
-  public static final RangeSettings PILOT_SETTINGS = RangeSettings.InitTankBot(MIN_THROT, 1, 2, 0.1, false, MIN_TURN, 1,
-      3, 0.1, false, 0, 0);
+  /*public static final DriveBaseFit PILOT_SETTINGS = DriveBaseFit.InitTankBot(
+      MIN_THROT, 1, 2, 0.1, false, 
+      MIN_TURN, 1, 3, 0.1, false, 
+      0.5, 0, 1);*/
+  public static final DriveBaseFit PILOT_SETTINGS = new DriveBaseFit(
+      new AxesFit().withOutputMinMax(MIN_THROT, 1).withDeadBand(0.1).withPow(2),
+      new AxesFit().withOutputMinMax(MIN_TURN, 1).withDeadBand(0.1).withPow(3),
+      0.5
+  );
+
   /**
    * settings for robot drive in demo mode
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power}
    */
-  public static final RangeSettings DEMO_SETTINGS = RangeSettings.InitTankBot(MIN_THROT, 0.5, 3, 0.1, false, MIN_TURN,
-      0.6, 4, 0.1, false, 0, 0);
+  /*public static final DriveBaseFit DEMO_SETTINGS = DriveBaseFit.InitTankBot(
+      MIN_THROT, 0.5, 3, 0.1, false, 
+      MIN_TURN,  0.6, 4, 0.1, false, 
+      0.5, 0, 1);*/
+  public static final DriveBaseFit DEMO_SETTINGS = new DriveBaseFit(
+      new AxesFit().withOutputMinMax(MIN_THROT, 0.5).withDeadBand(0.1).withPow(3),
+      new AxesFit().withOutputMinMax(MIN_TURN, 0.6).withDeadBand(0.1).withPow(4),
+      0.5
+  );
 
   /**
    * settings for robot drive in PID drive
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power}
    */
-  public static final RangeSettings PID1_SETTINGS = RangeSettings.InitTankBot(0, MAX_SPEED, 3, 0, false, 0, 1, 3, 0,
-      false, 0, 0);
+  /*public static final DriveBaseFit PID1_SETTINGS = DriveBaseFit.InitTankBot(
+      0, MAX_SPEED, 3, 0, false, 
+      0, 1, 3, 0, false,
+      0.5, 0, 1);*/
 
   /**
    * settings for robot drive in PID drive
    * {min throt,max throt,curve power}, {min turn throt, max turn throt,curve
    * power}
    */
-  public static final RangeSettings PID2_SETTINGS = RangeSettings.InitTankBot(MIN_THROT, 1, 1, 0, false, MIN_TURN, 1, 1,
-      0, false, 0, 0);
+  /*public static final DriveBaseFit PID2_SETTINGS = DriveBaseFit.InitTankBot(
+      MIN_THROT, 1, 1, 0, false, 
+      MIN_TURN, 1, 1, 0, false,
+      0.5, 0, 1);*/
 }

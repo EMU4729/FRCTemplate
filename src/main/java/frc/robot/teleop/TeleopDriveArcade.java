@@ -9,14 +9,13 @@ import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.shufflecontrol.ShuffleTabController;
-import frc.robot.utils.RangeMath.CurveFit;
-import frc.robot.utils.RangeMath.RangeSettings;
+import frc.robot.utils.RangeMath.DriveBaseFit;
 
 /**
  * The Arcade Teleop command
  */
 public class TeleopDriveArcade extends Command {
-  private final RangeSettings settings;
+  private final DriveBaseFit settings;
 
   private ShuffleTabController shuffleTab;
 
@@ -25,7 +24,7 @@ public class TeleopDriveArcade extends Command {
     shuffleTab = createShuffleTab();
   }
 
-  public TeleopDriveArcade(RangeSettings settings) {
+  public TeleopDriveArcade(DriveBaseFit settings) {
     this.settings = settings;
 
     //addRequirements(Subsystems.diffDrive);
@@ -45,8 +44,7 @@ public class TeleopDriveArcade extends Command {
 
   @Override
   public void execute() {
-    double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftY(), 0, OI.pilot.getRightX(), 0 },
-        settings);
+    double[] control = settings.fitTank(OI.pilot.getLeftY(), OI.pilot.getRightX());
     double throttle = control[0];
     double steering = control[2];
 

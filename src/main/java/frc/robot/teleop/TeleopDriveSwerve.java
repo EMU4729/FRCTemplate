@@ -9,16 +9,15 @@ import frc.robot.Subsystems;
 import frc.robot.Variables;
 //import frc.robot.shufflecontrol.ShuffleControl;
 import frc.robot.shufflecontrol.ShuffleTabController;
-import frc.robot.utils.RangeMath.CurveFit;
-import frc.robot.utils.RangeMath.RangeSettings;
+import frc.robot.utils.RangeMath.DriveBaseFit;
 
 public class TeleopDriveSwerve extends Command {
   //private int updateShuffleCounter = 0;
-  public RangeSettings settings;
+  public DriveBaseFit settings;
   
   private ShuffleTabController shuffleTab;
 
-  public TeleopDriveSwerve(RangeSettings settings) {
+  public TeleopDriveSwerve(DriveBaseFit settings) {
     this.settings = settings;
     addRequirements(Subsystems.swerveDrive);
     shuffleTab = createShuffleTab();
@@ -37,10 +36,12 @@ public class TeleopDriveSwerve extends Command {
 
   @Override
   public void execute() {
-    double limiter = (1 - OI.pilot.getRightTriggerAxis());
+    double limiter = OI.pilot.getRightTriggerAxis();
+    double booster = OI.pilot.rightBumper().getAsBoolean()?1:0;
     // organise field relitive switch
-    double[] control = CurveFit.fitDrive(new double[] { OI.pilot.getLeftX(), OI.pilot.getLeftY(),
-        OI.pilot.getRightX(), limiter }, settings);
+    double[] control = settings.fitSwerve(-OI.pilot.getLeftX(), OI.pilot.getLeftY(), 
+          OI.pilot.getRightX(), booster, limiter);
+
     var translateX = control[0];
     var translateY = control[1];
     var rotate = control[2];
