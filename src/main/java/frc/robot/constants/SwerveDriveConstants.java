@@ -191,7 +191,7 @@ public class SwerveDriveConstants {
     0, 1, 3, 0.1, false,
     0.85, 0.8);*/
   public static DriveBaseFit PILOT_SETTINGS = new DriveBaseFit(
-    new AxesFit().withOutputMinMax(0,0.4).withPow(4).withDeadBand(0.1)
+    new AxesFit().withOutputMinMax(0,0.7).withPow(4).withDeadBand(0.1)
         .withLimiter(0.15).withBooster(1),
     new AxesFit().withPow(3).withDeadBand(0.1).withLimiter(0.15)
   );
