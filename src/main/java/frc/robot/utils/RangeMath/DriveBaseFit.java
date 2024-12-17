@@ -13,6 +13,10 @@ public class DriveBaseFit {
   
   protected double ModifierTurnRateBySpeed;
 
+
+
+  //-------------------------- Constructor ------------------------
+  
   public DriveBaseFit(AxesFit axesLin, AxesFit axesYaw){
     this(axesLin, axesYaw, 0);
 
@@ -38,6 +42,11 @@ public class DriveBaseFit {
    * inverts the yaw axis
    * */
   public DriveBaseFit invertYaw(){invertYaw = true; return this;}
+
+
+
+  //-------------------------- User functions ------------------------
+
   /** apply the specified curve to the provided input and returns (no boost, no limit) */
   public double[] fitTank(double x, double yaw){ return fitTank(x, yaw, 0, 0);}
   /** apply the specified curve to the provided input and returns<p>
