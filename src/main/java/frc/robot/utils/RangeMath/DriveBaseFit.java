@@ -88,7 +88,6 @@ public class DriveBaseFit {
     power = axesLin.fit(power, boostPercent, limitPercent);
     yaw = axesYaw.fit(yaw, boostPercent, limitPercent);
    
-    System.out.println(power +" "+ power*Math.cos(angle) +" "+ power*Math.sin(angle) +" "+ yaw);
     return new double[]{power*Math.cos(angle), power*Math.sin(angle), yaw};
   }
 }
