@@ -113,6 +113,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    Subsystems.elevator.setHeight(0.5);
     batteryLEDDisplay.finish();
     new ClearLEDCommand().withZone().schedule();
     // This makes sure that the autonomous stops running when

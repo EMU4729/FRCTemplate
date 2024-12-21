@@ -76,6 +76,12 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> Variables.fieldRelative = false))
         .onFalse(new InstantCommand(()-> Variables.fieldRelative = true));
 
+
+    OI.copilot.a().onTrue(new InstantCommand(() -> Subsystems.elevator.driveTo(0))); 
+    OI.copilot.b().onTrue(new InstantCommand(() -> Subsystems.elevator.driveTo(0.25))); 
+    OI.copilot.x().onTrue(new InstantCommand(() -> Subsystems.elevator.driveTo(0.5))); 
+    OI.copilot.y().onTrue(new InstantCommand(() -> Subsystems.elevator.driveTo(1))); 
+
     //OI.pilot.start()
     //    .onTrue(
     //        new InstantCommand(() -> Subsystems.swerveDrive.zeroHeading(), Subsystems.swerveDrive));

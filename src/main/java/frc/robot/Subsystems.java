@@ -6,6 +6,7 @@ import java.util.List;
 
 import frc.robot.LEDs.LEDZone;
 import frc.robot.subsystems.DifferentialDriveSub;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveDriveSub;
 
 /**
@@ -18,5 +19,7 @@ public class Subsystems {
     new LEDZone(70, 91, 1),
     new LEDZone(0,59, 2)
   ));
-  //public static final DifferentialDriveSub diffDrive = new DifferentialDriveSub();
+  //public static final DifferentialDriveSub diffDrivve = new DifferentialDriveSub();
+
+  public static final Elevator elevator = new Elevator(8, 4, 2, 5);
 }

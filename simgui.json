@@ -39,6 +39,14 @@
       "window": {
         "visible": true
       }
+    },
+    "RoboRIO": {
+      "RoboRIO Input": {
+        "open": true
+      },
+      "window": {
+        "visible": true
+      }
     }
   },
   "NTProvider": {
@@ -47,6 +55,7 @@
       "/Shuffleboard/Drive/DriveOutput": "DifferentialDrive",
       "/Shuffleboard/Drive/TeleopType": "String Chooser",
       "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Elevator Sim": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Teleop Chooser": "String Chooser",
       "/SmartDashboard/VisionSystemSim-photonvision/Sim Field": "Field2d",
@@ -64,6 +73,11 @@
         }
       },
       "/SmartDashboard/Auto Chooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Elevator Sim": {
         "window": {
           "visible": true
         }
@@ -143,5 +157,29 @@
       "open": true
     },
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "axis": [
+            {
+              "autoFit": true
+            }
+          ],
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "crosshairs": true,
+          "height": 332
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    }
   }
 }
