@@ -10,9 +10,10 @@ public class RepeatedFlashLEDCommand extends Command{
   private int iterations = 0;
 
   public RepeatedFlashLEDCommand(FlashSolidLEDCommand flashCommand, int iterations){
-    this.flashSequence.addCommands(flashCommand);
-    this.flashSequence.addCommands(new FlashSolidLEDCommand(Color.kBlack, flashCommand.getDuration()).withZone(flashCommand.getZones()));
-    this.iterations = iterations;
+    this.flashSequence.addCommands(flashCommand.withRef(this));
+    this.flashSequence.addCommands(new FlashSolidLEDCommand(Color.kBlack, flashCommand.getDuration())
+        .withRef(this).withZone(flashCommand.getZones()));
+        this.iterations = iterations;
   }
 
   @Override
