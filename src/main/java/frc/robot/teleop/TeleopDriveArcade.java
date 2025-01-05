@@ -5,7 +5,6 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.OI;
-import frc.robot.Subsystems;
 import frc.robot.Variables;
 import frc.robot.constants.DifferentialDriveConstants;
 import frc.robot.shufflecontrol.ShuffleTabController;
@@ -27,19 +26,19 @@ public class TeleopDriveArcade extends Command {
   public TeleopDriveArcade(DriveBaseFit settings) {
     this.settings = settings;
 
-    //addRequirements(Subsystems.diffDrive);
+    // addRequirements(Subsystems.diffDrive);
     shuffleTab = createShuffleTab();
   }
 
   private static ShuffleTabController createShuffleTab() {
     var shuffleTab = new ShuffleTabController("Arcade Teleop");
-    
-    shuffleTab.createWidget("Drive X", BuiltInWidgets.kNumberBar,  5, 2)
-      .withProperties(Map.of("min", -1, "max", 1));
-    shuffleTab.createWidget("Drive Y", BuiltInWidgets.kNumberBar,  6, 3)
-      .withProperties(Map.of("min", -1, "max", 1));
-    
-      return shuffleTab;
+
+    shuffleTab.createWidget("Drive X", BuiltInWidgets.kNumberBar, 5, 2)
+        .withProperties(Map.of("min", -1, "max", 1));
+    shuffleTab.createWidget("Drive Y", BuiltInWidgets.kNumberBar, 6, 3)
+        .withProperties(Map.of("min", -1, "max", 1));
+
+    return shuffleTab;
   }
 
   @Override
@@ -61,7 +60,7 @@ public class TeleopDriveArcade extends Command {
     shuffleTab.getEntry("Drive X").setDouble(-OI.pilot.getLeftY());
     shuffleTab.getEntry("Drive Y").setDouble(OI.pilot.getRightX());
 
-    //Subsystems.diffDrive.arcade(throttle, steering);
+    // Subsystems.diffDrive.arcade(throttle, steering);
   }
 
   @Override
