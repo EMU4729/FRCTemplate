@@ -7,8 +7,8 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
 import frc.robot.constants.SwerveDriveConstants;
 import frc.robot.shufflecontrol.ShuffleTabController;
 import frc.robot.utils.SwerveModule;
@@ -46,7 +45,7 @@ public class SwerveDriveSub extends SubsystemBase {
   private final ADIS16470_IMU imu = new ADIS16470_IMU();
 
   // Photon Bridge
-  //public final PhotonBridge photon = new PhotonBridge();
+  // public final PhotonBridge photon = new PhotonBridge();
 
   // Field for robot viz
   private final Field2d field = new Field2d();
@@ -68,55 +67,59 @@ public class SwerveDriveSub extends SubsystemBase {
   ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
   private Pose2d poseSim = new Pose2d();
 
-  private ShuffleTabController shuffleTab =  new ShuffleTabController("Swerve");
+  private ShuffleTabController shuffleTab = new ShuffleTabController("Swerve");
 
   /** Creates a new DriveSubsystem. */
   public SwerveDriveSub() {
     // instantiate the swerve modules
     frontLeft = new SwerveModule(
-      SwerveDriveConstants.SWERVE_MODULE_FL,
-      shuffleTab);
+        SwerveDriveConstants.SWERVE_MODULE_FL,
+        shuffleTab);
 
     frontRight = new SwerveModule(
-      SwerveDriveConstants.SWERVE_MODULE_FR,
-      shuffleTab);
+        SwerveDriveConstants.SWERVE_MODULE_FR,
+        shuffleTab);
 
     backLeft = new SwerveModule(
-      SwerveDriveConstants.SWERVE_MODULE_BL,
-      shuffleTab);
+        SwerveDriveConstants.SWERVE_MODULE_BL,
+        shuffleTab);
 
     backRight = new SwerveModule(
-      SwerveDriveConstants.SWERVE_MODULE_BR,
-      shuffleTab);
-      
-    odometry = new SwerveDriveOdometry(
-      SwerveDriveConstants.DRIVE_KINEMATICS,
-      Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
-      getModulePositions(),
-      new Pose2d());
-    
-    
-    // Configure PathPlanner auto
-    AutoBuilder.configureHolonomic(
-        this::getPose,
-        this::resetOdometry,
-        this::getRelativeChassisSpeeds,
-        this::driveRelative,
-        new HolonomicPathFollowerConfig(
-            SwerveDriveConstants.AUTO_TRANSLATION_PID,
-            SwerveDriveConstants.AUTO_ROTATION_PID,
-            SwerveDriveConstants.MAX_MODULE_SPEED,
-            SwerveDriveConstants.DRIVEBASE_RADIUS,
-            new ReplanningConfig()),
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+        SwerveDriveConstants.SWERVE_MODULE_BR,
+        shuffleTab);
 
-          return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-        },
-        this);
+    odometry = new SwerveDriveOdometry(
+        SwerveDriveConstants.DRIVE_KINEMATICS,
+        Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ)),
+        getModulePositions(),
+        new Pose2d());
+
+    // Configure PathPlanner auto
+    try {
+      var config = RobotConfig.fromGUISettings();
+      AutoBuilder.configure(
+          this::getPose,
+          this::resetOdometry,
+          this::getRelativeChassisSpeeds,
+          (speeds, feedforwards) -> driveRelative(speeds),
+          new PPHolonomicDriveController(
+              SwerveDriveConstants.AUTO_TRANSLATION_PID,
+              SwerveDriveConstants.AUTO_ROTATION_PID),
+          config,
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red
+            // alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+            return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
+          },
+          this);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
+    }
+
     SmartDashboard.putData(field);
   }
 
@@ -127,7 +130,7 @@ public class SwerveDriveSub extends SubsystemBase {
     frontRight.updateShuffleTab();
     backLeft.updateShuffleTab();
     backRight.updateShuffleTab();
-    
+
     updateOdometry();
   }
 
@@ -191,7 +194,7 @@ public class SwerveDriveSub extends SubsystemBase {
     double xSpeedCommanded;
     double ySpeedCommanded;
     this.fieldRelative = fieldRelative;
-    
+
     if (rateLimit) {
       // Convert XY to polar for rate limiting
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
@@ -253,7 +256,6 @@ public class SwerveDriveSub extends SubsystemBase {
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, SwerveDriveConstants.MAX_SPEED);
-
 
     frontLeft.setDesiredState(swerveModuleStates[0]);
     frontRight.setDesiredState(swerveModuleStates[1]);
@@ -323,14 +325,14 @@ public class SwerveDriveSub extends SubsystemBase {
    */
   public Rotation2d getHeading() {
     Rotation2d heading = Rotation2d.fromDegrees(imu.getAngle(IMUAxis.kZ));
-    if(DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red){
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
       heading = heading.plus(Rotation2d.fromDegrees(180));
     }
     return heading;
   }
 
-  public SwerveModulePosition[] getModulePositions(){
-    return new SwerveModulePosition[]{
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
         frontLeft.getPosition(),
         frontRight.getPosition(),
         backLeft.getPosition(),
@@ -360,8 +362,7 @@ public class SwerveDriveSub extends SubsystemBase {
   public void updateOdometry() {
     odometry.update(
         getHeading(),
-        getModulePositions()
-        );
+        getModulePositions());
     // System.out.println(frontLeft.getPosition() + " " +
     // frontRight.getPosition() + " " +
     // backLeft.getPosition() + " " +
@@ -406,7 +407,8 @@ public class SwerveDriveSub extends SubsystemBase {
         backRight.getDesiredState(optimizedAngle, moduleRel));
 
     imuSim.setGyroRateZ(speeds.omegaRadiansPerSecond * (180 / Math.PI));
-    //imuSim.setGyroAngleZ(getHeading().plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond * 0.02)).getDegrees());
+    // imuSim.setGyroAngleZ(getHeading().plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond
+    // * 0.02)).getDegrees());
     imuSim.setGyroAngleZ(field.getRobotPose().getRotation().getDegrees());
     poseSim = poseSim.exp(
         new Twist2d(

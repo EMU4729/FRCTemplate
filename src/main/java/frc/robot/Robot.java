@@ -28,20 +28,18 @@ public class Robot extends TimedRobot {
   private Command autoCommand;
   private RobotContainer robotContainer;
 
-
   /**
    * This function is run when the robot is first started up and should be used
    * for any
    * initialization code.
    */
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     // LEDControl.getInstance().runDirectionLights();
-    //new ShuffleControl();
+    // new ShuffleControl();
   }
 
   /**
@@ -68,16 +66,16 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-
   BatteryPercentLEDCommand batteryLEDDisplay;
+
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
     new RainbowLEDCommand().withZone().schedule();
     Logger.pauseAllLoggers();
     System.out
-    .println("Disabled ----------------------------------------------------------------------------------------");
-    new TeamColorLEDCommand().withZone(new int[]{1,2}).schedule();
+        .println("Disabled ----------------------------------------------------------------------------------------");
+    new TeamColorLEDCommand().withZone(new int[] { 1, 2 }).schedule();
     batteryLEDDisplay = new BatteryPercentLEDCommand();
     batteryLEDDisplay.schedule();
   }
@@ -103,7 +101,7 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Auto Start --------------------------------------------------------------------------------------");
-    //Subsystems.swerveDrive.resetIntegral();
+    // Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during autonomous. */
@@ -125,7 +123,7 @@ public class Robot extends TimedRobot {
     Logger.unpauseAllLoggers();
     System.out
         .println("Teleop Start ------------------------------------------------------------------------------------");
-    //Subsystems.swerveDrive.resetIntegral();
+    // Subsystems.swerveDrive.resetIntegral();
   }
 
   /** This function is called periodically during operator control. */
