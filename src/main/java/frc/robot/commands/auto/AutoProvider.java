@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
 import frc.robot.commands.analysis.AngularSpeedAnalysis;
 import frc.robot.commands.analysis.LateralSpeedAnalysis;
-import frc.robot.commands.analysis.SystemTest;
+import frc.robot.commands.analysis.SwerveTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.utils.pathplanner.AutoBuilderFix;
 
@@ -46,7 +46,7 @@ public class AutoProvider {
             DriveConstants.PATH_CONSTRAINTS));
     chooser.addOption("Lateral Speed Analysis", new LateralSpeedAnalysis());
     chooser.addOption("Angular Speed Analysis", new AngularSpeedAnalysis());
-    chooser.addOption("System Test", new SystemTest());
+    chooser.addOption("System Test", new SwerveTest());
 
     SmartDashboard.putData("Auto Chooser", chooser);
 
