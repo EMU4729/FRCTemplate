@@ -4,20 +4,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.LEDs.FlashSolidLEDCommand;
-import frc.robot.LEDs.RepeatedFlashLEDCommand;
-import frc.robot.LEDs.SolidLEDCommand;
-import frc.robot.auto.AutoProvider;
-import frc.robot.teleop.TeleopProvider;
+import frc.robot.commands.auto.AutoProvider;
+import frc.robot.commands.teleop.TeleopProvider;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -27,8 +19,8 @@ import frc.robot.teleop.TeleopProvider;
  * Subsystemsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final AutoProvider autoProvider = AutoProvider.getInstance();
-  private final TeleopProvider teleopProvider = TeleopProvider.getInstance();
+  private final AutoProvider autoProvider;
+  private final TeleopProvider teleopProvider;
 
   /**
    * The container for the robot. Contains Subsystemsystems, OI devices, and
@@ -37,6 +29,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    autoProvider = AutoProvider.getInstance();
+    teleopProvider = TeleopProvider.getInstance();
   }
 
   /**
@@ -46,42 +40,13 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Robot Automations
-    // flash leds yellow during endgame
-    new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30)
-        .onTrue(new RepeatedFlashLEDCommand((FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 300).withZone()), 5));
-
-    DigitalInput dio0 = new DigitalInput(0);
-    new Trigger(()->dio0.get()).whileTrue(new SolidLEDCommand(Color.kGreen).withZone(1));
     // +----------------+
     // | PILOT CONTROLS |
     // +----------------+
 
     // --- Manual Controls ---
-
-    // Invert Drive
-    // OI.pilot.start().onTrue(new InstantCommand(() ->
-    // Variables.invertDriveDirection = !Variables.invertDriveDirection));
-
-    //OI.pilot.y().onTrue(new InstantCommand(()->BatteryPercentLEDCommand.runFor(50)));
-    OI.pilot.a().onTrue(new FlashSolidLEDCommand(Color.kCrimson, 1000).withZone());
-    OI.pilot.b().onTrue(new RepeatedFlashLEDCommand(
-        (FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kYellow, 200).withZone(new int[]{1,2})),
-        5).withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-    OI.pilot.x().onTrue(new RepeatedFlashLEDCommand(
-        (FlashSolidLEDCommand)(new FlashSolidLEDCommand(Color.kBlue, 200).withZone(new int[]{0})),
-        5));
-
-    // set field relitive  Arrays.asList(Color.kBlue, Color.kRed)
-    OI.pilot.leftTrigger(0.5)
-        .onTrue(new InstantCommand(() -> Variables.fieldRelative = false))
-        .onFalse(new InstantCommand(()-> Variables.fieldRelative = true));
-
-    //OI.pilot.start()
-    //    .onTrue(
-    //        new InstantCommand(() -> Subsystems.swerveDrive.zeroHeading(), Subsystems.swerveDrive));
-
-    // Drive bindings handled in teleop command
+    OI.pilot.start()
+        .onTrue(new InstantCommand(Subsystems.nav::zeroHeading, Subsystems.drive));
   }
 
   /**
