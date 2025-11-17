@@ -24,11 +24,12 @@ import frc.robot.utils.rangemath.AxesFit;
 import frc.robot.utils.rangemath.DriveBaseFit;
 
 public class DriveConstants {
-  // NEO Motor Constants
   /** Distance between centers of left and right wheels on robot in meters */
   public static final Distance TRACK_WIDTH = Meters.of(0.52);
+
   /** Distance between front and back wheel on robot in meters */
   public static final Distance WHEEL_BASE = Meters.of(0.52);
+
   /** Drivebase radius in m (distance from center of robot to farthest module) */
   public static final Distance DRIVEBASE_RADIUS = Meters
       .of(Math.hypot(WHEEL_BASE.in(Meters) / 2, TRACK_WIDTH.in(Meters) / 2));
@@ -46,6 +47,7 @@ public class DriveConstants {
   public static final LinearVelocity MAX_SPEED = MetersPerSecond.of(5);
   /** Max acceleration of robot in meters per second squared */
   public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(0.3); // TODO check this
+  /** Max (negative) deceleration of the robot */
   public static final LinearAcceleration MAX_DECELERATION = MAX_ACCELERATION.times(-2);
   /**
    * Max angular speed of robot in radians per second

@@ -38,7 +38,7 @@ public class DriveSub extends SubsystemBase {
   private final ClosedSlewRateLimiter rLimiter = new ClosedSlewRateLimiter(
       DriveConstants.MAX_ANGULAR_ACCELERATION.in(RadiansPerSecondPerSecond),
       DriveConstants.MAX_ANGULAR_DECELERATION.in(RadiansPerSecondPerSecond));
-  // Swerve Modules
+
   private final SwerveModule frontLeft = new SwerveModule(DriveConstants.SWERVE_MODULE_FL);
   private final SwerveModule frontRight = new SwerveModule(DriveConstants.SWERVE_MODULE_FR);
   private final SwerveModule backLeft = new SwerveModule(DriveConstants.SWERVE_MODULE_BL);
@@ -55,7 +55,6 @@ public class DriveSub extends SubsystemBase {
     drive(speeds, fieldRelative, true);
     Rotation2d currentYaw = Subsystems.nav.getHeadingR2D();
     Rotation2d err = currentYaw.minus(yawAngle);
-    err.getDegrees();
     speeds.omegaRadiansPerSecond = holdYawPid.calculate(err.getDegrees());
   }
 
