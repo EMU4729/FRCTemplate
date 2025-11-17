@@ -241,6 +241,7 @@ public class SwerveModule implements Sendable {
         ControlType.kPosition);
   }
 
+  /** @return a command that tests several motions of the swerve module */
   public SequentialCommandGroup testFunction() {
     return new SequentialCommandGroup(
         // turn to 0 degrees and check
