@@ -21,10 +21,10 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Subsystems;
-import frc.robot.classes.SwerveModule;
 import frc.robot.constants.DriveConstants;
 import frc.robot.utils.ClosedSlewRateLimiter;
 import frc.robot.utils.OptimisedSwerveModuleState;
+import frc.robot.utils.SwerveModule;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 

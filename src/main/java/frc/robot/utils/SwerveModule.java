@@ -4,7 +4,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.classes;
+package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -40,7 +40,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.Robot;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SwerveModuleDetails;
-import frc.robot.utils.OptimisedSwerveModuleState;
 import frc.robot.utils.TypeSupliers.motorsupplier.FalconMotorSupplier;
 import frc.robot.utils.TypeSupliers.motorsupplier.SparkMotorSupplier;
 
