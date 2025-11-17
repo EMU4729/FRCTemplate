@@ -23,6 +23,11 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -34,14 +39,15 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Robot;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SwerveModuleDetails;
-import frc.robot.utils.TypeSupliers.motorsupplier.FalconMotorSupplier;
-import frc.robot.utils.TypeSupliers.motorsupplier.SparkMotorSupplier;
 
 public class SwerveModule implements Sendable {
   private final SwerveModuleDetails details;
@@ -67,36 +73,40 @@ public class SwerveModule implements Sendable {
     this.details = moduleDetails;
 
     // DRIVE MOTOR CONFIG
-    var driveMotorSupplier = new FalconMotorSupplier(moduleDetails.driveCANID())
-        .withBrake()
-        .withEncoder(DriveConstants.DRIVE_GEAR_RATIO)
-        .withPID(DriveConstants.DRIVE_P,
-            DriveConstants.DRIVE_I,
-            DriveConstants.DRIVE_D);
-
+    driveMotor = new TalonFX(moduleDetails.driveCANID());
+    TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
+    driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    driveMotorConfig.Feedback.SensorToMechanismRatio = DriveConstants.DRIVE_GEAR_RATIO;
+    driveMotorConfig.Slot0.kP = DriveConstants.DRIVE_P;
+    driveMotorConfig.Slot0.kI = DriveConstants.DRIVE_I;
+    driveMotorConfig.Slot0.kD = DriveConstants.DRIVE_D;
     if (moduleDetails.invertDrive()) {
-      driveMotorSupplier = driveMotorSupplier.withInvert();
-
+      driveMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     }
+    driveMotor.getConfigurator().apply(driveMotorConfig);
 
-    driveMotor = driveMotorSupplier.get();
     driveController = new VelocityVoltage(0).withFeedForward(DriveConstants.DRIVING_FF).withSlot(0);
 
     // TURNING MOTOR CONFIG
-    turnMotor = new SparkMotorSupplier(moduleDetails.steerCANID())
-        .withAbsEncoder(DriveConstants.TURNING_ENCODER_POSITION_FACTOR,
-            DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR)
-        .withPID(DriveConstants.TURNING_P,
+    SparkMaxConfig turnMotorConfig = new SparkMaxConfig();
+    turnMotorConfig.absoluteEncoder
+        .positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR)
+        .velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
+    turnMotorConfig.closedLoop
+        .pidf(
+            DriveConstants.TURNING_P,
             DriveConstants.TURNING_I,
             DriveConstants.TURNING_D,
             DriveConstants.TURNING_FF)
-        .withPIDIZone(DriveConstants.TURNING_I_ZONE.in(Radians))
-        .withPositionWrapping(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
-            DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT)
-        .withBrake()
-        .get();
+        .iZone(DriveConstants.TURNING_I_ZONE.in(Radians))
+        .positionWrappingEnabled(true)
+        .positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
+            DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
+    turnMotorConfig.idleMode(IdleMode.kBrake);
+
+    turnMotor = new SparkMax(moduleDetails.steerCANID(), MotorType.kBrushless);
+    turnMotor.configure(turnMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     turnController = turnMotor.getClosedLoopController();
-    // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
     turnEncoder = turnMotor.getAbsoluteEncoder();
 
     // --------------GO TO DEFAULTS--------------
