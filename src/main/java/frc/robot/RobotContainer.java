@@ -4,10 +4,16 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.auto.AutoProvider;
 import frc.robot.commands.teleop.TeleopProvider;
 
@@ -40,6 +46,12 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Robot Automations
+
+    // Flash LEDs yellow on endgame
+    new Trigger(() -> DriverStation.isTeleop() && DriverStation.getMatchTime() <= 30).onTrue(
+        Subsystems.led.runPattern(LEDPattern.solid(Color.kYellow).blink(Seconds.of(0.5))).withTimeout(2));
+
     // +----------------+
     // | PILOT CONTROLS |
     // +----------------+

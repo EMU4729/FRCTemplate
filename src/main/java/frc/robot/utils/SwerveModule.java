@@ -4,29 +4,6 @@
 
 package frc.robot.utils;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
@@ -42,8 +19,34 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.Subsystems;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SwerveModuleDetails;
 
@@ -244,21 +247,41 @@ public class SwerveModule implements Sendable {
         new InstantCommand(
             () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kZero))),
         new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear((getTurnRotation2d().minus(Rotation2d.kZero)).getDegrees(), 0, 5))
+            .withTimeout(0.5),
 
         // turn to 90 and check
         new InstantCommand(
             () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kCCW_90deg))),
         new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear((getTurnRotation2d().minus(Rotation2d.kCCW_90deg)).getDegrees(), 0, 5))
+            .withTimeout(0.5),
 
         // drive forwards and check
         new InstantCommand(
             () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(1), Rotation2d.kCCW_90deg))),
         new WaitCommand(0.7),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear(getDriveVelocity().in(MetersPerSecond) - 1, 0, 5))
+            .withTimeout(0.5),
 
         // drive backwards and check
         new InstantCommand(
             () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(-1), Rotation2d.kCCW_90deg))),
         new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear(getDriveVelocity().in(MetersPerSecond) - 1, 0, 5))
+            .withTimeout(0.5),
 
         new InstantCommand(
             () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kZero)))
