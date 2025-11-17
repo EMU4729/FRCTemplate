@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems;
 import frc.robot.commands.analysis.AngularSpeedAnalysis;
 import frc.robot.commands.analysis.LateralSpeedAnalysis;
-import frc.robot.commands.analysis.SwerveTest;
 import frc.robot.constants.DriveConstants;
 import frc.robot.utils.pathplanner.AutoBuilderFix;
 
@@ -35,27 +34,23 @@ public class AutoProvider {
     @SuppressWarnings("unused")
     final var _nav = Subsystems.nav;
 
-    loadPathAuto("Left Starting Position", "Left Starting Position");
-    loadPathAuto("Right Starting Position", "Right Starting Position");
-    loadPathAuto("Mid Starting Position", "Mid Starting Position");
-    loadPathAuto("Newtest", "Newtest");
+    loadPathPlannerAuto("Left Starting Position", "Left Starting Position");
+    loadPathPlannerAuto("Right Starting Position", "Right Starting Position");
+    loadPathPlannerAuto("Mid Starting Position", "Mid Starting Position");
+    loadPathPlannerAuto("Newtest", "Newtest");
 
-    chooser.addOption("Pathfind to Pose Test",
-        AutoBuilderFix.pathfindToPose(
-            new Pose2d(1, 1, Rotation2d.k180deg),
-            DriveConstants.PATH_CONSTRAINTS));
+    chooser.addOption(
+        "Pathfind to Pose Test",
+        AutoBuilderFix.pathfindToPose(new Pose2d(1, 1, Rotation2d.k180deg), DriveConstants.PATH_CONSTRAINTS));
     chooser.addOption("Lateral Speed Analysis", new LateralSpeedAnalysis());
     chooser.addOption("Angular Speed Analysis", new AngularSpeedAnalysis());
-    chooser.addOption("System Test", new SwerveTest());
+    chooser.addOption("System Test", Subsystems.drive.testFunction());
 
     SmartDashboard.putData("Auto Chooser", chooser);
 
   }
 
-  public static Angle getAngleAfterAuto() {
-    return Subsystems.nav.getIMUHeading();
-  }
-
+  /** @return The instance of AutoProvider. */
   public static AutoProvider getInstance() {
     if (!inst.isPresent()) {
       inst = Optional.of(new AutoProvider());
@@ -64,11 +59,18 @@ public class AutoProvider {
 
   }
 
+  /** @return The selected command. */
   public Command getSelected() {
     return chooser.getSelected();
   }
 
-  public void loadPathAuto(String name, String key) {
+  /**
+   * Loads an auto from PathPlanner into the provider.
+   * 
+   * @param name The name of the auto in the chooser.
+   * @param key  The name of the auto in PathPlanner.
+   */
+  private void loadPathPlannerAuto(String name, String key) {
     try {
       chooser.addOption(name, new PathPlannerAuto(key));
     } catch (Exception e) {

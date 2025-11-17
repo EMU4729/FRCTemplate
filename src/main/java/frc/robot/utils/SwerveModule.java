@@ -1,5 +1,3 @@
-// Originally from https://github.com/REVrobotics/MAXSwerve-Java-Template/blob/main/src/main/java/frc/robot/subsystems/MAXSwerveModule.java
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -64,8 +62,9 @@ public class SwerveModule implements Sendable {
   private OptimisedSwerveModuleState desiredState = new OptimisedSwerveModuleState(0, new Rotation2d());
 
   /**
-   * Constructs a new SwerveModule for a MAX Swerve Module housing a Falcon
-   * driving motor and a Neo 550 Turning Motor.
+   * Constructs a new SwerveModule for a MAX Swerve Module housing a
+   * TalonFX-controlled
+   * driving motor and a SparkMax-controlled Turning Motor.
    * 
    * @param moduleDetails the details of the module
    */
@@ -116,23 +115,20 @@ public class SwerveModule implements Sendable {
 
   /** @return the module's drive wheel position (m) */
   public Distance getDrivePosition() {
-    if (Robot.isSimulation()) {
+    if (Robot.isSimulation())
       return Meters.of(-1);
-    }
+
     return Meters.of(driveMotor.getPosition().getValue().in(Rotations) * DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
   }
 
   /** @return the module's drive wheel velocity (m/s) */
   public LinearVelocity getDriveVelocity() {
-    LinearVelocity speed;
-    if (Robot.isSimulation()) {
-      speed = MetersPerSecond.of(desiredState.speedMetersPerSecond);
-    } else {
-      speed = MetersPerSecond.of(
-          driveMotor.getVelocity().getValue().in(RotationsPerSecond) *
-              DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
-    }
-    return speed;
+    if (Robot.isSimulation())
+      return MetersPerSecond.of(desiredState.speedMetersPerSecond);
+
+    return MetersPerSecond.of(
+        driveMotor.getVelocity().getValue().in(RotationsPerSecond) *
+            DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
   }
 
   /**
@@ -143,14 +139,11 @@ public class SwerveModule implements Sendable {
    *         Frame
    */
   public Angle getTurnAngle() {
-    Angle encoderReading;
-    if (Robot.isSimulation()) {
-      encoderReading = desiredState.getAngle();
-    } else {
-      encoderReading = Radians.of(turnEncoder.getPosition())
-          .minus(Radians.of(details.angularOffset().getRadians()));
-    }
-    return encoderReading;
+    if (Robot.isSimulation())
+      return desiredState.getAngle();
+
+    return Radians.of(turnEncoder.getPosition())
+        .minus(Radians.of(details.angularOffset().getRadians()));
   }
 
   /** @return the module's turning angle as a {@link Rotation2d} */
@@ -205,21 +198,21 @@ public class SwerveModule implements Sendable {
    * @param state the desired state, relative to the robot.
    */
   public void setDesiredState(OptimisedSwerveModuleState state) {
-    // if the desired state's speed is low enough,
-    // and we are close enough to the target angle
-    // we can just stop the motors to prevent motor weirdness
+    // if the desired state's speed is low enough, and we are close enough to the
+    // target angle we can just stop the motors to prevent motor weirdness
     if (Math.abs(state.speedMetersPerSecond) < 0.001) {
       state.speedMetersPerSecond = 0;
-      if (Math.abs((state.angle.minus(getTurnRotation2d()).getRadians()) % 2 * Math.PI) < Math.PI / 16) { // rougly 11
-                                                                                                          // degrees
+      if (Math.abs((state.angle.minus(getTurnRotation2d()).getRadians()) % 2 * Math.PI) < Math.PI / 16) { // ~11 degrees
         desiredState = state;
         stop();
         return;
       }
     }
 
-    state.optimize(getTurnAngle(), getTurnVelocity(), RadiansPerSecond.of(3), RadiansPerSecondPerSecond.of(24),
-        desiredState); // TODO wrong constants
+    state.optimize(
+        getTurnAngle(), getTurnVelocity(),
+        RadiansPerSecond.of(3), RadiansPerSecondPerSecond.of(24), // TODO wrong constants
+        desiredState);
     desiredState = state;
     applyState();
   }
@@ -243,7 +236,6 @@ public class SwerveModule implements Sendable {
     turnController.setReference(
         desiredState.angle.plus(details.angularOffset()).getRadians(),
         ControlType.kPosition);
-
   }
 
   public SequentialCommandGroup testFunction() {

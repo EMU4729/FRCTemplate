@@ -56,11 +56,14 @@ public class PhotonBridge {
   private Transform2d simError = new Transform2d();
 
   public void simulationPeriodic(Pose2d pose) {
-    if (visionSim != null) {
-      simError.plus(new Transform2d((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2,
-          Rotation2d.fromDegrees((Math.random() - 0.5) * 10)));
-      visionSim.update(pose.plus(simError));
+    if (visionSim == null)
+      return;
 
-    }
+    // introduce random error into simulation pose to simulate real-world vision
+    // conditions
+    simError.plus(new Transform2d(
+        (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2,
+        Rotation2d.fromDegrees((Math.random() - 0.5) * 10)));
+    visionSim.update(pose.plus(simError));
   }
 }

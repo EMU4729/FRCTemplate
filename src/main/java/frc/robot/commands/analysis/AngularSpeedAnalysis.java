@@ -16,6 +16,11 @@ public class AngularSpeedAnalysis extends Command {
     addRequirements(Subsystems.drive);
   }
 
+  /**
+   * sets the swerve to turn on the spot
+   * 
+   * @param v The speed to turn at
+   */
   private void setSpeed(double v) {
     Subsystems.drive.setModuleStates(new SwerveModuleState[] {
         new SwerveModuleState(v, Rotation2d.fromDegrees(-45)),

@@ -15,6 +15,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
+/**
+ * Improved version of {@link SwerveModuleState} that better optimises some
+ * cases
+ */
 public class OptimisedSwerveModuleState extends SwerveModuleState {
   protected boolean optimised_last_loop = false;
   protected int optimize_lockout = 0;

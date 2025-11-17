@@ -15,17 +15,15 @@ import frc.robot.constants.DriveConstants;
 public class TeleopProvider {
   private static Optional<TeleopProvider> inst = Optional.empty();
 
-  private final Command disableCommand = new InstantCommand();
+  private final Command disableCommand = new InstantCommand(() -> {
+  }, Subsystems.drive);
   private final Command teleopSwerve = new TeleopDriveSwerve(DriveConstants.PILOT_SETTINGS);
   private final Command teleopDemoSwerve = new TeleopDriveSwerve(DriveConstants.PILOT_DEMO_SETTINGS);
 
   private final SendableChooser<Command> chooser = new SendableChooser<>(); // pub for shuffle board
 
   private TeleopProvider() {
-    // disabled
-    disableCommand.addRequirements(Subsystems.drive);
     chooser.setDefaultOption("Disable Teleop", disableCommand);
-
     chooser.addOption("Swerve Teleop", teleopSwerve);
     chooser.addOption("Swerve Demo Teleop", teleopDemoSwerve);
 
@@ -35,6 +33,7 @@ public class TeleopProvider {
     SmartDashboard.putData("Teleop Chooser", chooser);
   }
 
+  /** @return the singleton instance of the provider */
   public static TeleopProvider getInstance() {
     if (!inst.isPresent()) {
       inst = Optional.of(new TeleopProvider());
@@ -42,6 +41,7 @@ public class TeleopProvider {
     return inst.get();
   }
 
+  /** @return the currently selected teleop command */
   public Command getSelected() {
     return chooser.getSelected();
   }

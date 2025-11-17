@@ -16,6 +16,11 @@ public class LateralSpeedAnalysis extends Command {
     addRequirements(Subsystems.drive);
   }
 
+  /**
+   * Sets the swerve to drive in a straight line
+   * 
+   * @param v The speed to drive at
+   */
   private void setSpeed(double v) {
     Subsystems.drive.setModuleStates(new SwerveModuleState[] {
         new SwerveModuleState(v, Rotation2d.kZero),

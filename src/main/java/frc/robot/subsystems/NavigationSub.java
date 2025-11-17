@@ -46,22 +46,15 @@ public class NavigationSub extends SubsystemBase {
     zeroHeading();
     initPathPlanner();
 
-    SmartDashboard.putData("Field", field);
-
     poseEstimator = new SwerveDrivePoseEstimator(
         DriveConstants.DRIVE_KINEMATICS,
         Rotation2d.fromDegrees(imu.getAngle()),
         Subsystems.drive.getModulePositions(),
         new Pose2d());
 
-    final var onRedAlliance = DriverStation.getAlliance()
-        .map(alliance -> alliance == Alliance.Red)
-        .orElse(false);
-    if (onRedAlliance) {
-      resetOdometry(new Pose2d(8, 4, Rotation2d.kZero));
-    } else {
-      resetOdometry(new Pose2d(8, 4, Rotation2d.k180deg));
-    }
+    resetOdometry(null);
+
+    SmartDashboard.putData("Field", field);
   }
 
   /**
@@ -152,29 +145,37 @@ public class NavigationSub extends SubsystemBase {
     return RobotBase.isReal() ? poseEstimator.getEstimatedPosition().plus(simError) : poseSim;
   }
 
+  /**
+   * Normalises odometry so that the robot's pose is within field bounds.
+   */
   public void normaliseOdometry() {
-    Translation2d poseCur = getPose().getTranslation();
-    Translation2d minloc = DriveConstants.FIELD_BOUNDS[0];
-    Translation2d maxloc = DriveConstants.FIELD_BOUNDS[1];
-    poseCur = new Translation2d(
-        Math.max(Math.min(poseCur.getX(), maxloc.getX()), minloc.getX()),
-        Math.max(Math.min(poseCur.getY(), maxloc.getY()), minloc.getY()));
-
-    poseEstimator.resetTranslation(poseCur);
+    Translation2d currentPose = getPose().getTranslation();
+    Translation2d minPose = DriveConstants.FIELD_BOUNDS[0];
+    Translation2d maxPose = DriveConstants.FIELD_BOUNDS[1];
+    currentPose = new Translation2d(
+        Math.max(Math.min(currentPose.getX(), maxPose.getX()), minPose.getX()),
+        Math.max(Math.min(currentPose.getY(), maxPose.getY()), minPose.getY()));
+    poseEstimator.resetTranslation(currentPose);
     if (Robot.isSimulation()) {
-      poseSim = new Pose2d(poseCur, poseSim.getRotation());
+      poseSim = new Pose2d(currentPose, poseSim.getRotation());
     }
   }
 
   /**
    * Resets the odometry to the specified pose.
    *
-   * @param pose The pose to which to set the odometry.
+   * @param pose The pose to which to set the odometry. If `null`, picks a default
+   *             pose depending on alliance color.
    */
   public void resetOdometry(Pose2d pose) {
+    // fun fact: PathPlanner can pass null when an auto includes no move command
     if (pose == null) {
-      pose = new Pose2d(0, 0, Rotation2d.kZero);
-    } // path planner can pass null when an auto includes no move command
+      final var onRedAlliance = DriverStation.getAlliance()
+          .map(alliance -> alliance == Alliance.Red)
+          .orElse(false);
+
+      pose = onRedAlliance ? new Pose2d(8, 4, Rotation2d.kZero) : new Pose2d(8, 4, Rotation2d.k180deg);
+    }
 
     if (RobotBase.isSimulation()) {
       simImuSetAngleYaw(pose.getRotation().getDegrees());
@@ -185,23 +186,24 @@ public class NavigationSub extends SubsystemBase {
     poseEstimator.resetPosition(Rotation2d.fromDegrees(imu.getAngle()), Subsystems.drive.getModulePositions(), pose);
   }
 
-  /** Zeroes the heading of the robot. */
+  /** Zeroes the IMU heading of the robot. */
   public void zeroHeading() {
     imu.reset();
   }
 
   /**
-   * @return the robot's heading (direction the robot is pointing field rel)
+   * @return the robot's field-relative heading according to the pose estimator
    */
   public Angle getHeading() {
     return Radians.of(poseEstimator.getEstimatedPosition().getRotation().getRadians());
   }
 
+  /** @return the robot's heading according to the IMU */
   public Angle getIMUHeading() {
     return Degrees.of(imu.getAngle());
   }
 
-  /** * @return the turn rate of the robot */
+  /** @return the turn rate of the robot */
   public AngularVelocity getTurnRate() {
     return DegreesPerSecond.of(imu.getRate());
   }

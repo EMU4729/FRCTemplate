@@ -189,6 +189,7 @@ public class DriveConstants {
        * module.
        */
       Rotation2d angularOffset,
+      /** Whether the drive motor is inverted or not */
       boolean invertDrive,
       /**
        * Location of module relative to robot center. Mainly for sim purposes.

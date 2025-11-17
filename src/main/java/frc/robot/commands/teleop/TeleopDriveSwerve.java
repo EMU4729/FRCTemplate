@@ -21,9 +21,8 @@ public class TeleopDriveSwerve extends Command {
 
   @Override
   public void execute() {
-    if (!DriverStation.isTeleop()) {
+    if (!DriverStation.isTeleop())
       return;
-    }
 
     double limiter = OI.pilot.getRightTriggerAxis();
     double booster = OI.pilot.getHID().getRightBumperButton() ? 1 : 0;
