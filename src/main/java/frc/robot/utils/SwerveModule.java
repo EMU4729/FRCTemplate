@@ -1,41 +1,54 @@
-// Originally from https://github.com/REVrobotics/MAXSwerve-Java-Template/blob/main/src/main/java/frc/robot/subsystems/MAXSwerveModule.java
-
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.utils;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-
-import java.util.Map;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
-import frc.robot.constants.SwerveDriveConstants;
-import frc.robot.constants.SwerveDriveConstants.S_MODULE_DETAILS;
-import frc.robot.shufflecontrol.ShuffleTabController;
-import frc.robot.utils.logger.Logger;
+import frc.robot.Subsystems;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.DriveConstants.SwerveModuleDetails;
 
-public class SwerveModule {
+public class SwerveModule implements Sendable {
+  private final SwerveModuleDetails details;
+
   private final TalonFX driveMotor;
   private final SparkMax turnMotor;
 
@@ -44,258 +57,267 @@ public class SwerveModule {
   private final VelocityVoltage driveController;
   private final SparkClosedLoopController turnController;
 
-  // private final int moduleId;
-  private final S_MODULE_DETAILS module_details;
-
-  private int lastLimit = 0;
-
-  private boolean isFlipped = false;
-
-  private Rotation2d angularOffset = new Rotation2d(0);
-  private SwerveModuleState desiredState = new SwerveModuleState(0.0, new Rotation2d());
-
-  private Logger logger;
-  private ShuffleTabController shuffleTab;
+  /** the module's desired state, <strong>relative to the module.</strong> */
+  private OptimisedSwerveModuleState desiredState = new OptimisedSwerveModuleState(0, new Rotation2d());
 
   /**
-   * Constructs a new SwerveModule for a MAX Swerve Module housing a Falcon
-   * driving motor and a Neo 550 Turning Motor.
+   * Constructs a new SwerveModule for a MAX Swerve Module housing a
+   * TalonFX-controlled
+   * driving motor and a SparkMax-controlled Turning Motor.
    * 
-   * @param drivingCANId  CAN ID for the driving motor
-   * @param turningCANId  CAN ID for the turning motor
-   * @param angularOffset Angular offset of the module in radians
-   * @param shuffleTab    The shuffleboard tab to add widgets to
+   * @param moduleDetails the details of the module
    */
-  public SwerveModule(S_MODULE_DETAILS module_details, ShuffleTabController shuffleTab) {
-    // moduleId = settings.CAN_ID_DRIVE;
-    this.module_details = module_details;
-    this.angularOffset = Rotation2d.fromRadians(module_details.ANGULAR_OFFSET);
+  public SwerveModule(SwerveModuleDetails moduleDetails) {
+    this.details = moduleDetails;
 
-    // --------------INIT--------------
-    // create loggger
-    logger = new Logger("swerve-" + module_details.CAN_ID_DRIVE,
-        new String[] { "Pos", "Vel", "Ang", "Ang Rate", "Target Vel", "Target Ang" });
-
-    // create shuffle tab
-    this.shuffleTab = shuffleTab;
-    shuffleTab
-        .createWidget("Drive " + module_details.CAN_ID_DRIVE, BuiltInWidgets.kNumberBar,
-            0 + (((module_details.CAN_ID_DRIVE - 1) % 2) * 3), 0 + (((module_details.CAN_ID_DRIVE - 1) / 2) * 2), 1, 2)
-        .withProperties(Map.of("Min", -10, "Max", 10));
-    shuffleTab
-        .createWidget("Turn " + module_details.CAN_ID_STEER, BuiltInWidgets.kGyro,
-            1 + (((module_details.CAN_ID_DRIVE - 1) % 2) * 3), 0 + (((module_details.CAN_ID_DRIVE - 1) / 2) * 2), 2, 2)
-        .withProperties(Map.of("Starting Angle",
-            this.angularOffset.unaryMinus().minus(Rotation2d.fromDegrees(270)).getDegrees() + 180));
-
-    // --------------DRIVE MOTOR--------------
-    driveMotor = new TalonFX(module_details.CAN_ID_DRIVE);
-    final var driveMotorConfig = new TalonFXConfiguration();
-    driveMotorConfig.MotorOutput.Inverted = SwerveDriveConstants.DRIVE_MOTOR_INVERTED;
+    // DRIVE MOTOR CONFIG
+    driveMotor = new TalonFX(moduleDetails.driveCANID());
+    TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
     driveMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    /* set the Gear Ratio used for encoder reads */
-    driveMotorConfig.Feedback.SensorToMechanismRatio = SwerveDriveConstants.DRIVE_GEAR_RATIO;
-    /* enable and set Current Limiting to prevent brownouts */
-    driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 40;
-    /* set the PID Config for the drive motor */
-    driveMotorConfig.Slot0.kP = SwerveDriveConstants.DRIVE_P;
-    driveMotorConfig.Slot0.kI = SwerveDriveConstants.DRIVE_I;
-    driveMotorConfig.Slot0.kD = SwerveDriveConstants.DRIVE_D;
-
+    driveMotorConfig.Feedback.SensorToMechanismRatio = DriveConstants.DRIVE_GEAR_RATIO;
+    driveMotorConfig.Slot0.kP = DriveConstants.DRIVE_P;
+    driveMotorConfig.Slot0.kI = DriveConstants.DRIVE_I;
+    driveMotorConfig.Slot0.kD = DriveConstants.DRIVE_D;
+    if (moduleDetails.invertDrive()) {
+      driveMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    }
     driveMotor.getConfigurator().apply(driveMotorConfig);
-    driveController = new VelocityVoltage(0).withSlot(0);
 
-    // --------------STEER MOTOR--------------
-    turnMotor = new SparkMax(module_details.CAN_ID_STEER, MotorType.kBrushless);
-    turnController = turnMotor.getClosedLoopController();
-    final var turnMotorConfig = new SparkMaxConfig();
+    driveController = new VelocityVoltage(0).withFeedForward(DriveConstants.DRIVING_FF).withSlot(0);
 
-    // Setup encoders and PID controllers for the driving and turning SPARKS MAX.
-    turnEncoder = turnMotor.getAbsoluteEncoder();
-
-    // Apply position and velocity conversion factors for the turning encoder. We
-    // want these in radians and radians per second to use with WPILib's swerve
-    // APIs.
-    turnMotorConfig.absoluteEncoder.positionConversionFactor(SwerveDriveConstants.TURNING_ENCODER_POSITION_FACTOR)
-        .velocityConversionFactor(SwerveDriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
-
-    // Set the PID gains for the turning motor and
-    // Enable PID wrap around for the turning motor. This will allow the PID
-    // controller to go through 0 to get to the setpoint
+    // TURNING MOTOR CONFIG
+    SparkMaxConfig turnMotorConfig = new SparkMaxConfig();
+    turnMotorConfig.absoluteEncoder
+        .positionConversionFactor(DriveConstants.TURNING_ENCODER_POSITION_FACTOR)
+        .velocityConversionFactor(DriveConstants.TURNING_ENCODER_VELOCITY_FACTOR);
     turnMotorConfig.closedLoop
-        .pidf(SwerveDriveConstants.TURNING_P, SwerveDriveConstants.TURNING_I, SwerveDriveConstants.TURNING_D,
-            SwerveDriveConstants.TURNING_FF)
+        .pidf(
+            DriveConstants.TURNING_P,
+            DriveConstants.TURNING_I,
+            DriveConstants.TURNING_D,
+            DriveConstants.TURNING_FF)
+        .iZone(DriveConstants.TURNING_I_ZONE.in(Radians))
         .positionWrappingEnabled(true)
-        .positionWrappingInputRange(SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
-            SwerveDriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT)
-        .outputRange(-1, 1)
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
+        .positionWrappingInputRange(DriveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
+            DriveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
+    turnMotorConfig.idleMode(IdleMode.kBrake);
 
-    // enable and set Current Limiting to prevent brownouts
-    turnMotorConfig.smartCurrentLimit(30).idleMode(IdleMode.kBrake);
-
-    // Save the SPARK MAX configurations (Brownout protection).
+    turnMotor = new SparkMax(moduleDetails.steerCANID(), MotorType.kBrushless);
     turnMotor.configure(turnMotorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    turnController = turnMotor.getClosedLoopController();
+    turnEncoder = turnMotor.getAbsoluteEncoder();
 
     // --------------GO TO DEFAULTS--------------
     desiredState.angle = new Rotation2d(turnEncoder.getPosition());
     driveMotor.setPosition(0);
   }
 
-  /**
-   * Returns the current raw state of the module.
-   *
-   * @return The current state of the module.
-   */
-  public SwerveModuleState getState() {
-    // Apply chassis angular offset to the encoder position to get the position
-    // relative to the chassis.
-    return new SwerveModuleState(
-        driveMotor.getVelocity().getValueAsDouble(),
-        getRotation2d(false));
+  /** @return the module's drive wheel position (m) */
+  public Distance getDrivePosition() {
+    if (Robot.isSimulation())
+      return Meters.of(-1);
+
+    return Meters.of(driveMotor.getPosition().getValue().in(Rotations) * DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
+  }
+
+  /** @return the module's drive wheel velocity (m/s) */
+  public LinearVelocity getDriveVelocity() {
+    if (Robot.isSimulation())
+      return MetersPerSecond.of(desiredState.speedMetersPerSecond);
+
+    return MetersPerSecond.of(
+        driveMotor.getVelocity().getValue().in(RotationsPerSecond) *
+            DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
   }
 
   /**
-   * Returns the current desired state of the module
    * 
-   * @return The current desired state of the module
+   * @param robotRelative angles returned rel to (True : the robot front CCW+,
+   *                      False : The current module)
+   * @return the angle of the module relative to either Module Frame or Robot
+   *         Frame
    */
-  public SwerveModuleState getDesiredState(boolean optimizedAngle, boolean moduleRel) {
-    SwerveModuleState state = optimizedAngle || !isFlipped ? desiredState
-        : new SwerveModuleState(-desiredState.speedMetersPerSecond, desiredState.angle);
-    state = moduleRel ? state
-        : new SwerveModuleState(state.speedMetersPerSecond,
-            state.angle.plus(Rotation2d.fromRadians(module_details.ANGULAR_OFFSET)));
-    return state;
+  public Angle getTurnAngle() {
+    if (Robot.isSimulation())
+      return desiredState.getAngle();
+
+    return Radians.of(turnEncoder.getPosition())
+        .minus(Radians.of(details.angularOffset().getRadians()));
   }
 
-  /**
-   * Returns the current position of the module.
-   *
-   * @return The current position of the module.
-   */
+  /** @return the module's turning angle as a {@link Rotation2d} */
+  public Rotation2d getTurnRotation2d() {
+    return new Rotation2d(getTurnAngle());
+  }
+
+  /** @return the module's turning velocity (rad/s) */
+  public AngularVelocity getTurnVelocity() {
+    return RadiansPerSecond.of(turnEncoder.getVelocity());
+  }
+
+  /** @return the module's current robot-relative position */
   public SwerveModulePosition getPosition() {
-    // Apply chassis angular offset to the encoder position to get the position
-    // relative to the chassis.
-    Rotation2d angle = getRotation2d(true).minus(angularOffset);
-    // if the wheel is flipped, flip the returned angle too
-    return new SwerveModulePosition(Math.abs(driveMotor.getPosition().getValueAsDouble()), angle);
+    return new SwerveModulePosition(getDrivePosition(), getTurnRotation2d());
   }
 
-  public Rotation2d getRotation2d(boolean optimizedAngle) {
-    // take care, get position only returns as rotations when a scale factor is not
-    // set
-    Rotation2d angle = Rotation2d.fromRadians(turnEncoder.getPosition());
-    if (Robot.isSimulation()) {
-      angle = desiredState.angle;
-    }
-    if (isFlipped)
-      angle = angle.minus(Rotation2d.fromDegrees(180));
-    return angle;
+  /** @return the module's current robot-relative state */
+  public OptimisedSwerveModuleState getState() {
+    return new OptimisedSwerveModuleState(getDriveVelocity(), getTurnAngle());
+  }
+
+  /** @return the module's current optimization status */
+  public boolean getIsOptimized() {
+    return desiredState.isOptimized();
   }
 
   /**
-   * Sets the desired state for the module.
-   *
-   * @param desiredState Desired state with speed and angle.
+   * @return the desired state of the module, relative to the
+   *         robot.
    */
-  public void setDesiredState(SwerveModuleState desiredState) {
-    // Apply chassis angular offset to the desired state.
-    SwerveModuleState correctedDesiredState = new SwerveModuleState(
+  public OptimisedSwerveModuleState getDesiredState() {
+    // we must convert to a robot-relative angle, since desiredState is relative to
+    // the module.
+    return new OptimisedSwerveModuleState(
         desiredState.speedMetersPerSecond,
-        desiredState.angle.minus(angularOffset));
-
-    // Optimize the reference state to avoid spinning further than 90 degrees.
-    SwerveModuleState optimizedDesiredState = /* SwerveModuleState. */optimize(
-        correctedDesiredState,
-        getRotation2d(false));
-
-    driveMotor.setControl(
-        driveController
-            .withVelocity(
-                // withVelocity accepts rps, not mps
-                optimizedDesiredState.speedMetersPerSecond / SwerveDriveConstants.WHEEL_CIRCUMFERENCE_METERS));// .withFeedForward(DriveConstants.DRIVING_FF));
-    turnController.setReference(
-        optimizedDesiredState.angle.getRadians() + Math.PI,
-        ControlType.kPosition);
-
-    this.desiredState = optimizedDesiredState;
-
-    logger.log(new double[] {
-        driveMotor.getPosition().getValueAsDouble(),
-        driveMotor.getVelocity().getValueAsDouble(),
-        getRotation2d(false).getDegrees(),
-        turnEncoder.getVelocity() * (180 / Math.PI),
-        desiredState.speedMetersPerSecond,
-        desiredState.angle.getDegrees()
-    });
+        desiredState.angle);
   }
 
-  // private static final double intertia = 45;
-  // TODO finish
-  /* Optimises wheel angle, using an inertia based system *//*
-                                                             * public SwerveModuleState optimize(SwerveModuleState
-                                                             * desiredState, Rotation2d currentAngle) {
-                                                             * var turnSpeed = 0;//Subsystems.swerveDrive.getTurnRate();
-                                                             * double threshold = 0;//90 + MathUtil.clamp(turnSpeed *
-                                                             * intertia, -80, 80);
-                                                             * 
-                                                             * var delta = desiredState.angle.minus(currentAngle);
-                                                             * if (delta.getDegrees() > threshold || delta.getDegrees()
-                                                             * < 180-threshold) {
-                                                             * isFlipped = true;
-                                                             * return new SwerveModuleState(
-                                                             * -desiredState.speedMetersPerSecond,
-                                                             * desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)
-                                                             * ));
-                                                             * } else {
-                                                             * isFlipped = false;
-                                                             * return new
-                                                             * SwerveModuleState(desiredState.speedMetersPerSecond,
-                                                             * desiredState.angle);
-                                                             * }
-                                                             * }
-                                                             */
-
-  /*
-   * Optimises the wheel pivot direction to reduce time spent turning
-   * uses a moving threshold to reduce flip-floping when near the 90deg point
+  /**
+   * sets the desired state of the module.
+   * 
+   * @param state the desired state, relative to the robot.
    */
-  public SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-    var delta = desiredState.angle.minus(currentAngle);
-    double error = Math.abs(delta.getDegrees());
-    int limit = lastLimit;
+  public void setDesiredState(SwerveModuleState state) {
+    setDesiredState(new OptimisedSwerveModuleState(state));
+  }
 
-    // optimizes by inverting the turn if the module is more than the limit
-    if (error < limit) {
-      lastLimit = error < 20 ? 90 : 135; // release only when near the target direction
-      isFlipped = true;
-      return new SwerveModuleState(
-          -desiredState.speedMetersPerSecond,
-          desiredState.angle.rotateBy(Rotation2d.fromDegrees(180.0)));
-    } else {
-      isFlipped = false;
-      lastLimit = error > 160 ? 90 : 45; // release only when near the inverted target direction
-      return new SwerveModuleState(desiredState.speedMetersPerSecond, desiredState.angle);
+  /**
+   * sets the desired state of the module.
+   * 
+   * @param state the desired state, relative to the robot.
+   */
+  public void setDesiredState(OptimisedSwerveModuleState state) {
+    // if the desired state's speed is low enough, and we are close enough to the
+    // target angle we can just stop the motors to prevent motor weirdness
+    if (Math.abs(state.speedMetersPerSecond) < 0.001) {
+      state.speedMetersPerSecond = 0;
+      if (Math.abs((state.angle.minus(getTurnRotation2d()).getRadians()) % 2 * Math.PI) < Math.PI / 16) { // ~11 degrees
+        desiredState = state;
+        stop();
+        return;
+      }
     }
+
+    state.optimize(
+        getTurnAngle(), getTurnVelocity(),
+        RadiansPerSecond.of(3), RadiansPerSecondPerSecond.of(24), // TODO wrong constants
+        desiredState);
+    desiredState = state;
+    applyState();
   }
 
-  /* Updates the shuffleboard tab with new values */
-  public void updateShuffleTab() {
-    var state = desiredState;
-
-    shuffleTab.getEntry("Turn " + module_details.CAN_ID_DRIVE).setDouble(state.angle.getDegrees());
-    shuffleTab.getEntry("Drive " + module_details.CAN_ID_DRIVE).setDouble(state.speedMetersPerSecond);
-  }
-
-  /** Zeroes the drive encoder. */
+  /** resets the drive encoder */
   public void resetEncoders() {
     driveMotor.setPosition(0);
   }
 
-  /** reset turn motor pid I accumulation to 0 */
-  public void resetIntegral() {
-    turnController.setIAccum(0);
+  /** stops both the drive and turning motors. */
+  public void stop() {
+    driveMotor.set(0);
+    turnMotor.set(0);
+  }
+
+  /** apply current desired state to drive motors */
+  private void applyState() {
+    driveMotor.setControl(
+        driveController.withVelocity(
+            desiredState.speedMetersPerSecond / DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters)));
+    turnController.setReference(
+        desiredState.angle.plus(details.angularOffset()).getRadians(),
+        ControlType.kPosition);
+  }
+
+  /** @return a command that tests several motions of the swerve module */
+  public SequentialCommandGroup testFunction() {
+    return new SequentialCommandGroup(
+        // turn to 0 degrees and check
+        new InstantCommand(
+            () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kZero))),
+        new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear((getTurnRotation2d().minus(Rotation2d.kZero)).getDegrees(), 0, 5))
+            .withTimeout(0.5),
+
+        // turn to 90 and check
+        new InstantCommand(
+            () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kCCW_90deg))),
+        new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear((getTurnRotation2d().minus(Rotation2d.kCCW_90deg)).getDegrees(), 0, 5))
+            .withTimeout(0.5),
+
+        // drive forwards and check
+        new InstantCommand(
+            () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(1), Rotation2d.kCCW_90deg))),
+        new WaitCommand(0.7),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear(getDriveVelocity().in(MetersPerSecond) - 1, 0, 5))
+            .withTimeout(0.5),
+
+        // drive backwards and check
+        new InstantCommand(
+            () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(-1), Rotation2d.kCCW_90deg))),
+        new WaitCommand(1),
+        new ConditionalCommand(
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kGreen)),
+            Subsystems.led.runPattern(LEDPattern.solid(Color.kRed)),
+            () -> MathUtil.isNear(getDriveVelocity().in(MetersPerSecond) - 1, 0, 5))
+            .withTimeout(0.5),
+
+        new InstantCommand(
+            () -> setDesiredState(new OptimisedSwerveModuleState(MetersPerSecond.of(0), Rotation2d.kZero)))
+
+    );
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.addDoubleProperty(
+        "Desired Turn Angle (deg)",
+        () -> getDesiredState().angle.getDegrees(),
+        (newValue) -> {
+        });
+    builder.addDoubleProperty(
+        "Desired Drive Speed (m/s)",
+        () -> getDesiredState().speedMetersPerSecond,
+        (newValue) -> {
+        });
+
+    builder.addDoubleProperty(
+        "Current Turn Angle (deg)",
+        () -> getTurnAngle().in(Degrees),
+        (newValue) -> {
+        });
+    builder.addDoubleProperty(
+        "Current Drive Distance (m)",
+        () -> this.getDrivePosition().in(Meters),
+        (newValue) -> {
+        });
+    builder.addDoubleProperty(
+        "Current Turn Speed (deg/s)",
+        () -> getTurnVelocity().in(DegreesPerSecond),
+        (newValue) -> {
+        });
+    builder.addDoubleProperty(
+        "Current Drive Speed (m/s)",
+        () -> this.getDriveVelocity().in(MetersPerSecond),
+        (newValue) -> {
+        });
   }
 }
