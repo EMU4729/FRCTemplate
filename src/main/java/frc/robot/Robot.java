@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.util.datalog.IntegerLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,11 +24,15 @@ public class Robot extends TimedRobot {
   private Command autoCommand;
   private RobotContainer robotContainer;
 
+  private int FrameIdx = 0;
+  private IntegerLogEntry LogFrameIdx = new IntegerLogEntry(DataLogManager.getLog(), "FrameIndex");
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
    */
   public Robot() {
+    DataLogManager.start(); //Starts logging to a plugged in usb stick
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
@@ -49,6 +55,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    
+    LogFrameIdx.append(FrameIdx); //dont remove, used for finding the start of a frame in the log file
+    FrameIdx++;
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
@@ -60,7 +69,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    System.out.println("--- DISABLED ---");
+    DataLogManager.log("--- DISABLED ---");
   }
 
   @Override
@@ -79,7 +88,7 @@ public class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.schedule();
     }
-    System.out.println("--- AUTO START ---");
+    DataLogManager.log("--- AUTO START ---");
     // Subsystems.drive.resetIntegral();
   }
 
@@ -97,7 +106,7 @@ public class Robot extends TimedRobot {
     if (autoCommand != null) {
       autoCommand.cancel();
     }
-    System.out.println("--- TELEOP START ---");
+    DataLogManager.log("--- TELEOP START ---");
   }
 
   /** This function is called periodically during operator control. */
@@ -109,7 +118,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    System.out.println("--- TEST START ---");
+    DataLogManager.log("--- TEST START ---");
     Subsystems.drive.testFunction().schedule();
   }
 

@@ -34,6 +34,10 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the button bindings
+    if(Robot.isSimulation()){
+      DriverStation.silenceJoystickConnectionWarning(true);
+    }
+
     configureButtonBindings();
     autoProvider = AutoProvider.getInstance();
     teleopProvider = TeleopProvider.getInstance();
@@ -58,7 +62,7 @@ public class RobotContainer {
 
     // --- Manual Controls ---
     OI.pilot.start()
-        .onTrue(new InstantCommand(Subsystems.nav::zeroHeading, Subsystems.drive));
+        .onTrue(new InstantCommand(Subsystems.nav::zeroDriveHeading, Subsystems.drive));
   }
 
   /**

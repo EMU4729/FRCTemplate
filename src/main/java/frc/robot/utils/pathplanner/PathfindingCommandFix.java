@@ -408,7 +408,6 @@ public class PathfindingCommandFix extends Command {
     }
 
     if (currentTrajectory != null) {
-      System.out.println(currentTrajectory.getTotalTimeSeconds());
       return timer.hasElapsed(currentTrajectory.getTotalTimeSeconds() - timeOffset);
     }
 

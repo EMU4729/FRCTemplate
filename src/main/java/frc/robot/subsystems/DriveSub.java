@@ -61,7 +61,7 @@ public class DriveSub extends SubsystemBase {
    */
   public void drive(ChassisSpeeds speeds, boolean fieldRelative, boolean accelerationLimit) {
     if (fieldRelative) { // convert field rel speeds to robot rel
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, new Rotation2d(Subsystems.nav.getIMUHeading()));
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, new Rotation2d(Subsystems.nav.getDriveHeading()));
     }
 
     if (accelerationLimit) {
@@ -74,6 +74,14 @@ public class DriveSub extends SubsystemBase {
 
     final var states = DriveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(speeds);
     setModuleStates(states);
+  }
+
+  private short logRateCounter = 0;
+  @Override
+  public void periodic() {    
+    if   (logRateCounter < 10) {logRateCounter++; return;} //log every 200ms
+    else                       {logRateCounter = 0;}
+    log();
   }
 
   /**
@@ -143,6 +151,22 @@ public class DriveSub extends SubsystemBase {
         frontRight.testFunction(),
         backLeft.testFunction(),
         backRight.testFunction());
+  }
+
+  private void log(){
+    frontLeft.log();
+    frontRight.log();
+    backLeft.log();
+    backRight.log();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    frontLeft.runSim();
+    frontRight.runSim();
+    backLeft.runSim();
+    backRight.runSim();
+    
   }
 
   public void setupSmartDash() {

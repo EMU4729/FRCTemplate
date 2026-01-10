@@ -8,6 +8,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+//import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -17,11 +18,15 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
+
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.ADIS16470_IMUSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.Subsystems;
 import frc.robot.utils.photon.PhotonBridge;
+import frc.robot.utils.photon.PhotonCameraPoseEstimator;
 import frc.robot.constants.DriveConstants;
 import frc.robot.utils.pathplanner.AutoBuilderFix;
 
@@ -38,12 +44,18 @@ public class NavigationSub extends SubsystemBase {
   private final ADIS16470_IMUSim imuSim = new ADIS16470_IMUSim(imu);
   private Pose2d poseSim = new Pose2d();
   public final PhotonBridge photon = new PhotonBridge();
-  private final double baseReadingError = 0.2;
-  private double allowedReadingError = baseReadingError;
   private final SwerveDrivePoseEstimator poseEstimator;
+  private Angle IMURawOffset = Radians.of(0);
+
+  private DataLog datalog = DataLogManager.getLog();
+  private DoubleLogEntry LogPoseX = new DoubleLogEntry(datalog, "Pose/X");
+  private DoubleLogEntry LogPoseY = new DoubleLogEntry(datalog, "Pose/Y");
+  private DoubleLogEntry LogPoseYaw = new DoubleLogEntry(datalog, "Pose/Yaw");
+  private DoubleLogEntry LogPoseDriveYaw = new DoubleLogEntry(datalog, "Pose/DriveYaw");
+
 
   public NavigationSub() {
-    zeroHeading();
+    zeroIMUHeading();
     initPathPlanner();
 
     poseEstimator = new SwerveDrivePoseEstimator(
@@ -93,9 +105,22 @@ public class NavigationSub extends SubsystemBase {
     }
   }
 
+  private short logRateCounter = 0;
   @Override
   public void periodic() {
     updateOdometry();
+    
+    if   (logRateCounter < 10) {logRateCounter++;} //log every 200ms
+    else                       {
+      logRateCounter = 0;
+    
+      
+      Pose2d pose = getPose();
+      LogPoseX.append(pose.getX());
+      LogPoseY.append(pose.getY());
+      LogPoseYaw.append(pose.getRotation().getRadians());
+      LogPoseDriveYaw.append(getDriveHeading().in(Radians));
+    }
   }
 
   /**
@@ -108,41 +133,27 @@ public class NavigationSub extends SubsystemBase {
 
     for (final var cam : photon.cams) {
       cam.getEstimatedPose()
-          .ifPresent((visionResult) -> {
-            // Reject any egregiously incorrect vision pose estimates
+          .ifPresentOrElse(
+            (visionResult) -> {
             final var visionPose = visionResult.estimatedPose.toPose2d();
-            SmartDashboard.putString("visionPose", visionPose.toString());
-            final var currentPose = getPose();
-            final var errorMeters = visionPose.getTranslation().getDistance(currentPose.getTranslation());
-            SmartDashboard.putNumber("visionErr", errorMeters);
-            SmartDashboard.putNumber("visionErrLim", allowedReadingError);
-            if (errorMeters > allowedReadingError) {
-              allowedReadingError *= 2;
-            } else {
-              allowedReadingError = baseReadingError;
-              poseEstimator.addVisionMeasurement(visionPose, visionResult.timestampSeconds);
-            }
+            poseEstimator.addVisionMeasurement(visionPose, visionResult.timestampSeconds);
+            PhotonCameraPoseEstimator.decreaseTollerance();
+          },
+          ()->{
+            PhotonCameraPoseEstimator.increaseTollerance();
           });
     }
-
+    
+    
     normaliseOdometry();
-
+    
     field.setRobotPose(getPose());
-
-    SmartDashboard.putString("pose", getPose().toString());
-    SmartDashboard.putNumber("IMU_ANGLE", getIMUHeading().in(Degrees));
-    // System.out.println(getIMUHeading());
   }
-
-  private Transform2d simError = new Transform2d();
 
   /** @return the currently estimated pose of the robot. */
   public Pose2d getPose() {
-    if (Robot.isSimulation())
-      simError.plus(new Transform2d((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2,
-          Rotation2d.fromDegrees((Math.random() - 0.5) * 10)));
 
-    return RobotBase.isReal() ? poseEstimator.getEstimatedPosition().plus(simError) : poseSim;
+    return poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -156,9 +167,6 @@ public class NavigationSub extends SubsystemBase {
         Math.max(Math.min(currentPose.getX(), maxPose.getX()), minPose.getX()),
         Math.max(Math.min(currentPose.getY(), maxPose.getY()), minPose.getY()));
     poseEstimator.resetTranslation(currentPose);
-    if (Robot.isSimulation()) {
-      poseSim = new Pose2d(currentPose, poseSim.getRotation());
-    }
   }
 
   /**
@@ -177,17 +185,28 @@ public class NavigationSub extends SubsystemBase {
       pose = onRedAlliance ? new Pose2d(8, 4, Rotation2d.kZero) : new Pose2d(8, 4, Rotation2d.k180deg);
     }
 
-    if (RobotBase.isSimulation()) {
+    if (Robot.isSimulation()){
+      simImuSetAngleYaw(pose.getRotation().getDegrees());
+    }
+
+    poseEstimator.resetPosition(Rotation2d.fromDegrees(imu.getAngle()), Subsystems.drive.getModulePositions(), pose);
+    
+    if (Robot.isSimulation()) {
       simImuSetAngleYaw(pose.getRotation().getDegrees());
       poseSim = pose;
       return;
     }
+    
+    IMURawOffset = Radians.of(pose.getRotation().getRadians()).minus(getIMUHeading());
+  }
 
-    poseEstimator.resetPosition(Rotation2d.fromDegrees(imu.getAngle()), Subsystems.drive.getModulePositions(), pose);
+  /** Zeroes the Drive heading of the robot returned by getDriveHeading to current angle. */
+  public void zeroDriveHeading() {
+    IMURawOffset = Radians.of(0).minus(getIMUHeading());
   }
 
   /** Zeroes the IMU heading of the robot. */
-  public void zeroHeading() {
+  public void zeroIMUHeading() {
     imu.reset();
   }
 
@@ -198,6 +217,11 @@ public class NavigationSub extends SubsystemBase {
     return Radians.of(poseEstimator.getEstimatedPosition().getRotation().getRadians());
   }
 
+  /** @return the robot's heading according to the IMU
+   * plus an offset set by reset Odometry to align it with pose estimator angle*/
+  public Angle getDriveHeading() {
+    return getIMUHeading().plus(IMURawOffset);
+  }
   /** @return the robot's heading according to the IMU */
   public Angle getIMUHeading() {
     return Degrees.of(imu.getAngle());
@@ -252,13 +276,10 @@ public class NavigationSub extends SubsystemBase {
   public void simulationPeriodic() {
     final var speeds = getDesiredChassisSpeeds();
 
-    SmartDashboard.putNumber("simImuAngle", field.getRobotPose().getRotation().getDegrees());
-    SmartDashboard.putNumber("simImuRate", Math.toDegrees(speeds.omegaRadiansPerSecond));
-
     simImuSetRateYaw(Math.toDegrees(speeds.omegaRadiansPerSecond));
     // imuSim.setGyroAngleZ(getHeading().plus(Rotation2d.fromRadians(speeds.omegaRadiansPerSecond
     // * 0.02)).getDegrees());
-    simImuSetAngleYaw(field.getRobotPose().getRotation().getDegrees());
+    simImuSetAngleYaw(poseSim.getRotation().getDegrees());
 
     Translation2d pos = field.getRobotObject().getPose().getTranslation();
     Translation2d tmpPos = pos.minus(simulationPeriodicLastRobotLocal);
@@ -272,8 +293,14 @@ public class NavigationSub extends SubsystemBase {
             speeds.vxMetersPerSecond * 0.02,
             speeds.vyMetersPerSecond * 0.02,
             speeds.omegaRadiansPerSecond * 0.02));
+    Translation2d minPose = DriveConstants.FIELD_BOUNDS[0];
+    Translation2d maxPose = DriveConstants.FIELD_BOUNDS[1];
+    poseSim = new Pose2d(new Translation2d(
+        Math.max(Math.min(poseSim.getX(), maxPose.getX()), minPose.getX()),
+        Math.max(Math.min(poseSim.getY(), maxPose.getY()), minPose.getY())),
+        poseSim.getRotation());
 
-    photon.simulationPeriodic(getPose());
+    photon.simulationPeriodic(poseSim);
   }
 
   private void simImuSetAngleYaw(double angle) {

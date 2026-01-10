@@ -33,8 +33,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -46,7 +51,7 @@ import frc.robot.Subsystems;
 import frc.robot.constants.DriveConstants;
 import frc.robot.constants.DriveConstants.SwerveModuleDetails;
 
-public class SwerveModule implements Sendable {
+public class SwerveModule {
   private final SwerveModuleDetails details;
 
   private final TalonFX driveMotor;
@@ -59,6 +64,17 @@ public class SwerveModule implements Sendable {
 
   /** the module's desired state, <strong>relative to the module.</strong> */
   private OptimisedSwerveModuleState desiredState = new OptimisedSwerveModuleState(0, new Rotation2d());
+
+  private Distance simPose = Meters.of(0);
+  private LinearVelocity simVelocity = MetersPerSecond.of(0);
+  private Angle simAngle= Radians.of(0);
+  private AngularVelocity simAngularRate = RadiansPerSecond.of(0);
+
+  DoubleLogEntry logVTarg;
+  DoubleLogEntry logVTrue;
+  DoubleLogEntry logATarg;
+  DoubleLogEntry logATrue;
+  BooleanLogEntry logOptimised;
 
   /**
    * Constructs a new SwerveModule for a MAX Swerve Module housing a
@@ -110,12 +126,21 @@ public class SwerveModule implements Sendable {
     // --------------GO TO DEFAULTS--------------
     desiredState.angle = new Rotation2d(turnEncoder.getPosition());
     driveMotor.setPosition(0);
+
+
+
+    DataLog datalog = DataLogManager.getLog();
+    logVTarg = new DoubleLogEntry(datalog, "SwerveModule/".concat(details.name().concat("/VTarget")));
+    logVTrue = new DoubleLogEntry(datalog, "SwerveModule/".concat(details.name().concat("/VActual")));
+    logATarg = new DoubleLogEntry(datalog, "SwerveModule/".concat(details.name().concat("/AngleTarget")));
+    logATrue = new DoubleLogEntry(datalog, "SwerveModule/".concat(details.name().concat("/AngleActual")));
+    logOptimised = new BooleanLogEntry(datalog, "SwerveModule/".concat(details.name().concat("/Optimisation")));
   }
 
   /** @return the module's drive wheel position (m) */
   public Distance getDrivePosition() {
     if (Robot.isSimulation())
-      return Meters.of(-1);
+      return simPose;
 
     return Meters.of(driveMotor.getPosition().getValue().in(Rotations) * DriveConstants.WHEEL_CIRCUMFERENCE.in(Meters));
   }
@@ -123,7 +148,7 @@ public class SwerveModule implements Sendable {
   /** @return the module's drive wheel velocity (m/s) */
   public LinearVelocity getDriveVelocity() {
     if (Robot.isSimulation())
-      return MetersPerSecond.of(desiredState.speedMetersPerSecond);
+      return simVelocity;
 
     return MetersPerSecond.of(
         driveMotor.getVelocity().getValue().in(RotationsPerSecond) *
@@ -138,10 +163,13 @@ public class SwerveModule implements Sendable {
    *         Frame
    */
   public Angle getTurnAngle() {
+    double angle;
     if (Robot.isSimulation())
-      return desiredState.getAngle();
+      angle = simAngle.in(Radians);
+    else
+      angle = turnEncoder.getPosition();
 
-    return Radians.of(turnEncoder.getPosition())
+    return Radians.of(angle)
         .minus(Radians.of(details.angularOffset().getRadians()));
   }
 
@@ -152,6 +180,9 @@ public class SwerveModule implements Sendable {
 
   /** @return the module's turning velocity (rad/s) */
   public AngularVelocity getTurnVelocity() {
+    if ( Robot.isSimulation() ){
+      return simAngularRate;
+    }
     return RadiansPerSecond.of(turnEncoder.getVelocity());
   }
 
@@ -237,6 +268,23 @@ public class SwerveModule implements Sendable {
         ControlType.kPosition);
   }
 
+  public void runSim(){
+    double degreesStep = 360;
+    Angle targetAngle = Radians.of(desiredState.angle.plus(details.angularOffset()).getRadians());
+    double angleDiff = targetAngle.minus(simAngle).in(Radians);
+    angleDiff = angleDiff % (2 * Math.PI);
+    angleDiff = (angleDiff < -Math.PI ? 2 * Math.PI + angleDiff : (angleDiff > Math.PI ? -2 * Math.PI + angleDiff : angleDiff));
+
+    simAngularRate = angleDiff > 0 ? DegreesPerSecond.of(degreesStep) : DegreesPerSecond.of(-degreesStep);
+    if (Math.abs(angleDiff) <= Math.abs(simAngularRate.in(RadiansPerSecond)/50)){
+      simAngle = Radians.of(desiredState.angle.plus(details.angularOffset()).getRadians());
+    } else {
+      simAngle = simAngle.plus(Radians.of(simAngularRate.in(RadiansPerSecond)/50));
+    }
+    simVelocity = desiredState.getSpeed();
+    simPose = simPose.plus(Meters.of(simVelocity.in(MetersPerSecond)/50));
+  }
+
   /** @return a command that tests several motions of the swerve module */
   public SequentialCommandGroup testFunction() {
     return new SequentialCommandGroup(
@@ -286,38 +334,11 @@ public class SwerveModule implements Sendable {
     );
   }
 
-  @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.addDoubleProperty(
-        "Desired Turn Angle (deg)",
-        () -> getDesiredState().angle.getDegrees(),
-        (newValue) -> {
-        });
-    builder.addDoubleProperty(
-        "Desired Drive Speed (m/s)",
-        () -> getDesiredState().speedMetersPerSecond,
-        (newValue) -> {
-        });
-
-    builder.addDoubleProperty(
-        "Current Turn Angle (deg)",
-        () -> getTurnAngle().in(Degrees),
-        (newValue) -> {
-        });
-    builder.addDoubleProperty(
-        "Current Drive Distance (m)",
-        () -> this.getDrivePosition().in(Meters),
-        (newValue) -> {
-        });
-    builder.addDoubleProperty(
-        "Current Turn Speed (deg/s)",
-        () -> getTurnVelocity().in(DegreesPerSecond),
-        (newValue) -> {
-        });
-    builder.addDoubleProperty(
-        "Current Drive Speed (m/s)",
-        () -> this.getDriveVelocity().in(MetersPerSecond),
-        (newValue) -> {
-        });
+  public void log(){
+    logVTarg.append(desiredState.getSpeed().in(MetersPerSecond));
+    logVTrue.append(getDriveVelocity().in(MetersPerSecond));
+    logATarg.append(desiredState.getAngle().in(Radians));
+    logATrue.append(getTurnAngle().in(Radians));
+    logOptimised.append(desiredState.isOptimized());
   }
 }
