@@ -130,22 +130,17 @@ public class NavigationSub extends SubsystemBase {
    */
   private void updateOdometry() {
     poseEstimator.update(Rotation2d.fromDegrees(imu.getAngle()), Subsystems.drive.getModulePositions());
-
     for (final var cam : photon.cams) {
       cam.getEstimatedPose()
-          .ifPresentOrElse(
+          .ifPresent(
             (visionResult) -> {
             final var visionPose = visionResult.estimatedPose.toPose2d();
             poseEstimator.addVisionMeasurement(visionPose, visionResult.timestampSeconds);
-            PhotonCameraPoseEstimator.decreaseTollerance();
-          },
-          ()->{
-            PhotonCameraPoseEstimator.increaseTollerance();
           });
     }
     
     
-    normaliseOdometry();
+    //normaliseOdometry(); //broken
     
     field.setRobotPose(getPose());
   }
@@ -153,20 +148,20 @@ public class NavigationSub extends SubsystemBase {
   /** @return the currently estimated pose of the robot. */
   public Pose2d getPose() {
 
-    return poseEstimator.getEstimatedPosition();
+    return normaliseOdometry(poseEstimator.getEstimatedPosition());
   }
 
   /**
    * Normalises odometry so that the robot's pose is within field bounds.
    */
-  public void normaliseOdometry() {
-    Translation2d currentPose = getPose().getTranslation();
+  public Pose2d normaliseOdometry(Pose2d pose) {
+    Translation2d currentLoc = pose.getTranslation();
     Translation2d minPose = DriveConstants.FIELD_BOUNDS[0];
     Translation2d maxPose = DriveConstants.FIELD_BOUNDS[1];
-    currentPose = new Translation2d(
-        Math.max(Math.min(currentPose.getX(), maxPose.getX()), minPose.getX()),
-        Math.max(Math.min(currentPose.getY(), maxPose.getY()), minPose.getY()));
-    poseEstimator.resetTranslation(currentPose);
+    currentLoc = new Translation2d(
+        Math.max(Math.min(currentLoc.getX(), maxPose.getX()), minPose.getX()),
+        Math.max(Math.min(currentLoc.getY(), maxPose.getY()), minPose.getY()));
+    return new Pose2d(currentLoc, pose.getRotation());
   }
 
   /**
@@ -182,7 +177,7 @@ public class NavigationSub extends SubsystemBase {
           .map(alliance -> alliance == Alliance.Red)
           .orElse(false);
 
-      pose = onRedAlliance ? new Pose2d(8, 4, Rotation2d.kZero) : new Pose2d(8, 4, Rotation2d.k180deg);
+      pose = onRedAlliance ? new Pose2d(1, 4, Rotation2d.kZero) : new Pose2d(15, 4, Rotation2d.k180deg);
     }
 
     if (Robot.isSimulation()){
@@ -261,17 +256,15 @@ public class NavigationSub extends SubsystemBase {
     return Math.hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
   }
 
-  /**
-   * @return the current translational speed of the robot (angle irrelevant) (m/s)
-   */
-  public double getTranslationAngle() {
-    final var speeds = getChassisSpeeds();
-    return Math.atan2(speeds.vyMetersPerSecond, speeds.vxMetersPerSecond);
+  public void drawFieldObject(String key, Pose2d position, boolean robotRelative){
+    if (robotRelative){
+      position = getPose().plus(new Transform2d(position.getTranslation(), position.getRotation()));
+    }
+    field.getObject(key).setPose(position);
   }
 
   Translation2d simulationPeriodicLastRobotLocal = new Translation2d();
   double simulationPeriodicLastVel = 0;
-
   @Override
   public void simulationPeriodic() {
     final var speeds = getDesiredChassisSpeeds();

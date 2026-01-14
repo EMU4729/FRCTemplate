@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.Radians;
 
 import java.util.Optional;
 
-import javax.tools.StandardJavaFileManager.PathFactory;
-
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -87,7 +85,19 @@ public class PhotonCameraPoseEstimator {
    * @return the new currently estimated pose
    */
   public Optional<EstimatedRobotPose> getEstimatedPose() {
-    return filter(log(getLatestResult().flatMap(poseEstimator::update)));
+    Optional<PhotonPipelineResult> latestResult = getLatestResult();
+
+    if (latestResult.isEmpty()) return Optional.empty();
+    
+    Optional<EstimatedRobotPose> res = filter(log(latestResult.flatMap(poseEstimator::update)));
+    if (res.isEmpty()){increaseTollerance();}
+    else {decreaseTollerance();}
+
+    return res;
+  }
+
+  public double getDistanceTol(){
+    return distanceTol;
   }
 
   private boolean wasConnected = true;
@@ -130,7 +140,7 @@ public class PhotonCameraPoseEstimator {
     double heightError = pose.estimatedPose.getZ();
 
     if ( distanceError > distanceTol) {
-      LogFiltered.append("Distance"); 
+      LogFiltered.append("Distance");
       return Optional.empty();
     }
     if ( Math.abs(heightError) > heightTol) {
@@ -162,8 +172,8 @@ public class PhotonCameraPoseEstimator {
     
   }
   public static void decreaseTollerance(){
-    distanceTol = Math.max(distanceTol-distanceTolStep, distanceTolBase);
-    heightTol   = Math.max(heightTol-heightTolStep, heightTolBase);
+    distanceTol = Math.max(distanceTol-5*distanceTolStep, distanceTolBase);
+    heightTol   = Math.max(heightTol-5*heightTolStep, heightTolBase);
 
   }
 
